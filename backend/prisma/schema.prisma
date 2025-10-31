@@ -1,0 +1,63 @@
+// Prisma schema for PocketSomm backend
+// This schema defines the database models for users, sessions, and preferences
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // Use connection pooling with PgBouncer for Neon
+  // Ensure DATABASE_URL includes ?pgbouncer=true&connection_limit=5
+}
+
+model User {
+  id                    String   @id @default(uuid())
+  email                 String   @unique
+  passwordHash          String   @map("password_hash")
+  role                  String   @default("user")
+  isEmailVerified       Boolean  @default(false) @map("is_email_verified")
+  emailVerificationToken String? @map("email_verification_token")
+  createdAt             DateTime @default(now()) @map("created_at")
+  lastLogin             DateTime? @map("last_login")
+  
+  // Relations
+  sessions              Session[]
+  preferences           UserPreference?
+  
+  @@map("users")
+  @@index([email])
+}
+
+model Session {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  refreshTokenHash  String   @map("refresh_token_hash")
+  device            String?
+  ip                String?
+  expiresAt         DateTime @map("expires_at")
+  revokedAt         DateTime? @map("revoked_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  lastUsed          DateTime @default(now()) @map("last_used")
+  
+  // Relations
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("sessions")
+  @@index([userId])
+  @@index([refreshTokenHash])
+  @@index([expiresAt])
+}
+
+model UserPreference {
+  userId    String   @id @map("user_id")
+  dataJson  Json     @map("data_json")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_preferences")
+}
+

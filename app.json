@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "PocketSomm",
+    "slug": "pocketsomm",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pocketsomm.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false,
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSExceptionMinimumTLSVersion": "TLSv1.0",
+              "NSExceptionRequiresForwardSecrecy": false
+            }
+          }
+        },
+        "NSCameraUsageDescription": "This app uses the camera to take photos of menus for wine recommendations.",
+        "NSPhotoLibraryUsageDescription": "This app accesses your photo library to select menu images for wine recommendations."
+      }
+    },
+    "android": {
+      "package": "com.pocketsomm.app",
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "usesCleartextTraffic": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "build": {
+        "babel": {
+          "include": ["@babel/plugin-proposal-export-namespace-from"]
+        }
+      }
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-image-picker"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
+    },
+    "scheme": "pocketsomm",
+    "privacy": "public",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  }
+}

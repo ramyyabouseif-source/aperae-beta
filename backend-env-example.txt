@@ -1,0 +1,30 @@
+# PocketSomm Backend Environment Variables
+# Copy this file to backend/.env and fill in your actual values
+
+# JWT Secrets (REQUIRED - Generate secure random strings)
+# Use: openssl rand -base64 32
+JWT_SECRET=your-secure-jwt-secret-here-minimum-32-characters
+REFRESH_SECRET=your-secure-refresh-secret-here-minimum-32-characters
+
+# Server Configuration
+PORT=3001
+NODE_ENV=development
+
+# API Keys (Optional - for external services)
+OPENAI_API_KEY=your-openai-api-key-here
+
+# Database Configuration (if using database)
+# DATABASE_URL=postgresql://user:password@localhost:5432/pocketsomm
+
+# Security Settings
+CORS_ORIGIN=http://localhost:8081
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Cache Settings
+CACHE_TTL_SECONDS=3600
+CACHE_MAX_SIZE=1000
+
+
+
+

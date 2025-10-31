@@ -1,0 +1,49 @@
+﻿[
+  {
+    "dish": "Ribeye Steak with Creamed Spinach",
+    "recommendations": [
+      {
+        "wineName": "Château Léoville Barton",
+        "producer": "Léoville Barton",
+        "vintage": "2016",
+        "pricePoint": "$145",
+        "rationale": "The ribeye's marbling and char demand a structured Bordeaux with balance between tannins and freshness. This wine's power complements the richness while its acidity cuts through the fat.",
+        "tastingNotes": "Aromas of cassis, cedar, and graphite. On the palate, concentrated dark fruits, firm tannins, and a long, savory finish with tobacco and spice.",
+        "servingGuidance": "Serve at 60–62°F in a Bordeaux glass to allow full aeration.",
+        "confidenceScore": 98,
+        "expertRating": "97 (Wine Spectator)",
+        "retailerSuggestion": "Berry Bros. & Rudd (UK), Wine.com (US)",
+        "image": "https://example.com/leoville-barton-2016.jpg",
+        "storytellingElements": "Léoville Barton, a historic 1855 Second Growth, embodies Saint-Julien's elegance and power. This vintage reflects the estate's centuries of winemaking, perfect for celebratory steak dinners."
+      },
+      {
+        "wineName": "Ridge Vineyards 'Lytton Springs'",
+        "producer": "Ridge Vineyards",
+        "vintage": "2019",
+        "pricePoint": "$59",
+        "rationale": "Zinfandel's fruit-forward energy and subtle spice balance the ribeye's boldness while adding an approachable, distinctly Californian twist.",
+        "tastingNotes": "Ripe blackberry, raspberry compote, and black pepper. Medium-plus body with lively acidity, framed by supple tannins and a lingering finish.",
+        "servingGuidance": "Serve slightly cooler than room temperature (58–60°F) in a universal red wine glass.",
+        "confidenceScore": 95,
+        "expertRating": "94 (Wine Spectator)",
+        "retailerSuggestion": "K&L Wines, Total Wine & More",
+        "image": "https://example.com/ridge-lytton-2019.jpg",
+        "storytellingElements": "Ridge has championed old-vine Zinfandel since the 1960s. Lytton Springs comes from gnarly 100-year-old vines, offering a piece of California history in every bottle."
+      },
+      {
+        "wineName": "Catena Zapata 'Catena Alta'",
+        "producer": "Catena Zapata",
+        "vintage": "2020",
+        "pricePoint": "$40",
+        "rationale": "Malbec's plush fruit and smoky undertones harmonize with grilled ribeye, bringing balance between dark fruit and char.",
+        "tastingNotes": "Notes of plum, violet, and cocoa. Juicy mid-palate with soft tannins, finishing with spice and mineral lift from high-altitude vineyards.",
+        "servingGuidance": "Serve at 60°F in a Malbec or Bordeaux-style glass.",
+        "confidenceScore": 92,
+        "expertRating": "93 (James Suckling)",
+        "retailerSuggestion": "Wine.com, Vivino Marketplace",
+        "image": "https://example.com/catena-alta-2020.jpg",
+        "storytellingElements": "The Catena family revolutionized Argentine winemaking through high-altitude viticulture, producing wines of remarkable purity and energy."
+      }
+    ]
+  }
+]

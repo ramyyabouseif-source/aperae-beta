@@ -73,14 +73,30 @@ Fill in these exact values:
 | **Branch** | `main` |
 | **Root Directory** | `backend` |
 | **Runtime** | `Docker` |
-| **Dockerfile Path** | `backend/Dockerfile` |
-| **Docker Context** | `backend` |
+
+**Important Notes:**
+- When you select **"Docker"** as Runtime, Render will automatically detect the `Dockerfile` in the Root Directory (`backend`)
+- You don't need separate fields for "Dockerfile Path" or "Docker Context" - Render handles this automatically
+- The Root Directory (`backend`) tells Render where to find the Dockerfile
 
 ### **2.5 Build & Deploy Settings**
 
-- **Build Command:** (Leave EMPTY)
-- **Start Command:** (Leave EMPTY)
+**For Docker deployments, use these values:**
+
+- **Build Command:** Leave as default (Render will use `docker build` automatically)
+  - If field is required and won't accept empty, use: `docker build -t app .`
+  - But typically, leaving it empty/default is fine for Docker
+  
+- **Start Command:** Leave as default (Dockerfile CMD will be used)
+  - If field is required and won't accept empty, use: `node server.js`
+  - But typically, leaving it empty/default is fine since Dockerfile has `CMD ["node", "server.js"]`
+  
 - **Plan:** Select **"Free"** (same as production)
+
+**Note:** If Render's UI requires values in Build/Start Command fields:
+- **Build Command:** `docker build -t app .` (or leave default if available)
+- **Start Command:** `node server.js` (or leave default if available)
+- Render will use the Dockerfile's CMD instruction, so these are fallbacks
 
 ### **2.6 Create Service**
 

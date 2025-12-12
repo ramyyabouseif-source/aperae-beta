@@ -267,19 +267,44 @@
 
 ---
 
+#### **15. Enhanced Menu Prompt for Restaurant Pairing Assistant** - NOT STARTED
+**Purpose:** Implement enhanced menu prompt similar to V7.0 Master Sommelier Prompt for restaurant menu analysis
+
+**Required Components:**
+1. Enhanced menu prompt structure (similar to V7.0 modular approach)
+2. Static/dynamic section separation for prompt caching
+3. Character/word limits for optimization
+4. Menu-specific pairing principles and validation
+5. Enhanced accuracy requirements for menu wine recommendations
+6. Integration with existing menu OCR functionality
+
+**Files to Create/Modify:**
+- `backend/prompts/enhanced-menu-prompt.js` (new)
+- `backend/prompts/enhanced-menu-static-sections.js` (new)
+- `backend/prompts/enhanced-menu-dynamic-sections.js` (new)
+- `backend/services/enhancedMenuPromptService.js` (new)
+- `backend/server.js` (update menu OCR endpoint)
+- Update existing `MENU_SOMMELIER_PROMPT` usage
+
+**Estimated Time:** 4-6 hours
+
+**Dependencies:** Requires Reverse Pairing System to be complete (or at least menu OCR endpoint working)
+
+---
+
 ### **🔵 Phase 6: Production Deployment** (FINAL PHASE)
 
-#### **15. Security Audit** - NOT STARTED
+#### **16. Security Audit** - NOT STARTED
 **Estimated Time:** 4-8 hours
 
 ---
 
-#### **16. Load Testing** - NOT STARTED
+#### **17. Load Testing** - NOT STARTED
 **Estimated Time:** 2-4 hours
 
 ---
 
-#### **17. Production Deployment (Final Step)** - NOT STARTED
+#### **18. Production Deployment (Final Step)** - NOT STARTED
 **Dependencies:**
 - ✅ Domain setup complete
 - ⏳ Session storage fix (CRITICAL)
@@ -299,10 +324,10 @@
 | **Phase 2.5: Critical Blockers** | 🟡 Partial | 50% (1/2) |
 | **Phase 3: Infrastructure** | 🟡 Partial | 60% (1.2/4) |
 | **Phase 4: UX Enhancements** | ⏳ Not Started | 0% (0/2) |
-| **Phase 5: Reverse Pairing** | ⏳ Not Started | 0% (0/7) |
+| **Phase 5: Reverse Pairing** | ⏳ Not Started | 0% (0/8) |
 | **Phase 6: Production** | ⏳ Not Started | 0% (0/3) |
 
-**Overall Progress:** ~35% Complete (10.2/29 tasks)
+**Overall Progress:** ~32% Complete (10.2/30 tasks)
 
 ---
 
@@ -333,10 +358,13 @@
 7. 🟢 **Reverse Pairing System** (18-25 hours total)
    - Full wine-to-dish feature
 
+8. 🟢 **Enhanced Menu Prompt** (4-6 hours)
+   - Enhanced prompt for restaurant pairing assistant
+
 ### **Before Production Launch:**
-8. 🔴 **Security Audit** (4-8 hours)
-9. 🔴 **Load Testing** (2-4 hours)
-10. 🔴 **Production Deployment** (4-6 hours) - FINAL STEP
+9. 🔴 **Security Audit** (4-8 hours)
+10. 🔴 **Load Testing** (2-4 hours)
+11. 🔴 **Production Deployment** (4-6 hours) - FINAL STEP
 
 ---
 
@@ -359,9 +387,10 @@
 - Validation Layer: 4-6 hours
 - My Cellar: 3-4 hours
 - Reverse Pairing: 18-25 hours
-- **Total Medium Priority: ~25-35 hours (3-4 days)**
+- Enhanced Menu Prompt: 4-6 hours
+- **Total Medium Priority: ~29-41 hours (3.5-5 days)**
 
-**Total Remaining Work: ~6-8 days**
+**Total Remaining Work: ~6.5-8.5 days**
 
 ---
 

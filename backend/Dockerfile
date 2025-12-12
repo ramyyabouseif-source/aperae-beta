@@ -4,12 +4,10 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies including OpenSSL for Prisma
+# Install system dependencies
 RUN apk add --no-cache \
     curl \
-    dumb-init \
-    openssl1.1-compat \
-    libc6-compat
+    dumb-init
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -48,7 +46,6 @@ ENTRYPOINT ["dumb-init", "--"]
 
 # Start the application
 CMD ["node", "server.js"]
-
 
 
 

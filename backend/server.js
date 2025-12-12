@@ -1945,6 +1945,14 @@ app.post('/api/recommendations',
         // Check for V7.0 prompt first (highest priority)
         useV7PromptFlag = isFeatureEnabled('ENABLE_V7_PROMPT');
         
+        // Diagnostic logging
+        logger.info('Prompt selection diagnostic', {
+          requestId,
+          ENABLE_V7_PROMPT_raw: process.env.ENABLE_V7_PROMPT,
+          useV7PromptFlag,
+          isFeatureEnabled_result: isFeatureEnabled('ENABLE_V7_PROMPT')
+        });
+        
         if (useV7PromptFlag) {
           // Use V7.0 Master Sommelier Prompt with caching support
           // We'll handle the caching setup in the API call below

@@ -3,6 +3,8 @@
  * Handles user consent, data collection, and privacy preferences
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export interface PrivacyConsent {
   analytics: boolean;
   personalization: boolean;
@@ -69,6 +71,13 @@ class PrivacyManager {
         isShared: false,
       },
       {
+        dataType: 'wine_recommendations',
+        purpose: 'Track wine recommendations for analysis and improvement',
+        retentionPeriod: 365,
+        isRequired: true,
+        isShared: false,
+      },
+      {
         dataType: 'usage_analytics',
         purpose: 'Improve app performance and user experience',
         retentionPeriod: 90,
@@ -97,14 +106,17 @@ class PrivacyManager {
    */
   private async loadPrivacySettings(): Promise<void> {
     try {
-      // In a real implementation, this would use AsyncStorage
-      // const stored = await AsyncStorage.getItem(this.STORAGE_KEY);
-      // if (stored) {
-      //   this.privacySettings = JSON.parse(stored);
-      // }
-      
-      // For now, initialize with defaults
-      this.privacySettings = this.initializeDefaultSettings();
+      const stored = await AsyncStorage.getItem(this.STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // Convert date strings back to Date objects
+        parsed.consent.timestamp = new Date(parsed.consent.timestamp);
+        parsed.lastUpdated = new Date(parsed.lastUpdated);
+        this.privacySettings = parsed;
+      } else {
+        // Initialize with defaults if no stored settings
+        this.privacySettings = this.initializeDefaultSettings();
+      }
     } catch (error) {
       console.error('Failed to load privacy settings:', error);
       this.privacySettings = this.initializeDefaultSettings();
@@ -118,18 +130,21 @@ class PrivacyManager {
     if (!this.privacySettings) return;
 
     try {
-      // In a real implementation, this would use AsyncStorage
-      // await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.privacySettings));
+      await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.privacySettings));
       console.log('Privacy settings saved:', this.privacySettings);
     } catch (error) {
       console.error('Failed to save privacy settings:', error);
+      throw error;
     }
   }
 
   /**
-   * Gets current privacy settings
+   * Gets current privacy settings (async to ensure settings are loaded)
    */
-  getPrivacySettings(): PrivacySettings | null {
+  async getPrivacySettings(): Promise<PrivacySettings | null> {
+    if (!this.privacySettings) {
+      await this.loadPrivacySettings();
+    }
     return this.privacySettings;
   }
 
@@ -172,6 +187,10 @@ class PrivacyManager {
 
     // Check specific consent based on data type
     switch (dataType) {
+      case 'wine_preferences':
+      case 'wine_recommendations':
+        // Wine-related data uses personalization consent, but is required
+        return true; // Required data is always allowed
       case 'usage_analytics':
         return this.privacySettings.consent.analytics;
       case 'personalization_data':
@@ -295,12 +314,14 @@ PRIVACY POLICY - PocketSomm
 
 Data Collection:
 - Wine Preferences: Required for personalized recommendations
+- Wine Recommendations: Required for analysis and improvement
 - Usage Analytics: Optional, helps improve app performance
 - Favorite Wines: Required for user experience
 - Marketing Data: Optional, for personalized offers
 
 Data Retention:
 - Wine preferences: 1 year
+- Wine recommendations: 1 year
 - Usage analytics: 3 months
 - Favorite wines: 2 years
 - Marketing data: 6 months
@@ -322,7 +343,8 @@ Last Updated: ${new Date().toLocaleDateString()}
 const privacyManager = PrivacyManager.getInstance();
 
 export default privacyManager;
-export { PrivacyManager, PrivacyConsent, DataCollectionPolicy, PrivacySettings };
+export { PrivacyManager };
+// Types are already exported at the top of the file
 
 
 

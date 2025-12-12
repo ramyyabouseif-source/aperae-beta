@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2025-11-03T20:25:40.269Z",
+  "sampleSize": 70,
+  "statistics": {
+    "averageIncreaseRatio": 1.3187228334268317,
+    "averageIncreasePercent": 31.872283342683172,
+    "medianIncreaseRatio": 1.2315151515151515,
+    "minIncreaseRatio": 0.6,
+    "maxIncreaseRatio": 2.695,
+    "standardDeviation": 0.41588589245388863
+  },
+  "formulas": {
+    "simpleMultiplier": {
+      "type": "simple_multiplier",
+      "description": "Apply average increase ratio to all wines",
+      "formula": "estimatedPrice = kagglePrice * 1.319",
+      "multiplier": 1.3187228334268317
+    },
+    "priceRangeBased": {
+      "type": "price_range_based",
+      "ranges": {
+        "budget": {
+          "multiplier": 1.1088120213120214,
+          "sampleSize": 16
+        },
+        "moderate": {
+          "multiplier": 1.1670472582972582,
+          "sampleSize": 12
+        },
+        "premium": {
+          "multiplier": 1.3665922343050823,
+          "sampleSize": 14
+        },
+        "luxury": {
+          "multiplier": 1.5348367346938774,
+          "sampleSize": 14
+        },
+        "ultraLuxury": {
+          "multiplier": 1.4246452380952381,
+          "sampleSize": 14
+        }
+      }
+    },
+    "regionalBased": {
+      "type": "regional_based",
+      "regions": {
+        "United States": {
+          "multiplier": 1.21562429238555,
+          "sampleSize": 29
+        },
+        "France": {
+          "multiplier": 1.4274468428949794,
+          "sampleSize": 25
+        },
+        "Australia": {
+          "multiplier": 1.2751464646464648,
+          "sampleSize": 6
+        }
+      }
+    },
+    "linearRegression": {
+      "type": "linear_regression",
+      "description": "estimatedPrice = kagglePrice * (0.000094 * kagglePrice + 1.275)",
+      "slope": 0.00009440994634536989,
+      "intercept": 1.2750460948204252,
+      "r2": 0.1157696776888939
+    },
+    "recommended": {
+      "type": "price_range_based",
+      "description": "Apply different multipliers based on price range",
+      "ranges": {
+        "budget": {
+          "multiplier": 1.1088120213120214,
+          "sampleSize": 16
+        },
+        "moderate": {
+          "multiplier": 1.1670472582972582,
+          "sampleSize": 12
+        },
+        "premium": {
+          "multiplier": 1.3665922343050823,
+          "sampleSize": 14
+        },
+        "luxury": {
+          "multiplier": 1.5348367346938774,
+          "sampleSize": 14
+        },
+        "ultraLuxury": {
+          "multiplier": 1.4246452380952381,
+          "sampleSize": 14
+        }
+      }
+    }
+  },
+  "recommendations": [
+    "Use price-range based formula for better accuracy across price tiers"
+  ]
+}

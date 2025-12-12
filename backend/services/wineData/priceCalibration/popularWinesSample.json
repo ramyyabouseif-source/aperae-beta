@@ -1,0 +1,214 @@
+[
+  {
+    "title": "Caymus Cabernet Sauvignon",
+    "producer": "Caymus Vineyards",
+    "wineName": "Cabernet Sauvignon",
+    "vintage": "2020",
+    "region": "Napa Valley",
+    "country": "United States",
+    "kagglePrice": 85,
+    "priceYear": 2017
+  },
+  {
+    "title": "Dom Pérignon",
+    "producer": "Moët & Chandon",
+    "wineName": "Dom Pérignon",
+    "vintage": "2013",
+    "region": "Champagne",
+    "country": "France",
+    "kagglePrice": 200,
+    "priceYear": 2017
+  },
+  {
+    "title": "Cloudy Bay Sauvignon Blanc",
+    "producer": "Cloudy Bay",
+    "wineName": "Sauvignon Blanc",
+    "vintage": "2022",
+    "region": "Marlborough",
+    "country": "New Zealand",
+    "kagglePrice": 25,
+    "priceYear": 2017
+  },
+  {
+    "title": "Opus One",
+    "producer": "Opus One",
+    "wineName": "Opus One",
+    "vintage": "2019",
+    "region": "Oakville",
+    "country": "United States",
+    "kagglePrice": 350,
+    "priceYear": 2017
+  },
+  {
+    "title": "Silver Oak Cabernet Sauvignon",
+    "producer": "Silver Oak Cellars",
+    "wineName": "Cabernet Sauvignon",
+    "vintage": "2019",
+    "region": "Napa Valley",
+    "country": "United States",
+    "kagglePrice": 125,
+    "priceYear": 2017
+  },
+  {
+    "title": "Penfolds Grange",
+    "producer": "Penfolds",
+    "wineName": "Grange",
+    "vintage": "2018",
+    "region": "South Australia",
+    "country": "Australia",
+    "kagglePrice": 750,
+    "priceYear": 2017
+  },
+  {
+    "title": "Veuve Clicquot Yellow Label",
+    "producer": "Veuve Clicquot",
+    "wineName": "Yellow Label",
+    "vintage": "NV",
+    "region": "Champagne",
+    "country": "France",
+    "kagglePrice": 65,
+    "priceYear": 2017
+  },
+  {
+    "title": "Kendall-Jackson Chardonnay",
+    "producer": "Kendall-Jackson",
+    "wineName": "Chardonnay",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "kagglePrice": 18,
+    "priceYear": 2017
+  },
+  {
+    "title": "Château Margaux",
+    "producer": "Château Margaux",
+    "wineName": "Château Margaux",
+    "vintage": "2018",
+    "region": "Bordeaux",
+    "country": "France",
+    "kagglePrice": 800,
+    "priceYear": 2017
+  },
+  {
+    "title": "Belle Glos Pinot Noir",
+    "producer": "Belle Glos",
+    "wineName": "Pinot Noir",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "kagglePrice": 55,
+    "priceYear": 2017
+  },
+  {
+    "title": "Sancerre",
+    "producer": "Various",
+    "wineName": "Sancerre",
+    "vintage": "2022",
+    "region": "Loire Valley",
+    "country": "France",
+    "kagglePrice": 28,
+    "priceYear": 2017
+  },
+  {
+    "title": "Rombauer Chardonnay",
+    "producer": "Rombauer Vineyards",
+    "wineName": "Chardonnay",
+    "vintage": "2021",
+    "region": "Napa Valley",
+    "country": "United States",
+    "kagglePrice": 40,
+    "priceYear": 2017
+  },
+  {
+    "title": "Josh Cellars Cabernet Sauvignon",
+    "producer": "Josh Cellars",
+    "wineName": "Cabernet Sauvignon",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "kagglePrice": 15,
+    "priceYear": 2017
+  },
+  {
+    "title": "Meiomi Pinot Noir",
+    "producer": "Meiomi",
+    "wineName": "Pinot Noir",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "kagglePrice": 20,
+    "priceYear": 2017
+  },
+  {
+    "title": "Barefoot Chardonnay",
+    "producer": "Barefoot",
+    "wineName": "Chardonnay",
+    "vintage": "2022",
+    "region": "California",
+    "country": "United States",
+    "kagglePrice": 7,
+    "priceYear": 2017
+  },
+  {
+    "title": "Yellow Tail Shiraz",
+    "producer": "Yellow Tail",
+    "wineName": "Shiraz",
+    "vintage": "2022",
+    "region": "South Eastern Australia",
+    "country": "Australia",
+    "kagglePrice": 8,
+    "priceYear": 2017
+  },
+  {
+    "title": "La Crema Pinot Noir",
+    "producer": "La Crema",
+    "wineName": "Pinot Noir",
+    "vintage": "2021",
+    "region": "Sonoma Coast",
+    "country": "United States",
+    "kagglePrice": 35,
+    "priceYear": 2017
+  },
+  {
+    "title": "Jordan Cabernet Sauvignon",
+    "producer": "Jordan Vineyard & Winery",
+    "wineName": "Cabernet Sauvignon",
+    "vintage": "2019",
+    "region": "Alexander Valley",
+    "country": "United States",
+    "kagglePrice": 60,
+    "priceYear": 2017
+  },
+  {
+    "title": "Stag's Leap Wine Cellars Artemis",
+    "producer": "Stag's Leap Wine Cellars",
+    "wineName": "Cabernet Sauvignon",
+    "vintage": "2020",
+    "region": "Napa Valley",
+    "country": "United States",
+    "kagglePrice": 75,
+    "priceYear": 2017
+  },
+  {
+    "title": "Duckhorn Merlot",
+    "producer": "Duckhorn Vineyards",
+    "wineName": "Merlot",
+    "vintage": "2020",
+    "region": "Napa Valley",
+    "country": "United States",
+    "kagglePrice": 65,
+    "priceYear": 2017
+  },
+  {
+    "title": "Château Lafite Rothschild",
+    "producer": "Château Lafite Rothschild",
+    "wineName": "Château Lafite Rothschild",
+    "vintage": "2018",
+    "region": "Pauillac",
+    "country": "France",
+    "kagglePrice": 1200,
+    "priceYear": 2017
+  }
+]
+
+

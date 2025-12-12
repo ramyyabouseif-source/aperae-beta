@@ -1,6 +1,12 @@
 import React, { memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { WineRecommendation } from '../types/wine';
+import { 
+  getTastingNotesDisplay, 
+  getConfidenceScore, 
+  getConfidenceRationale,
+  getServingGuidance 
+} from '../utils/wineTypeHelpers';
 
 interface WineCardProps {
   wine: WineRecommendation;
@@ -10,6 +16,11 @@ interface WineCardProps {
 }
 
 const WineCard = memo(function WineCard({ wine, onAddToFavorites, onRemoveFromFavorites, isFavorite = false }: WineCardProps) {
+  const tastingNotes = getTastingNotesDisplay(wine.tastingNotes);
+  const confidenceScore = getConfidenceScore(wine);
+  const confidenceRationale = getConfidenceRationale(wine);
+  const servingGuidance = getServingGuidance(wine);
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -30,17 +41,28 @@ const WineCard = memo(function WineCard({ wine, onAddToFavorites, onRemoveFromFa
         <Text style={styles.description}>{wine.rationale}</Text>
         
         <Text style={styles.sectionTitle}>Tasting Notes:</Text>
-        <Text style={styles.description}>{wine.tastingNotes}</Text>
+        {tastingNotes.aromas.length > 0 && (
+          <Text style={styles.description}>
+            Aromas: {tastingNotes.aromas.join(', ')}
+          </Text>
+        )}
+        <Text style={styles.description}>{tastingNotes.palate}</Text>
+        {tastingNotes.finish && (
+          <Text style={styles.description}>Finish: {tastingNotes.finish}</Text>
+        )}
         
         <Text style={styles.sectionTitle}>Serving:</Text>
-        <Text style={styles.description}>{wine.servingGuidance}</Text>
+        <Text style={styles.description}>{servingGuidance}</Text>
         
         <Text style={styles.sectionTitle}>Where to Buy:</Text>
         <Text style={styles.description}>{wine.retailerSuggestion}</Text>
         
         <Text style={styles.confidence}>
-          Confidence: {wine.confidenceScore}%
+          Confidence: {confidenceScore}%
         </Text>
+        {confidenceRationale && (
+          <Text style={styles.confidenceRationale}>{confidenceRationale}</Text>
+        )}
       </View>
       
       <View style={styles.actions}>
@@ -56,7 +78,7 @@ const WineCard = memo(function WineCard({ wine, onAddToFavorites, onRemoveFromFa
       
       <View style={styles.disclaimer}>
         <Text style={styles.disclaimerText}>
-          * Prices and ratings are estimates and may vary by retailer
+          Recommendations based on established food-wine pairing principles - prices and ratings are estimates and may vary by retailer
         </Text>
       </View>
     </View>
@@ -70,12 +92,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
-    margin: 8,
+    marginHorizontal: 20,
+    marginVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    width: 'auto',
+    maxWidth: '100%',
+    alignSelf: 'stretch',
   },
   header: {
     borderBottomWidth: 1,
@@ -137,6 +163,13 @@ const styles = StyleSheet.create({
     color: '#8B0000',
     fontWeight: 'bold',
     marginTop: 12,
+    textAlign: 'center',
+  },
+  confidenceRationale: {
+    fontSize: 11,
+    color: '#666',
+    fontStyle: 'italic',
+    marginTop: 4,
     textAlign: 'center',
   },
   actions: {

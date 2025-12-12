@@ -61,3 +61,94 @@ model UserPreference {
   @@map("user_preferences")
 }
 
+// =============================================================================
+// WINE DATABASE MODELS (Legal Open/Public Data Sources Only)
+// =============================================================================
+
+model Wine {
+  id                String   @id @default(uuid())
+  wineName          String
+  producer          String?
+  vintage           String?  // Can be year or "NV"
+  region            String?
+  country           String?
+  wineType          String?  // Red, White, Rosé, Sparkling, Dessert, etc.
+  grapeVariety      String[] @default([]) // Array of grape varieties
+  appellation       String?  // Specific appellation/AOC/DOC
+  
+  // Pricing & Availability (from public sources only)
+  averagePrice      Float?   // Average market price in USD
+  priceRange        Json?    // {min: X, max: Y, currency: "USD"}
+  
+  // Ratings & Reviews (from public datasets only)
+  criticScores      Json?    // {wineSpectator: 95, wineAdvocate: 94, wineEnthusiast: 92}
+  communityRating   Float?   // Average rating from community (0-5 or 0-100)
+  reviewCount       Int      @default(0)
+  
+  // Tasting Notes (AI-generated or from public sources with attribution)
+  tastingNotes      String?  // Structured tasting notes
+  aromas            String[] @default([]) // Array of aroma descriptors
+  palate            String?  // Palate description
+  finish            String?  // Finish description
+  body              String?  // Light, Medium, Full, Medium-Full
+  acidity           String?  // Low, Medium, High
+  tannins           String?  // Low, Medium, High
+  sweetness         String?  // Dry, Off-Dry, Medium-Sweet, Sweet
+  
+  // Food Pairing (curated or AI-generated)
+  foodPairings      String[] @default([]) // Common food pairings
+  
+  // Quality Metrics (from public datasets)
+  qualityScore      Float?   // Overall quality score (0-100)
+  alcoholContent    Float?   // Alcohol by volume percentage
+  
+  // Metadata
+  source            String   // "kaggle", "uci", "manual", "wikipedia", etc.
+  sourceUrl         String?  // URL to original data source
+  sourceLicense     String?  // License info (e.g., "Public Domain", "CC0")
+  attribution       String?  // Required attribution text if needed
+  dataQuality       Int      @default(50) // 0-100 quality score
+  lastUpdated       DateTime @default(now()) @updatedAt
+  createdAt         DateTime @default(now())
+  
+  // Search optimization
+  searchVector      String?  // Full-text search vector
+  normalizedName    String   // Lowercase, normalized for matching
+  
+  // Relations
+  pairings          WinePairing[]
+  
+  @@unique([wineName, producer, vintage])
+  @@index([wineName])
+  @@index([producer])
+  @@index([region])
+  @@index([country])
+  @@index([wineType])
+  @@index([normalizedName])
+  @@index([source])
+  @@map("wines")
+}
+
+model WinePairing {
+  id              String   @id @default(uuid())
+  wineId          String
+  dish            String   // Dish name
+  dishCategory    String?  // e.g., "Meat", "Seafood", "Vegetarian", "Dessert"
+  pairingType     String   @default("classic") // "classic", "alternative", "experimental"
+  confidence      Int      @default(0) // 0-100
+  rationale       String?  // Why this pairing works
+  source          String   @default("ai") // "ai", "curated", "dataset"
+  
+  // Relations
+  wine            Wine     @relation(fields: [wineId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  
+  @@index([dish])
+  @@index([wineId])
+  @@index([dishCategory])
+  @@index([pairingType])
+  @@map("wine_pairings")
+}
+

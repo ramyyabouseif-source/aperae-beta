@@ -4,6 +4,8 @@
  */
 
 import { Platform } from 'react-native';
+import * as FileSystem from 'expo-file-system/legacy';
+import { getApiBaseUrl } from '../utils/api';
 
 export interface OCRResult {
   text: string;
@@ -61,13 +63,22 @@ export class OCRService {
         
         // Call our backend API instead of Google Vision directly
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minute timeout
+        const timeoutId = setTimeout(() => {
+          console.warn('OCR request timeout reached, aborting...');
+          controller.abort();
+        }, 300000); // 5 minute timeout
         
         console.log('Sending OCR request to backend...');
-        const response = await fetch('http://192.168.1.152:3001/api/ocr/extract-text', {
+        const backendUrl = getApiBaseUrl();
+        const ocrEndpoint = `${backendUrl}/ocr/extract-text`;
+        console.log('OCR endpoint:', ocrEndpoint);
+        console.log('Image size (base64 length):', base64Image.length);
+        
+        const response = await fetch(ocrEndpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning
           },
           body: JSON.stringify({
             image: base64Image,
@@ -76,26 +87,60 @@ export class OCRService {
         });
         
         clearTimeout(timeoutId);
-        console.log('OCR response received from backend');
+        
+        // Check if response was aborted
+        if (controller.signal.aborted) {
+          throw new Error('Request was aborted');
+        }
+        
+        console.log('OCR response received from backend, status:', response.status);
 
         if (!response.ok) {
-          throw new Error(`OCR API error: ${response.status} ${response.statusText}`);
+          const errorText = await response.text().catch(() => 'Unknown error');
+          throw new Error(`OCR API error: ${response.status} ${response.statusText}. ${errorText}`);
         }
 
         const data = await response.json();
         
         console.log(`OCR successful on attempt ${attempt}`);
+        console.log(`OCR text length: ${data.text?.length || 0} characters`);
+        // Log raw OCR text for debugging (first 500 chars to avoid log spam)
+        if (data.text) {
+          console.log('=== RAW OCR TEXT (first 500 chars) ===');
+          console.log(data.text.substring(0, 500));
+          console.log('=== END OCR TEXT PREVIEW ===');
+        }
         return {
           text: data.text || '',
           confidence: data.confidence || 0.8,
           boundingBoxes: data.boundingBoxes || [],
         };
-      } catch (error) {
+      } catch (error: any) {
         lastError = error;
-        console.error(`OCR attempt ${attempt} failed:`, error.message);
+        const errorName = error?.name || '';
+        const errorMessage = error?.message || String(error);
         
-        if (attempt < maxRetries) {
-          const delay = attempt * 2000; // 2s, 4s delays
+        console.error(`OCR attempt ${attempt} failed:`, errorMessage);
+        console.error(`Error name: ${errorName}`);
+        console.error(`Error type: ${typeof error}`);
+        
+        // Check if this is an abort/timeout error
+        const isAbortError = errorName === 'AbortError' || 
+                            errorName === 'Aborted' || 
+                            errorMessage === 'Aborted' ||
+                            errorMessage.includes('abort') ||
+                            errorMessage.includes('Aborted');
+        
+        if (isAbortError) {
+          console.error(`Request was aborted (likely timeout)`);
+          // For abort errors, wait a bit longer before retry to allow network to stabilize
+          if (attempt < maxRetries) {
+            const delay = attempt * 3000; // 3s, 6s delays for network issues
+            console.log(`Retrying after abort in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        } else if (attempt < maxRetries) {
+          const delay = attempt * 2000; // 2s, 4s delays for other errors
           console.log(`Retrying in ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
@@ -104,14 +149,23 @@ export class OCRService {
     
     // All retries failed
     console.error('All OCR attempts failed');
-    if (lastError?.name === 'AbortError') {
-      throw new Error('OCR processing timed out after 5 minutes. Please try again with a smaller image or check your connection.');
-    } else if (lastError?.message.includes('Network request failed')) {
-      throw new Error('Network connection failed. Please check your internet connection and try again.');
-    } else if (lastError?.message.includes('timeout')) {
-      throw new Error('OCR processing timed out. The image might be too large or complex.');
+    const errorName = lastError?.name || '';
+    const errorMessage = lastError?.message || String(lastError);
+    
+    const isAbortError = errorName === 'AbortError' || 
+                        errorName === 'Aborted' || 
+                        errorMessage === 'Aborted' ||
+                        errorMessage.includes('abort') ||
+                        errorMessage.includes('Aborted');
+    
+    if (isAbortError) {
+      throw new Error('OCR processing timed out after 5 minutes. The image might be too large, or there may be a network connectivity issue. Please try again with a smaller image or check your internet connection.');
+    } else if (errorMessage.includes('Network request failed') || errorMessage.includes('fetch')) {
+      throw new Error('Network connection failed. Please check your internet connection and ensure you are connected to the same WiFi network as your backend server.');
+    } else if (errorMessage.includes('timeout')) {
+      throw new Error('OCR processing timed out. The image might be too large or complex. Please try with a smaller image.');
     } else {
-      throw new Error(`OCR processing failed after ${maxRetries} attempts: ${lastError?.message}`);
+      throw new Error(`OCR processing failed after ${maxRetries} attempts: ${errorMessage}`);
     }
   }
 
@@ -155,30 +209,25 @@ export class OCRService {
 
   /**
    * Convert image URI to base64 string
+   * Uses expo-file-system for React Native/Expo compatibility
    */
   private static async convertImageToBase64(imageUri: string): Promise<string> {
     try {
       console.log('Converting image to base64...');
-      const response = await fetch(imageUri);
-      console.log('Image fetch response received');
-      const blob = await response.blob();
-      console.log('Image blob created, size:', blob.size);
+      console.log('Image URI:', imageUri);
       
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64 = reader.result as string;
-          // Remove data:image/jpeg;base64, prefix
-          const base64Data = base64.split(',')[1];
-          console.log('Base64 conversion completed, length:', base64Data.length);
-          resolve(base64Data);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
+      // Use expo-file-system to read the file as base64
+      // In expo-file-system v19+, use string literal 'base64' directly
+      const base64 = await FileSystem.readAsStringAsync(imageUri, {
+        encoding: 'base64' as any,
       });
+      
+      console.log('Base64 conversion completed, length:', base64.length);
+      return base64;
     } catch (error) {
       console.error('Image conversion error:', error);
-      throw new Error('Failed to convert image to base64');
+      console.error('Error details:', error);
+      throw new Error(`Failed to convert image to base64: ${error.message}`);
     }
   }
 

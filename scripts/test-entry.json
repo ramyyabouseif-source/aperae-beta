@@ -1,0 +1,231 @@
+{
+  "metadata": {
+    "slug": {
+      "value": "cherry-pie-stanly-ranch-carneros-2016-pinot-noir",
+      "provenance": "derived",
+      "generation_rule": "lowercase(producer)-lowercase(wineName)-vintage"
+    },
+    "crossCheckRelevance": {
+      "value": "High",
+      "note": "Data verified from multiple trusted sources including retailer and critic sites"
+    }
+  },
+  "wineIdentity": {
+    "wineName": {
+      "value": "Stanly Ranch Pinot Noir",
+      "provenance": "canonical",
+      "source": "Wine-Searcher.com"
+    },
+    "producer": {
+      "value": "Cherry Pie",
+      "provenance": "canonical",
+      "source": "Wine-Searcher.com"
+    },
+    "vintage": {
+      "value": "2016",
+      "provenance": "canonical",
+      "source": "Wine-Searcher.com"
+    }
+  },
+  "geography": {
+    "region": {
+      "value": "California",
+      "provenance": "canonical",
+      "source": "Wine-Searcher.com"
+    },
+    "appellation": {
+      "value": "Carneros",
+      "provenance": "canonical",
+      "source": "Wine-Searcher.com"
+    }
+  },
+  "composition": {
+    "grapeVariety": [
+      {
+        "variety": "Pinot Noir",
+        "percent": 100
+      }
+    ],
+    "alcoholLevel": {
+      "value": "14.5%",
+      "provenance": "canonical",
+      "source": "Prince of Pinot"
+    },
+    "residualSugar_g_per_L": {
+      "value": "N/A",
+      "provenance": "N/A",
+      "source": ""
+    },
+    "pH": {
+      "value": "N/A",
+      "provenance": "N/A",
+      "source": ""
+    },
+    "oakAgingDuration": {
+      "value": "Approx. 30% new French oak aging",
+      "provenance": "canonical",
+      "source": "K. Laz Wine Collection"
+    }
+  },
+  "market": {
+    "pricePoint": {
+      "value": "45-55 USD",
+      "provenance": "canonical",
+      "source": "Retail and Auction listings"
+    },
+    "range": {
+      "min": 45,
+      "max": 55,
+      "currency": "USD"
+    },
+    "availability": {
+      "value": "Limited but available via select retailers and wine auctions",
+      "provenance": "derived",
+      "source": "Wine.com, Ryann's Wines"
+    },
+    "aging": {
+      "value": "Best consumed within 5-7 years from vintage, but may develop further with careful cellaring",
+      "provenance": "derived",
+      "source": "Oenological knowledge"
+    }
+  },
+  "sensoryProfile": {
+    "tastingNotes": {
+      "value": "Medium to full-bodied Pinot Noir offering bright red cherry, cranberry, and raspberry fruit aromas and flavors, complemented by subtle toasty oak, brown spice, and sandalwood notes. The palate is textured, rich, and balanced with fine tannins and moderate acidity.",
+      "provenance": "derived",
+      "source": "Prince of Pinot, K. Laz Wine Collection, Wine-Searcher"
+    },
+    "structureProfile": {
+      "body": "Medium-Full",
+      "sweetness": "Dry",
+      "acidity": "Medium",
+      "tannin": "Medium",
+      "residualSugar_g_per_L": "N/A",
+      "oakInfluence": "Moderate",
+      "textureDescriptors": "Textured, rich",
+      "signature_characteristics": [
+        "bright red fruit",
+        "toasty oak",
+        "brown spice"
+      ],
+      "provenance": "derived"
+    },
+    "flavorProfile": {
+      "primary": [
+        "cherry",
+        "cranberry",
+        "raspberry"
+      ],
+      "secondary": [
+        "toasty oak",
+        "brown spice",
+        "sandalwood"
+      ],
+      "tertiary": [],
+      "provenance": "derived"
+    },
+    "finish": {
+      "length": "Medium",
+      "character": [
+        "balanced tannins",
+        "moderate acidity",
+        "lingering fruit and spice"
+      ],
+      "provenance": "derived"
+    }
+  },
+  "expertRatings": [
+    {
+      "publication": "Wine Enthusiast",
+      "critic": "Virginie Boone",
+      "score": "87",
+      "scale": "100",
+      "date": "2019",
+      "citation": "Wine Enthusiast 87/100 (2019)",
+      "provenance": "attribution_required"
+    }
+  ],
+  "averageRating": {
+    "value": "87",
+    "provenance": "derived"
+  },
+  "pairingIntelligence": {
+    "primaryPairings": {
+      "value": [
+        "Roast chicken",
+        "Turkey",
+        "Mushroom risotto",
+        "Lightly spiced pork dishes"
+      ],
+      "provenance": "derived",
+      "note": "Pairings based on weight, acidity, tannin-protein interactions, and flavor bridging"
+    },
+    "avoidPairings": {
+      "value": [
+        "Very spicy or heavily sauced dishes",
+        "Strongly bitter or umami-rich foods"
+      ],
+      "provenance": "derived",
+      "note": "Avoid pairing high tannin and medium acid wine directly with strongly bitter/umami dishes without mitigation"
+    },
+    "flavorBridge": {
+      "value": "Cherry and brown spice notes complement roasted and lightly spiced dishes",
+      "provenance": "derived"
+    },
+    "dominantElements": {
+      "value": "Medium body, moderate acidity, balanced tannin, moderate oak",
+      "provenance": "derived"
+    },
+    "pairingRationale": {
+      "value": "The medium-full body and moderate acidity cleanse the palate of richer pork and poultry, while tannins interact smoothly with proteins. Toasty oak and spice notes echo roasted and spiced food flavors, providing harmonious pairings.",
+      "provenance": "derived"
+    }
+  },
+  "servingGuidance": {
+    "temperature": {
+      "value": "55-60°F (13-16°C)",
+      "provenance": "derived"
+    },
+    "decanting": {
+      "value": "30 minutes recommended for aeration",
+      "provenance": "derived"
+    },
+    "glassware": {
+      "value": "Large Burgundy glass to enhance aromatic expression",
+      "provenance": "derived"
+    },
+    "agingPotential": {
+      "value": "5-7 years from vintage release",
+      "provenance": "derived"
+    }
+  },
+  "compliance": {
+    "provenanceSummary": {
+      "canonical": 7,
+      "attributionRequired": 1,
+      "derived": 14
+    },
+    "dataUseStatus": "commercial_safe",
+    "confidenceLevel": "high",
+    "confidenceRationale": "Multiple consistent sources from producer, retailers, and critic ratings with clear provenance",
+    "conflict": false,
+    "conflictDetails": "",
+    "sources": [
+      "Wine-Searcher.com",
+      "Prince of Pinot",
+      "K. Laz Wine Collection",
+      "Wine.com",
+      "Ryann's Wines",
+      "Wine Enthusiast"
+    ],
+    "lastUpdated": "2025-11-12",
+    "warnings": []
+  },
+  "qualityMetrics": {
+    "dataQualityScore": 93,
+    "crossCheckRelevance": {
+      "value": "High",
+      "note": "Consistent sensory, market data and validated pairing logic"
+    }
+  }
+}

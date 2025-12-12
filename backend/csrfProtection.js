@@ -16,7 +16,11 @@ const STATE_CHANGING_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
 // Public JSON endpoints that should not require CSRF browser headers
 const CSRF_SKIP_PATHS = new Set([
   '/api/recommendations',
-  '/api/ocr/extract-text'
+  '/api/ocr/extract-text',
+  '/api/auth/register',
+  '/api/auth/login',
+  '/api/auth/refresh',
+  '/api/auth/logout'
 ]);
 
 /**

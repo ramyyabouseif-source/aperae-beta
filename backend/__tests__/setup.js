@@ -7,7 +7,7 @@ process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-only';
 process.env.REFRESH_SECRET = 'test-refresh-secret-key-for-testing-only';
 process.env.PORT = '3002';
 process.env.MOCK_MODE = 'true';
-process.env.OPENAI_API_KEY = 'sk-test-key-for-testing';
+process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key-for-testing';
 
 // Mock external dependencies
 jest.mock('@google-cloud/vision', () => ({
@@ -20,35 +20,32 @@ jest.mock('@google-cloud/vision', () => ({
   }))
 }));
 
-jest.mock('openai', () => {
+jest.mock('@anthropic-ai/sdk', () => {
   return jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: jest.fn().mockResolvedValue({
-          choices: [{
-            message: {
-              content: JSON.stringify({
-                dish: 'Test Dish',
-                recommendations: [{
-                  wineName: 'Test Wine',
-                  producer: 'Test Producer',
-                  vintage: '2020',
-                  pricePoint: '$50',
-                  rationale: 'Test rationale',
-                  tastingNotes: 'Test notes',
-                  servingGuidance: 'Test guidance',
-                  confidenceScore: 95,
-                  expertRating: '90',
-                  retailerSuggestion: 'Test retailer',
-                  image: 'test.jpg',
-                  storytellingElements: 'Test story'
-                }],
-                closingNarrative: 'Test narrative'
-              })
-            }
-          }]
-        })
-      }
+    messages: {
+      create: jest.fn().mockResolvedValue({
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            dish: 'Test Dish',
+            recommendations: [{
+              wineName: 'Test Wine',
+              producer: 'Test Producer',
+              vintage: '2020',
+              pricePoint: '$50',
+              rationale: 'Test rationale',
+              tastingNotes: 'Test notes',
+              servingGuidance: 'Test guidance',
+              confidenceScore: 95,
+              expertRating: '90',
+              retailerSuggestion: 'Test retailer',
+              image: 'test.jpg',
+              storytellingElements: 'Test story'
+            }],
+            closingNarrative: 'Test narrative'
+          })
+        }]
+      })
     }
   }));
 });

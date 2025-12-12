@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -16,10 +16,10 @@ import WineRecommendation from '../components/WineRecommendation';
 import MockModeToggle from '../components/MockModeToggle';
 import { PreferencesService } from '../services/preferencesService';
 import { FavoritesService } from '../services/favoritesService';
-import { UserPreferences } from '../types/preferences';
 import { InputValidator } from '../utils/validation';
 import { SecureErrorHandler } from '../utils/errorHandler';
 import { sortWinesForAPIMode, sortWinesForMockMode } from '../utils/wineSorting';
+import { getConfidenceScore } from '../utils/wineTypeHelpers';
 
 export default function HomeScreen() {
   const [dish, setDish] = useState('');
@@ -65,8 +65,7 @@ export default function HomeScreen() {
       }
       
       // Get wine recommendations with sanitized input and validated preferences
-      const result = await WineService.getWineRecommendations(sanitizedDish, userPreferences);
-      console.log('Received recommendations:', result);
+      const result = await WineService.getWineRecommendations(sanitizedDish, userPreferences || undefined);
       
       // Validate the result before setting state
       if (result && result.dish && result.recommendations && Array.isArray(result.recommendations)) {
@@ -76,10 +75,99 @@ export default function HomeScreen() {
           ? sortWinesForMockMode(result.recommendations)
           : sortWinesForAPIMode(result.recommendations);
         
-        setRecommendations({
+        // Detailed logging similar to menu screen
+        console.log('=== HOME SCREEN RECOMMENDATION RESULTS ===');
+        console.log('Dish:', sanitizedDish);
+        console.log('Preferences:', userPreferences || 'none');
+        console.log('Mock Mode:', isMockMode);
+        console.log(`Generated recommendations: ${sortedRecommendations.length}`);
+        
+        // Log each recommendation with key details
+        sortedRecommendations.forEach((rec, index) => {
+          console.log(`\nRecommendation ${index + 1}:`);
+          console.log(`  Wine: ${rec.wineName || 'Unknown'}`);
+          console.log(`  Producer: ${rec.producer || 'Unknown'}`);
+          console.log(`  Vintage: ${rec.vintage || 'NV'}`);
+          console.log(`  Price Point: ${rec.pricePoint || 'Not specified'}`);
+          const confidenceScore = getConfidenceScore(rec) || 'N/A';
+          console.log(`  Confidence Score: ${confidenceScore}`);
+          console.log(`  Expert Rating: ${rec.expertRating || 'unknown'}`);
+          console.log(`  Category: ${rec.category || 'Unknown'}`);
+          if (rec.rationale) {
+            console.log(`  Pairing Rationale: ${rec.rationale.substring(0, 100)}...`);
+          }
+        });
+        
+        console.log('\n=== FULL RECOMMENDATION RESPONSE ===');
+        console.log('BEFORE JSON.stringify - about to stringify response');
+        try {
+          console.log(JSON.stringify({
+            dish: result.dish,
+            recommendations: sortedRecommendations.map(rec => ({
+              wineName: rec.wineName,
+              producer: rec.producer,
+              vintage: rec.vintage,
+              pricePoint: rec.pricePoint,
+              confidenceScore: getConfidenceScore(rec),
+              expertRating: rec.expertRating,
+              pairingRationale: rec.rationale?.substring(0, 150),
+              tastingNotes: typeof rec.tastingNotes === 'string' 
+                ? rec.tastingNotes?.substring(0, 100)
+                : rec.tastingNotes?.palate?.substring(0, 100) || 'N/A',
+            })),
+            recommendationCount: sortedRecommendations.length,
+          }, null, 2));
+          console.log('AFTER JSON.stringify - stringify completed');
+        } catch (stringifyError) {
+          console.error('ERROR in JSON.stringify:', stringifyError);
+        }
+        console.log('=== END RECOMMENDATION RESULTS ===');
+        console.log('TEST LINE 1: This should appear');
+        console.log('TEST LINE 2: If you see this, code is executing');
+        console.log('TEST LINE 3: About to check result data');
+        
+        // CRITICAL DEBUG: Force log immediately
+        console.log('CRITICAL: About to check result data');
+        console.log('CRITICAL: result object exists:', !!result);
+        console.log('CRITICAL: result.closingNarrative exists:', !!result.closingNarrative);
+        console.log('CRITICAL: result.avoid exists:', !!result.avoid);
+        
+        // Debug: Check if result has closingNarrative and avoid
+        console.log('RESULT DATA CHECK START');
+        console.log('result has closingNarrative:', !!result.closingNarrative);
+        console.log('result has avoid:', !!result.avoid);
+        console.log('result.closingNarrative:', result.closingNarrative?.substring(0, 50));
+        console.log('result.avoid:', JSON.stringify(result.avoid));
+        console.log('result keys:', Object.keys(result));
+        console.log('RESULT DATA CHECK END\n');
+        
+        // Preserve ALL fields from result, including closingNarrative and avoid
+        const finalRecommendations: WineRecommendationResponse = {
           ...result,
           recommendations: sortedRecommendations
-        });
+        };
+        
+        // CRITICAL DEBUG: Force log immediately
+        console.log('CRITICAL: Created finalRecommendations');
+        console.log('CRITICAL: finalRecommendations.closingNarrative:', !!finalRecommendations.closingNarrative);
+        console.log('CRITICAL: finalRecommendations.avoid:', !!finalRecommendations.avoid);
+        
+        // Debug: Verify finalRecommendations has the fields
+        console.log('FINAL RECOMMENDATIONS CHECK START');
+        console.log('finalRecommendations has closingNarrative:', !!finalRecommendations.closingNarrative);
+        console.log('finalRecommendations has avoid:', !!finalRecommendations.avoid);
+        console.log('finalRecommendations.closingNarrative:', finalRecommendations.closingNarrative?.substring(0, 50));
+        console.log('finalRecommendations.avoid:', JSON.stringify(finalRecommendations.avoid));
+        console.log('FINAL RECOMMENDATIONS CHECK END\n');
+        
+        // CRITICAL DEBUG: Log right before setState
+        console.log('CRITICAL: About to call setRecommendations');
+        console.log('CRITICAL: finalRecommendations keys:', Object.keys(finalRecommendations));
+        
+        setRecommendations(finalRecommendations);
+        
+        // CRITICAL DEBUG: Log right after setState
+        console.log('CRITICAL: setRecommendations called');
       } else {
         console.error('Invalid recommendations data:', result);
         throw new Error('Received invalid recommendations data');
@@ -295,5 +383,10 @@ const styles = StyleSheet.create({
     color: '#d32f2f',
     fontSize: 14,
     textAlign: 'center',
+  },
+  finalNotesSection: {
+    marginHorizontal: 20,
+    marginTop: 24,
+    marginBottom: 16,
   },
 });

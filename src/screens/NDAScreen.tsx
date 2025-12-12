@@ -52,12 +52,12 @@ export default function NDAScreen({ onAccept }: NDAScreenProps) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Image 
-          source={require('../../assets/images/pocketsomm-logo.jpg')} 
+          source={require('../../assets/images/Aperae Logo.jpg')} 
           style={styles.logo}
           resizeMode="contain"
         />
         <Text style={styles.title}>Confidentiality Agreement</Text>
-        <Text style={styles.subtitle}>Required before accessing PocketSomm</Text>
+        <Text style={styles.subtitle}>Required before accessing Aperae</Text>
         {previousAcceptance && (
           <Text style={styles.previousAcceptance}>
             Last accepted: {new Date(previousAcceptance).toLocaleString()}
@@ -73,16 +73,16 @@ export default function NDAScreen({ onAccept }: NDAScreenProps) {
         showsVerticalScrollIndicator={true}
       >
         <View style={styles.content}>
-          <Text style={styles.sectionTitle}>PocketSomm Mobile App NDA (Short Form)</Text>
-          <Text style={styles.effectiveDate}>Effective Date: [Insert Date]</Text>
+          <Text style={styles.sectionTitle}>Aperae Mobile App NDA (Short Form)</Text>
+          <Text style={styles.effectiveDate}>Effective Date: [November 5, 2025]</Text>
           
           <Text style={styles.introText}>
-            By tapping "Agree", you ("Recipient") agree to keep PocketSomm's ("Disclosing Party") confidential information private as described below.
+            By tapping "Agree", you ("Recipient") agree to keep Aperae's ("Disclosing Party") confidential information private as described below.
           </Text>
 
           <Text style={styles.subsectionTitle}>1. Purpose</Text>
           <Text style={styles.paragraph}>
-            You may receive confidential info from PocketSomm to explore a business, product, or collaboration opportunity.
+            You may receive confidential info from Aperae to explore a business, product, or collaboration opportunity.
           </Text>
 
           <Text style={styles.subsectionTitle}>2. What Is Confidential</Text>
@@ -106,12 +106,12 @@ export default function NDAScreen({ onAccept }: NDAScreenProps) {
 
           <Text style={styles.subsectionTitle}>4. Legal Requirements</Text>
           <Text style={styles.paragraph}>
-            If law requires disclosure, notify PocketSomm promptly and cooperate to limit disclosure.
+            If law requires disclosure, notify Aperae promptly and cooperate to limit disclosure.
           </Text>
 
           <Text style={styles.subsectionTitle}>5. Ownership & No License</Text>
           <Text style={styles.paragraph}>
-            PocketSomm retains ownership of all Confidential Information. You get no rights or licenses except as expressly stated.
+            Aperae retains ownership of all Confidential Information. You get no rights or licenses except as expressly stated.
           </Text>
 
           <Text style={styles.subsectionTitle}>6. Term & Survival</Text>
@@ -127,7 +127,7 @@ export default function NDAScreen({ onAccept }: NDAScreenProps) {
 
           <Text style={styles.subsectionTitle}>7. Remedies</Text>
           <Text style={styles.paragraph}>
-            PocketSomm may seek injunctive relief and other remedies if this NDA is breached.
+            Aperae may seek injunctive relief and other remedies if this NDA is breached.
           </Text>
 
           <Text style={styles.subsectionTitle}>8. Governing Law & Dispute Resolution</Text>
@@ -146,15 +146,17 @@ export default function NDAScreen({ onAccept }: NDAScreenProps) {
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.checkboxContainer, isAgreed && styles.checkboxChecked]}
-          onPress={() => setIsAgreed(!isAgreed)}
-        >
-          <Text style={styles.checkboxText}>✓</Text>
-        </TouchableOpacity>
-        <Text style={styles.agreementText}>
-          I have read and agree to the Confidentiality Agreement
-        </Text>
+        <View style={styles.checkboxRow}>
+          <TouchableOpacity
+            style={[styles.checkboxContainer, isAgreed && styles.checkboxChecked]}
+            onPress={() => setIsAgreed(!isAgreed)}
+          >
+            <Text style={styles.checkboxText}>✓</Text>
+          </TouchableOpacity>
+          <Text style={styles.agreementText}>
+            I have read and agree to the Confidentiality Agreement
+          </Text>
+        </View>
         
         <TouchableOpacity
           style={[styles.acceptButton, (!hasScrolledToBottom || !isAgreed) && styles.acceptButtonDisabled]}
@@ -253,13 +255,18 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(191, 150, 148, 0.3)', // Metallic accent border
   },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   checkboxContainer: {
     width: 24,
     height: 24,
     borderWidth: 2,
     borderColor: '#5B2433', // Dark tone border
     borderRadius: 4,
-    marginBottom: 10,
+    marginRight: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -274,7 +281,7 @@ const styles = StyleSheet.create({
   agreementText: {
     fontSize: 16,
     color: '#5B2433', // Dark tone text
-    marginBottom: 20,
+    flex: 1,
   },
   acceptButton: {
     backgroundColor: '#5B2433', // Dark tone background

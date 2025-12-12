@@ -1,0 +1,249 @@
+{
+  "metadata": {
+    "slug": {
+      "value": "benton-lane-estate-willamette-valley-2014",
+      "provenance": "canonical",
+      "generation_rule": null
+    },
+    "crossCheckRelevance": {
+      "value": "Medium — producer and vintage confirmed, but specific technical sheet for 2014 not located",
+      "note": "Some fields may be incomplete or set to N/A"
+    }
+  },
+  "wineIdentity": {
+    "wineName": {
+      "value": "Estate-Grown Pinot Noir",
+      "provenance": "canonical",
+      "source": "Producer website — Benton‑Lane Winery Estate, Willamette Valley. :contentReference[oaicite:1]{index=1}"
+    },
+    "producer": {
+      "value": "Benton-Lane Winery",
+      "provenance": "canonical",
+      "source": "Producer website. :contentReference[oaicite:2]{index=2}"
+    },
+    "vintage": {
+      "value": 2014,
+      "provenance": "canonical",
+      "source": "Retail listing for 2014 Estate Pinot Noir. :contentReference[oaicite:3]{index=3}"
+    }
+  },
+  "geography": {
+    "region": {
+      "value": "Willamette Valley, Oregon, USA",
+      "provenance": "canonical",
+      "source": "Producer website & OregonWine.org listing. :contentReference[oaicite:4]{index=4}"
+    },
+    "appellation": {
+      "value": "Estate Vineyard, Southern Willamette Valley (Monroe area)",
+      "provenance": "canonical",
+      "source": "Producer website geographic context. :contentReference[oaicite:5]{index=5}"
+    }
+  },
+  "composition": {
+    "grapeVariety": {
+      "value": [
+        {
+          "variety": "Pinot Noir",
+          "percent": 100
+        }
+      ],
+      "provenance": "canonical",
+      "source": null
+    },
+    "alcoholLevel": {
+      "value": "13.5%",
+      "provenance": "attribution_required",
+      "source": "Retail listing for 2014 Estate Pinot Noir (Half-bottle listing shows 13.5% ABV). :contentReference[oaicite:6]{index=6}",
+      "numericHelper": 13.5
+    },
+    "residualSugar_g_per_L": {
+      "value": "N/A",
+      "provenance": "unknown",
+      "source": "",
+      "numericHelper": null
+    },
+    "pH": {
+      "value": "N/A",
+      "provenance": "unknown",
+      "source": "",
+      "numericHelper": null
+    },
+    "oakAgingDuration": {
+      "value": "10-15 months in French oak barrels (for Estate Pinot Noir).",
+      "provenance": "canonical",
+      "source": "Producer website describes barrel aging for Pinot Noir at estate. :contentReference[oaicite:7]{index=7}"
+    }
+  },
+  "market": {
+    "pricePoint": {
+      "value": "$66.99 USD (retail listing for 2014 First Class Pinot Noir at Benton-Lane) for reference",
+      "provenance": "attribution_required",
+      "source": "Retail listing for 2014 \"First Class\" bottling shows this price. :contentReference[oaicite:8]{index=8}",
+      "numericHelper": 66.99,
+      "currency": "USD"
+    },
+    "availability": {
+      "value": "Limited (older vintage) — may only be available via specialty/secondary market",
+      "provenance": "derived",
+      "source": "Retail listings showing 2014 varietals sold out. :contentReference[oaicite:9]{index=9}"
+    },
+    "aging": {
+      "value": "Drink from ~2018 through ~2026 (estimate)",
+      "provenance": "derived",
+      "note": "Based on review commentary from 2014 estate-grown bottles. :contentReference[oaicite:10]{index=10}"
+    }
+  },
+  "sensoryProfile": {
+    "tastingNotes": {
+      "value": "Aromas of bright cherry and cassis, vanilla from toasted oak, rose petal and earth; palate shows cranberry and fig, mocha and subtle pepper. :contentReference[oaicite:11]{index=11}",
+      "provenance": "derived",
+      "source": "Retail reviews for 2014 Estate/First Class Pinot Noir."
+    },
+    "structureProfile": {
+      "body": "Medium-Full",
+      "sweetness": "Bone Dry",
+      "acidity": "Medium-High",
+      "tannin": "Medium",
+      "residualSugar_g_per_L": "N/A",
+      "oakInfluence": "Moderate",
+      "textureDescriptors": "silky yet firm grain tannins, integrated oak",
+      "signature_characteristics": [
+        "bright red fruit",
+        "toasty oak spice",
+        "forest-floor earthiness"
+      ],
+      "provenance": "derived"
+    },
+    "flavorProfile": {
+      "primary": [
+        "cherry",
+        "cranberry",
+        "fig"
+      ],
+      "secondary": [
+        "vanilla oak",
+        "mocha",
+        "rose petal"
+      ],
+      "tertiary": [
+        "forest floor",
+        "mushroom earth",
+        "black pepper"
+      ],
+      "provenance": "derived"
+    },
+    "finish": {
+      "length": "Medium-Long",
+      "character": [
+        "lingering red fruit",
+        "subtle oak spice",
+        "fine tannin echo"
+      ],
+      "provenance": "derived"
+    }
+  },
+  "expertRatings": [
+    {
+      "publication": "James Suckling",
+      "critic": "",
+      "score": "91",
+      "scale": "100",
+      "date": "— (circa 2018) ",
+      "citation": "James Suckling 91/100 (tasted March 2018) :contentReference[oaicite:12]{index=12}",
+      "provenance": "attribution_required"
+    },
+    {
+      "publication": "Wine Spectator",
+      "critic": "",
+      "score": "90",
+      "scale": "100",
+      "date": "— (tasted earlier) ",
+      "citation": "Wine Spectator 90/100 (2014 Estate Pinot Noir) :contentReference[oaicite:13]{index=13}",
+      "provenance": "attribution_required"
+    }
+  ],
+  "averageRating": {
+    "value": 90.5,
+    "provenance": "derived"
+  },
+  "pairingIntelligence": {
+    "primaryPairings": {
+      "value": [
+        "Roast lamb chops with rosemary & garlic",
+        "Grilled salmon with herb crust and wild mushrooms",
+        "Mushroom risotto with shaved truffle"
+      ],
+      "provenance": "derived",
+      "note": "Based on medium-full Pinot Noir with good tannin/acidity structure."
+    },
+    "avoidPairings": {
+      "value": [
+        "Creamy pasta without seasoning",
+        "Light seafood in lemon-butter sauce",
+        "Spicy hot-and-sour Asian dishes"
+      ],
+      "provenance": "derived",
+      "note": "Wine has enough structure that very light dishes would be overpowered."
+    },
+    "flavorBridge": {
+      "value": "The cherry/cranberry fruit echoes flavours in roasted lamb or mushrooms; the toasty oak and earth profile bridge to herb-and-wood-grilled sides.",
+      "provenance": "derived"
+    },
+    "dominantElements": {
+      "value": "Bright red fruit, moderate oak spice, fine tannin",
+      "provenance": "derived"
+    },
+    "pairingRationale": {
+      "value": "The wine's refreshing acidity cleanses richer poultry or pork fats, the moderate tannin binds with proteins, and its red-fruit/earth/spice profile harmonises with herb-roasted and wood-grilled dishes.",
+      "provenance": "derived"
+    }
+  },
+  "servingGuidance": {
+    "temperature": {
+      "value": "16-17 °C (61-63 °F)",
+      "provenance": "derived",
+      "note": "For premium Willamette Valley Pinot Noir."
+    },
+    "decanting": {
+      "value": "15-20 minutes",
+      "provenance": "derived",
+      "note": "Allows aroma opening and tannin integration."
+    },
+    "glassware": {
+      "value": "Large Pinot Noir glass (Burgundy style)",
+      "provenance": "derived"
+    },
+    "agingPotential": {
+      "value": "Up to ~10 years (to ~2024), now at mature drinking window",
+      "provenance": "derived",
+      "note": "Given vintage 2014 and review drinking window."
+    }
+  },
+  "compliance": {
+    "provenanceSummary": {
+      "canonical": 3,
+      "attribution_required": 4,
+      "derived": 10
+    },
+    "dataUseStatus": "commercial_safe",
+    "confidenceLevel": "medium",
+    "confidenceRationale": "Producer information provides general estate context but not vintage-specific detailed technical sheet; retail reviews fill gaps.",
+    "conflict": false,
+    "conflictDetails": "",
+    "sources": [
+      "Benton-Lane Winery – Estate & vineyard overview. :contentReference[oaicite:14]{index=14}",
+      "Retail listing for 2014 Estate Pinot Noir. :contentReference[oaicite:15]{index=15}"
+    ],
+    "lastUpdated": "2025-11-10",
+    "warnings": [
+      "Precise vineyard block, clone breakdown, residual sugar and pH data for 2014 vintage not publicly located — set to N/A where applicable."
+    ]
+  },
+  "qualityMetrics": {
+    "dataQualityScore": 82,
+    "crossCheckRelevance": {
+      "value": "Medium",
+      "note": "Good producer and vintage, but missing full technical disclosure."
+    }
+  }
+}

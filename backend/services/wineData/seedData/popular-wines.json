@@ -1,0 +1,3361 @@
+[
+  {
+    "wineName": "Caymus Cabernet Sauvignon",
+    "producer": "Caymus Vineyards",
+    "vintage": "2020",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 85,
+    "criticScores": {
+      "wineSpectator": 92,
+      "wineEnthusiast": 91
+    },
+    "tastingNotes": "Rich, full-bodied with dark fruit flavors, blackberry, cassis, and hints of oak",
+    "aromas": [
+      "Blackberry",
+      "Cassis",
+      "Vanilla",
+      "Oak"
+    ],
+    "palate": "Full-bodied with structured tannins and dark fruit flavors",
+    "finish": "Long, smooth finish with oak influence",
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry",
+    "foodPairings": [
+      "Grilled steak",
+      "Roast beef",
+      "Aged cheese",
+      "Lamb"
+    ],
+    "qualityScore": 92,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85
+  },
+  {
+    "wineName": "Dom Pérignon",
+    "producer": "Moët & Chandon",
+    "vintage": "2013",
+    "region": "Champagne",
+    "country": "France",
+    "wineType": "Sparkling",
+    "grapeVariety": [
+      "Chardonnay",
+      "Pinot Noir"
+    ],
+    "appellation": "Champagne AOC",
+    "averagePrice": 200,
+    "criticScores": {
+      "wineSpectator": 95,
+      "wineEnthusiast": 96
+    },
+    "tastingNotes": "Elegant and refined with notes of citrus, white flowers, and brioche",
+    "aromas": [
+      "Citrus",
+      "White Flowers",
+      "Brioche",
+      "Yeast"
+    ],
+    "palate": "Crisp, refined bubbles with citrus and mineral notes",
+    "finish": "Long, elegant finish",
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry",
+    "foodPairings": [
+      "Oysters",
+      "Caviar",
+      "Smoked salmon",
+      "Celebration"
+    ],
+    "qualityScore": 96,
+    "alcoholContent": 12.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90
+  },
+  {
+    "wineName": "Cloudy Bay Sauvignon Blanc",
+    "producer": "Cloudy Bay",
+    "vintage": "2022",
+    "region": "Marlborough",
+    "country": "New Zealand",
+    "wineType": "White",
+    "grapeVariety": [
+      "Sauvignon Blanc"
+    ],
+    "appellation": "Marlborough",
+    "averagePrice": 25,
+    "criticScores": {
+      "wineEnthusiast": 90
+    },
+    "tastingNotes": "Bright, zesty with tropical fruit, citrus, and herbaceous notes",
+    "aromas": [
+      "Tropical Fruit",
+      "Citrus",
+      "Herbaceous",
+      "Gooseberry"
+    ],
+    "palate": "Crisp, refreshing with high acidity and tropical fruit flavors",
+    "finish": "Clean, mineral finish",
+    "body": "Light",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry",
+    "foodPairings": [
+      "Seafood",
+      "Grilled fish",
+      "Goat cheese",
+      "Salads"
+    ],
+    "qualityScore": 90,
+    "alcoholContent": 13,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85
+  },
+  {
+    "wineName": "Screaming Eagle Cabernet Sauvignon",
+    "producer": "Screaming Eagle",
+    "vintage": "2019",
+    "region": "Oakville",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Oakville AVA",
+    "averagePrice": 3500,
+    "criticScores": {
+      "wineSpectator": 98,
+      "wineAdvocate": 100,
+      "jamesSuckling": 99
+    },
+    "tastingNotes": "Opulent and powerful with layers of dark fruit, graphite, and spice",
+    "aromas": [
+      "Black Currant",
+      "Graphite",
+      "Spice",
+      "Tobacco"
+    ],
+    "palate": "Full-bodied, powerful with intense fruit and firm tannins",
+    "finish": "Very long, complex finish",
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry",
+    "foodPairings": [
+      "Prime rib",
+      "Aged steak",
+      "Game",
+      "Special occasions"
+    ],
+    "qualityScore": 99,
+    "alcoholContent": 14.8,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95
+  },
+  {
+    "wineName": "Domaine de la Romanée-Conti La Tâche",
+    "producer": "Domaine de la Romanée-Conti",
+    "vintage": "2018",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "La Tâche Grand Cru",
+    "averagePrice": 4500,
+    "criticScores": {
+      "wineSpectator": 98,
+      "wineAdvocate": 99
+    },
+    "tastingNotes": "Ethereal and complex with red fruit, earth, and floral notes",
+    "aromas": [
+      "Red Cherry",
+      "Rose",
+      "Earth",
+      "Spice"
+    ],
+    "palate": "Elegant, silky texture with complex flavors",
+    "finish": "Endless, ethereal finish",
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry",
+    "foodPairings": [
+      "Duck",
+      "Game birds",
+      "Mushrooms",
+      "Fine dining"
+    ],
+    "qualityScore": 99,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95
+  },
+  {
+    "wineName": "Opus One",
+    "producer": "Opus One",
+    "vintage": "2019",
+    "region": "Oakville",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Cabernet Franc",
+      "Merlot",
+      "Petit Verdot",
+      "Malbec"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 350,
+    "criticScores": {
+      "wineSpectator": 96,
+      "wineAdvocate": 97
+    },
+    "tastingNotes": "Bold and structured with black fruit, cassis, and refined oak",
+    "aromas": [
+      "Black Currant",
+      "Cassis",
+      "Vanilla",
+      "Cedar"
+    ],
+    "palate": "Full-bodied, structured with powerful fruit and firm tannins",
+    "finish": "Long, complex finish",
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry",
+    "foodPairings": [
+      "Ribeye steak",
+      "Lamb chops",
+      "Aged cheeses",
+      "Fine dining"
+    ],
+    "qualityScore": 97,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90
+  },
+  {
+    "wineName": "Château Margaux",
+    "producer": "Château Margaux",
+    "vintage": "2018",
+    "region": "Bordeaux",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Margaux",
+    "averagePrice": 800,
+    "criticScores": {
+      "wineSpectator": 98,
+      "wineAdvocate": 99,
+      "jamesSuckling": 99
+    },
+    "tastingNotes": "Classic and elegant with black fruit, floral notes, and refined tannins",
+    "aromas": [
+      "Black Currant",
+      "Violet",
+      "Cedar",
+      "Graphite"
+    ],
+    "palate": "Elegant, refined with silky tannins and complex flavors",
+    "finish": "Very long, elegant finish",
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry",
+    "foodPairings": [
+      "Roast lamb",
+      "Beef tenderloin",
+      "Game",
+      "Fine dining"
+    ],
+    "qualityScore": 99,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95
+  },
+  {
+    "wineName": "Kendall-Jackson Chardonnay",
+    "producer": "Kendall-Jackson",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "California",
+    "averagePrice": 18,
+    "criticScores": {
+      "wineEnthusiast": 88
+    },
+    "tastingNotes": "Rich and creamy with tropical fruit, vanilla, and oak",
+    "aromas": [
+      "Tropical Fruit",
+      "Vanilla",
+      "Oak",
+      "Butter"
+    ],
+    "palate": "Medium-full body with creamy texture and oak influence",
+    "finish": "Smooth, lingering finish",
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Low",
+    "sweetness": "Dry",
+    "foodPairings": [
+      "Grilled chicken",
+      "Pasta with cream sauce",
+      "Lobster",
+      "Roasted vegetables"
+    ],
+    "qualityScore": 88,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 80
+  },
+  {
+    "wineName": "Stag's Leap Wine Cellars Cask 23",
+    "producer": "Stag's Leap Wine Cellars",
+    "vintage": "2019",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Stags Leap District",
+    "averagePrice": 250,
+    "qualityScore": 95,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Prime rib",
+      "Aged steak",
+      "Lamb"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Harlan Estate",
+    "producer": "Harlan Estate",
+    "vintage": "2018",
+    "region": "Oakville",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 1200,
+    "qualityScore": 98,
+    "alcoholContent": 14.8,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Aged steak",
+      "Game",
+      "Fine dining"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Screaming Eagle",
+    "producer": "Screaming Eagle",
+    "vintage": "2019",
+    "region": "Oakville",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Oakville AVA",
+    "averagePrice": 3500,
+    "qualityScore": 99,
+    "alcoholContent": 14.8,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Prime rib",
+      "Aged steak",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Colgin IX Estate",
+    "producer": "Colgin Cellars",
+    "vintage": "2018",
+    "region": "St. Helena",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 800,
+    "qualityScore": 97,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Aged steak",
+      "Lamb",
+      "Fine dining"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Dominus",
+    "producer": "Dominus Estate",
+    "vintage": "2019",
+    "region": "Yountville",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 250,
+    "qualityScore": 96,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Beef",
+      "Lamb",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Stag's Leap Wine Cellars Artemis",
+    "producer": "Stag's Leap Wine Cellars",
+    "vintage": "2020",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 75,
+    "qualityScore": 91,
+    "alcoholContent": 14.2,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Steak",
+      "Roast beef",
+      "Lamb"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Duckhorn Merlot",
+    "producer": "Duckhorn Vineyards",
+    "vintage": "2020",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Merlot"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 65,
+    "qualityScore": 90,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Pork",
+      "Poultry",
+      "Mushrooms"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Lafite Rothschild",
+    "producer": "Château Lafite Rothschild",
+    "vintage": "2018",
+    "region": "Pauillac",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Pauillac",
+    "averagePrice": 1200,
+    "qualityScore": 99,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Roast lamb",
+      "Beef",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Latour",
+    "producer": "Château Latour",
+    "vintage": "2018",
+    "region": "Pauillac",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Pauillac",
+    "averagePrice": 1100,
+    "qualityScore": 98,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Beef",
+      "Game",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Mouton Rothschild",
+    "producer": "Château Mouton Rothschild",
+    "vintage": "2018",
+    "region": "Pauillac",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Pauillac",
+    "averagePrice": 1000,
+    "qualityScore": 98,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Beef",
+      "Game",
+      "Fine dining"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Haut-Brion",
+    "producer": "Château Haut-Brion",
+    "vintage": "2018",
+    "region": "Pessac-Léognan",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc"
+    ],
+    "appellation": "Pessac-Léognan",
+    "averagePrice": 950,
+    "qualityScore": 98,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Lamb",
+      "Beef",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Domaine de la Romanée-Conti Romanée-Conti",
+    "producer": "Domaine de la Romanée-Conti",
+    "vintage": "2018",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Romanée-Conti Grand Cru",
+    "averagePrice": 15000,
+    "qualityScore": 100,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Fine dining",
+      "Game",
+      "Truffles"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Domaine Leroy Musigny",
+    "producer": "Domaine Leroy",
+    "vintage": "2018",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Musigny Grand Cru",
+    "averagePrice": 3500,
+    "qualityScore": 98,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 93,
+    "foodPairings": [
+      "Duck",
+      "Game",
+      "Fine dining"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Domaine Leflaive Montrachet",
+    "producer": "Domaine Leflaive",
+    "vintage": "2018",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Montrachet Grand Cru",
+    "averagePrice": 2500,
+    "qualityScore": 98,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 93,
+    "foodPairings": [
+      "Lobster",
+      "Scallops",
+      "Foie gras"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Sassicaia",
+    "producer": "Tenuta San Guido",
+    "vintage": "2019",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Cabernet Franc"
+    ],
+    "appellation": "Bolgheri Sassicaia DOC",
+    "averagePrice": 250,
+    "qualityScore": 96,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Steak",
+      "Game",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Ornellaia",
+    "producer": "Tenuta dell'Ornellaia",
+    "vintage": "2019",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Bolgheri Superiore DOC",
+    "averagePrice": 200,
+    "qualityScore": 95,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Beef",
+      "Lamb",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Tignanello",
+    "producer": "Marchesi Antinori",
+    "vintage": "2019",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Sangiovese",
+      "Cabernet Sauvignon",
+      "Cabernet Franc"
+    ],
+    "appellation": "Toscana IGT",
+    "averagePrice": 120,
+    "qualityScore": 94,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Pasta",
+      "Beef",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Barolo",
+    "producer": "Various",
+    "vintage": "2018",
+    "region": "Piedmont",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Nebbiolo"
+    ],
+    "appellation": "Barolo DOCG",
+    "averagePrice": 60,
+    "qualityScore": 92,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Braised meats",
+      "Game",
+      "Truffles"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Brunello di Montalcino",
+    "producer": "Various",
+    "vintage": "2017",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Sangiovese"
+    ],
+    "appellation": "Brunello di Montalcino DOCG",
+    "averagePrice": 70,
+    "qualityScore": 92,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Beef",
+      "Game",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Chianti Classico",
+    "producer": "Various",
+    "vintage": "2020",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Sangiovese"
+    ],
+    "appellation": "Chianti Classico DOCG",
+    "averagePrice": 25,
+    "qualityScore": 88,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 80,
+    "foodPairings": [
+      "Pasta",
+      "Pizza",
+      "Italian dishes"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Amarone della Valpolicella",
+    "producer": "Various",
+    "vintage": "2017",
+    "region": "Veneto",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Corvina",
+      "Rondinella",
+      "Molinara"
+    ],
+    "appellation": "Amarone della Valpolicella DOCG",
+    "averagePrice": 50,
+    "qualityScore": 91,
+    "alcoholContent": 15.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Game",
+      "Braised meats",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Vega Sicilia Único",
+    "producer": "Vega Sicilia",
+    "vintage": "2012",
+    "region": "Ribera del Duero",
+    "country": "Spain",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Tempranillo",
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Ribera del Duero DO",
+    "averagePrice": 450,
+    "qualityScore": 97,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Lamb",
+      "Game",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Rioja Reserva",
+    "producer": "Various",
+    "vintage": "2018",
+    "region": "Rioja",
+    "country": "Spain",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Tempranillo",
+      "Garnacha"
+    ],
+    "appellation": "Rioja DOCa",
+    "averagePrice": 30,
+    "qualityScore": 89,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 82,
+    "foodPairings": [
+      "Lamb",
+      "Beef",
+      "Tapas"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Priorat",
+    "producer": "Various",
+    "vintage": "2019",
+    "region": "Priorat",
+    "country": "Spain",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Garnacha",
+      "Cariñena"
+    ],
+    "appellation": "Priorat DOQ",
+    "averagePrice": 45,
+    "qualityScore": 91,
+    "alcoholContent": 15,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Game",
+      "Braised meats",
+      "Strong cheeses"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Penfolds Grange",
+    "producer": "Penfolds",
+    "vintage": "2018",
+    "region": "South Australia",
+    "country": "Australia",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Shiraz",
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "South Australia",
+    "averagePrice": 750,
+    "qualityScore": 98,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Grilled meats",
+      "Barbecue",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Henschke Hill of Grace",
+    "producer": "Henschke",
+    "vintage": "2017",
+    "region": "Eden Valley",
+    "country": "Australia",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Shiraz"
+    ],
+    "appellation": "Eden Valley",
+    "averagePrice": 800,
+    "qualityScore": 97,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Lamb",
+      "Game",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Grange Hermitage",
+    "producer": "Penfolds",
+    "vintage": "2017",
+    "region": "South Australia",
+    "country": "Australia",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Shiraz"
+    ],
+    "appellation": "South Australia",
+    "averagePrice": 700,
+    "qualityScore": 97,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Grilled meats",
+      "Barbecue",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Cristal",
+    "producer": "Louis Roederer",
+    "vintage": "2014",
+    "region": "Champagne",
+    "country": "France",
+    "wineType": "Sparkling",
+    "grapeVariety": [
+      "Chardonnay",
+      "Pinot Noir"
+    ],
+    "appellation": "Champagne AOC",
+    "averagePrice": 300,
+    "qualityScore": 97,
+    "alcoholContent": 12.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Caviar",
+      "Lobster",
+      "Celebration"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Salon",
+    "producer": "Salon",
+    "vintage": "2008",
+    "region": "Champagne",
+    "country": "France",
+    "wineType": "Sparkling",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Champagne AOC",
+    "averagePrice": 600,
+    "qualityScore": 98,
+    "alcoholContent": 12,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 93,
+    "foodPairings": [
+      "Oysters",
+      "Caviar",
+      "Fine dining"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Puligny-Montrachet",
+    "producer": "Various",
+    "vintage": "2020",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Puligny-Montrachet AOC",
+    "averagePrice": 80,
+    "qualityScore": 93,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Lobster",
+      "Scallops",
+      "Creamy sauces"
+    ],
+    "body": "Medium-Full",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Meursault",
+    "producer": "Various",
+    "vintage": "2020",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Meursault AOC",
+    "averagePrice": 90,
+    "qualityScore": 93,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Chicken",
+      "Creamy pasta",
+      "Lobster"
+    ],
+    "body": "Medium-Full",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Chablis Grand Cru",
+    "producer": "Various",
+    "vintage": "2020",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Chablis Grand Cru AOC",
+    "averagePrice": 120,
+    "qualityScore": 94,
+    "alcoholContent": 13,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Oysters",
+      "Seafood",
+      "Goat cheese"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Sancerre",
+    "producer": "Various",
+    "vintage": "2022",
+    "region": "Loire Valley",
+    "country": "France",
+    "wineType": "White",
+    "grapeVariety": [
+      "Sauvignon Blanc"
+    ],
+    "appellation": "Sancerre AOC",
+    "averagePrice": 28,
+    "qualityScore": 89,
+    "alcoholContent": 12.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 80,
+    "foodPairings": [
+      "Goat cheese",
+      "Seafood",
+      "Oysters"
+    ],
+    "body": "Light",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château d'Yquem",
+    "producer": "Château d'Yquem",
+    "vintage": "2015",
+    "region": "Bordeaux",
+    "country": "France",
+    "wineType": "Dessert",
+    "grapeVariety": [
+      "Sémillon",
+      "Sauvignon Blanc"
+    ],
+    "appellation": "Sauternes",
+    "averagePrice": 500,
+    "qualityScore": 98,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Foie gras",
+      "Desserts",
+      "Blue cheese"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Sweet"
+  },
+  {
+    "wineName": "La Crema Pinot Noir",
+    "producer": "La Crema",
+    "vintage": "2021",
+    "region": "Sonoma Coast",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Sonoma Coast",
+    "averagePrice": 35,
+    "qualityScore": 89,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 82,
+    "foodPairings": [
+      "Salmon",
+      "Duck",
+      "Pork"
+    ],
+    "body": "Medium",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Rombauer Chardonnay",
+    "producer": "Rombauer Vineyards",
+    "vintage": "2021",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 40,
+    "qualityScore": 90,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Lobster",
+      "Creamy pasta",
+      "Chicken"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Jordan Cabernet Sauvignon",
+    "producer": "Jordan Vineyard & Winery",
+    "vintage": "2019",
+    "region": "Alexander Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Alexander Valley",
+    "averagePrice": 60,
+    "qualityScore": 91,
+    "alcoholContent": 13.8,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Steak",
+      "Beef",
+      "Lamb"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Ridge Monte Bello",
+    "producer": "Ridge Vineyards",
+    "vintage": "2019",
+    "region": "Santa Cruz Mountains",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Santa Cruz Mountains",
+    "averagePrice": 200,
+    "qualityScore": 96,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Beef",
+      "Lamb",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Heitz Cellar Martha's Vineyard",
+    "producer": "Heitz Cellar",
+    "vintage": "2018",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 350,
+    "qualityScore": 95,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Prime rib",
+      "Steak",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Montelena Chardonnay",
+    "producer": "Château Montelena",
+    "vintage": "2020",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 60,
+    "qualityScore": 92,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Lobster",
+      "Seafood",
+      "Chicken"
+    ],
+    "body": "Medium-Full",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Stag's Leap Wine Cellars SLV",
+    "producer": "Stag's Leap Wine Cellars",
+    "vintage": "2019",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Stags Leap District",
+    "averagePrice": 120,
+    "qualityScore": 94,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Steak",
+      "Lamb",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Kim Crawford Sauvignon Blanc",
+    "producer": "Kim Crawford",
+    "vintage": "2023",
+    "region": "Marlborough",
+    "country": "New Zealand",
+    "wineType": "White",
+    "grapeVariety": [
+      "Sauvignon Blanc"
+    ],
+    "appellation": "Marlborough",
+    "averagePrice": 18,
+    "qualityScore": 88,
+    "alcoholContent": 13,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 82,
+    "foodPairings": [
+      "Seafood",
+      "Salads",
+      "Goat cheese"
+    ],
+    "body": "Light",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Felton Road Pinot Noir",
+    "producer": "Felton Road",
+    "vintage": "2021",
+    "region": "Central Otago",
+    "country": "New Zealand",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Central Otago",
+    "averagePrice": 65,
+    "qualityScore": 93,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Salmon",
+      "Duck",
+      "Pork"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Dr. Loosen Riesling",
+    "producer": "Dr. Loosen",
+    "vintage": "2022",
+    "region": "Mosel",
+    "country": "Germany",
+    "wineType": "White",
+    "grapeVariety": [
+      "Riesling"
+    ],
+    "appellation": "Mosel",
+    "averagePrice": 22,
+    "qualityScore": 90,
+    "alcoholContent": 9,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Spicy food",
+      "Seafood",
+      "Asian cuisine"
+    ],
+    "body": "Light",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Off-Dry"
+  },
+  {
+    "wineName": "Joh. Jos. Prüm Wehlener Sonnenuhr",
+    "producer": "Joh. Jos. Prüm",
+    "vintage": "2021",
+    "region": "Mosel",
+    "country": "Germany",
+    "wineType": "White",
+    "grapeVariety": [
+      "Riesling"
+    ],
+    "appellation": "Mosel",
+    "averagePrice": 45,
+    "qualityScore": 94,
+    "alcoholContent": 8.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Spicy food",
+      "Seafood",
+      "Pork"
+    ],
+    "body": "Light",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Off-Dry"
+  },
+  {
+    "wineName": "Domaine Serene Pinot Noir",
+    "producer": "Domaine Serene",
+    "vintage": "2020",
+    "region": "Willamette Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Willamette Valley",
+    "averagePrice": 55,
+    "qualityScore": 92,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Salmon",
+      "Duck",
+      "Mushrooms"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Penner-Ash Pinot Noir",
+    "producer": "Penner-Ash",
+    "vintage": "2020",
+    "region": "Willamette Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Willamette Valley",
+    "averagePrice": 50,
+    "qualityScore": 91,
+    "alcoholContent": 14.2,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Salmon",
+      "Pork",
+      "Game"
+    ],
+    "body": "Medium",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Yellow Tail Shiraz",
+    "producer": "Yellow Tail",
+    "vintage": "2022",
+    "region": "South Eastern Australia",
+    "country": "Australia",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Shiraz"
+    ],
+    "appellation": "South Eastern Australia",
+    "averagePrice": 8,
+    "qualityScore": 82,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 75,
+    "foodPairings": [
+      "Grilled meats",
+      "Pizza",
+      "Pasta"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Barefoot Chardonnay",
+    "producer": "Barefoot",
+    "vintage": "2022",
+    "region": "California",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "California",
+    "averagePrice": 7,
+    "qualityScore": 78,
+    "alcoholContent": 13,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 70,
+    "foodPairings": [
+      "Chicken",
+      "Seafood",
+      "Light dishes"
+    ],
+    "body": "Light",
+    "acidity": "Medium",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Apothic Red",
+    "producer": "Apothic",
+    "vintage": "2022",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Zinfandel",
+      "Merlot",
+      "Syrah",
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "California",
+    "averagePrice": 10,
+    "qualityScore": 80,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 72,
+    "foodPairings": [
+      "Barbecue",
+      "Pizza",
+      "Burgers"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Off-Dry"
+  },
+  {
+    "wineName": "Cupcake Chardonnay",
+    "producer": "Cupcake Vineyards",
+    "vintage": "2022",
+    "region": "California",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "California",
+    "averagePrice": 9,
+    "qualityScore": 79,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 70,
+    "foodPairings": [
+      "Chicken",
+      "Light pasta",
+      "Seafood"
+    ],
+    "body": "Light",
+    "acidity": "Medium",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Josh Cellars Cabernet Sauvignon",
+    "producer": "Josh Cellars",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "California",
+    "averagePrice": 15,
+    "qualityScore": 85,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 78,
+    "foodPairings": [
+      "Steak",
+      "Burgers",
+      "Pasta"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Petrus",
+    "producer": "Château Petrus",
+    "vintage": "2018",
+    "region": "Pomerol",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Merlot",
+      "Cabernet Franc"
+    ],
+    "appellation": "Pomerol",
+    "averagePrice": 5000,
+    "qualityScore": 100,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Fine dining",
+      "Game",
+      "Truffles"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Masseto",
+    "producer": "Tenuta dell'Ornellaia",
+    "vintage": "2018",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Merlot"
+    ],
+    "appellation": "Bolgheri",
+    "averagePrice": 800,
+    "qualityScore": 98,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 93,
+    "foodPairings": [
+      "Fine dining",
+      "Game",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Far Niente Cabernet Sauvignon",
+    "producer": "Far Niente",
+    "vintage": "2019",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 175,
+    "qualityScore": 94,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Steak",
+      "Roast beef",
+      "Lamb"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Montelena Cabernet Sauvignon",
+    "producer": "Château Montelena",
+    "vintage": "2019",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 200,
+    "qualityScore": 95,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Prime rib",
+      "Steak",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Joseph Phelps Insignia",
+    "producer": "Joseph Phelps",
+    "vintage": "2019",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Petit Verdot",
+      "Malbec"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 250,
+    "qualityScore": 96,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Beef",
+      "Lamb",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Shafer Hillside Select",
+    "producer": "Shafer Vineyards",
+    "vintage": "2019",
+    "region": "Stags Leap District",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Stags Leap District",
+    "averagePrice": 275,
+    "qualityScore": 96,
+    "alcoholContent": 14.8,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Prime rib",
+      "Aged steak",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Duckhorn Cabernet Sauvignon",
+    "producer": "Duckhorn Vineyards",
+    "vintage": "2019",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 95,
+    "qualityScore": 92,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Steak",
+      "Beef",
+      "Lamb"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Robert Mondavi Reserve Cabernet Sauvignon",
+    "producer": "Robert Mondavi",
+    "vintage": "2019",
+    "region": "Oakville",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 150,
+    "qualityScore": 93,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Steak",
+      "Roast beef",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Staglin Family Vineyard Cabernet Sauvignon",
+    "producer": "Staglin Family",
+    "vintage": "2019",
+    "region": "Rutherford",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 200,
+    "qualityScore": 94,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Prime rib",
+      "Steak",
+      "Lamb"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Kongsgaard Chardonnay",
+    "producer": "Kongsgaard",
+    "vintage": "2020",
+    "region": "Napa Valley",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Napa Valley",
+    "averagePrice": 150,
+    "qualityScore": 95,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Lobster",
+      "Scallops",
+      "Foie gras"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Peter Michael Chardonnay",
+    "producer": "Peter Michael",
+    "vintage": "2020",
+    "region": "Sonoma County",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Sonoma County",
+    "averagePrice": 85,
+    "qualityScore": 93,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Lobster",
+      "Creamy pasta",
+      "Chicken"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Flowers Pinot Noir",
+    "producer": "Flowers Vineyard & Winery",
+    "vintage": "2021",
+    "region": "Sonoma Coast",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Sonoma Coast",
+    "averagePrice": 65,
+    "qualityScore": 92,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Salmon",
+      "Duck",
+      "Mushrooms"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Kistler Pinot Noir",
+    "producer": "Kistler Vineyards",
+    "vintage": "2021",
+    "region": "Sonoma Coast",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Sonoma Coast",
+    "averagePrice": 85,
+    "qualityScore": 93,
+    "alcoholContent": 14.2,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Salmon",
+      "Duck",
+      "Game birds"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Cheval Blanc",
+    "producer": "Château Cheval Blanc",
+    "vintage": "2018",
+    "region": "Saint-Émilion",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Merlot",
+      "Cabernet Franc"
+    ],
+    "appellation": "Saint-Émilion",
+    "averagePrice": 850,
+    "qualityScore": 98,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Lamb",
+      "Beef",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Ausone",
+    "producer": "Château Ausone",
+    "vintage": "2018",
+    "region": "Saint-Émilion",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Merlot",
+      "Cabernet Franc"
+    ],
+    "appellation": "Saint-Émilion",
+    "averagePrice": 1200,
+    "qualityScore": 99,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Fine dining",
+      "Game",
+      "Lamb"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Palmer",
+    "producer": "Château Palmer",
+    "vintage": "2018",
+    "region": "Margaux",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Petit Verdot"
+    ],
+    "appellation": "Margaux",
+    "averagePrice": 450,
+    "qualityScore": 97,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 93,
+    "foodPairings": [
+      "Beef",
+      "Lamb",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Cos d'Estournel",
+    "producer": "Château Cos d'Estournel",
+    "vintage": "2018",
+    "region": "Saint-Estèphe",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Saint-Estèphe",
+    "averagePrice": 250,
+    "qualityScore": 95,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Beef",
+      "Game",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Léoville Las Cases",
+    "producer": "Château Léoville Las Cases",
+    "vintage": "2018",
+    "region": "Saint-Julien",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc"
+    ],
+    "appellation": "Saint-Julien",
+    "averagePrice": 300,
+    "qualityScore": 96,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Beef",
+      "Lamb",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Pichon Longueville Comtesse de Lalande",
+    "producer": "Château Pichon Longueville Comtesse de Lalande",
+    "vintage": "2018",
+    "region": "Pauillac",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Pauillac",
+    "averagePrice": 350,
+    "qualityScore": 96,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Beef",
+      "Lamb",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Château Pontet-Canet",
+    "producer": "Château Pontet-Canet",
+    "vintage": "2018",
+    "region": "Pauillac",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot",
+      "Cabernet Franc",
+      "Petit Verdot"
+    ],
+    "appellation": "Pauillac",
+    "averagePrice": 180,
+    "qualityScore": 95,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Beef",
+      "Lamb",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Domaine Armand Rousseau Chambertin",
+    "producer": "Domaine Armand Rousseau",
+    "vintage": "2018",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Chambertin Grand Cru",
+    "averagePrice": 2500,
+    "qualityScore": 98,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 93,
+    "foodPairings": [
+      "Duck",
+      "Game",
+      "Fine dining"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Domaine Comte Georges de Vogüé Musigny",
+    "producer": "Domaine Comte Georges de Vogüé",
+    "vintage": "2018",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Musigny Grand Cru",
+    "averagePrice": 2000,
+    "qualityScore": 98,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 93,
+    "foodPairings": [
+      "Duck",
+      "Game birds",
+      "Fine dining"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Domaine Coche-Dury Corton-Charlemagne",
+    "producer": "Domaine Coche-Dury",
+    "vintage": "2018",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Corton-Charlemagne Grand Cru",
+    "averagePrice": 3000,
+    "qualityScore": 99,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Lobster",
+      "Foie gras",
+      "Fine dining"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Domaine Leroy Chambertin",
+    "producer": "Domaine Leroy",
+    "vintage": "2018",
+    "region": "Burgundy",
+    "country": "France",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Chambertin Grand Cru",
+    "averagePrice": 4000,
+    "qualityScore": 99,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 95,
+    "foodPairings": [
+      "Game",
+      "Duck",
+      "Fine dining"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Gaja Barbaresco",
+    "producer": "Gaja",
+    "vintage": "2018",
+    "region": "Piedmont",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Nebbiolo"
+    ],
+    "appellation": "Barbaresco DOCG",
+    "averagePrice": 300,
+    "qualityScore": 96,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Game",
+      "Braised meats",
+      "Truffles"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Gaja Sori San Lorenzo",
+    "producer": "Gaja",
+    "vintage": "2018",
+    "region": "Piedmont",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Nebbiolo"
+    ],
+    "appellation": "Langhe DOC",
+    "averagePrice": 650,
+    "qualityScore": 97,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 93,
+    "foodPairings": [
+      "Game",
+      "Braised meats",
+      "Fine dining"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Biondi-Santi Brunello di Montalcino",
+    "producer": "Biondi-Santi",
+    "vintage": "2016",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Sangiovese"
+    ],
+    "appellation": "Brunello di Montalcino DOCG",
+    "averagePrice": 350,
+    "qualityScore": 96,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Beef",
+      "Game",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Marchesi Antinori Solaia",
+    "producer": "Marchesi Antinori",
+    "vintage": "2019",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Sangiovese",
+      "Cabernet Franc"
+    ],
+    "appellation": "Toscana IGT",
+    "averagePrice": 250,
+    "qualityScore": 95,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Beef",
+      "Game",
+      "Aged cheese"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Querciabella Chianti Classico",
+    "producer": "Querciabella",
+    "vintage": "2020",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Sangiovese"
+    ],
+    "appellation": "Chianti Classico DOCG",
+    "averagePrice": 35,
+    "qualityScore": 90,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Pasta",
+      "Pizza",
+      "Italian dishes"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Tenuta San Guido Guidalberto",
+    "producer": "Tenuta San Guido",
+    "vintage": "2020",
+    "region": "Tuscany",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon",
+      "Merlot"
+    ],
+    "appellation": "Toscana IGT",
+    "averagePrice": 50,
+    "qualityScore": 91,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Beef",
+      "Pasta",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Massolino Barolo",
+    "producer": "Massolino",
+    "vintage": "2018",
+    "region": "Piedmont",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Nebbiolo"
+    ],
+    "appellation": "Barolo DOCG",
+    "averagePrice": 55,
+    "qualityScore": 92,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Braised meats",
+      "Game",
+      "Truffles"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Vietti Barolo",
+    "producer": "Vietti",
+    "vintage": "2018",
+    "region": "Piedmont",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Nebbiolo"
+    ],
+    "appellation": "Barolo DOCG",
+    "averagePrice": 80,
+    "qualityScore": 93,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Game",
+      "Braised meats",
+      "Truffles"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Bodegas Vega-Sicilia Valbuena",
+    "producer": "Vega Sicilia",
+    "vintage": "2016",
+    "region": "Ribera del Duero",
+    "country": "Spain",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Tempranillo",
+      "Merlot",
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "Ribera del Duero DO",
+    "averagePrice": 150,
+    "qualityScore": 95,
+    "alcoholContent": 14,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Lamb",
+      "Beef",
+      "Game"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Marqués de Riscal Reserva",
+    "producer": "Marqués de Riscal",
+    "vintage": "2017",
+    "region": "Rioja",
+    "country": "Spain",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Tempranillo",
+      "Garnacha",
+      "Graciano"
+    ],
+    "appellation": "Rioja DOCa",
+    "averagePrice": 25,
+    "qualityScore": 89,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 82,
+    "foodPairings": [
+      "Lamb",
+      "Beef",
+      "Tapas"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "La Rioja Alta Gran Reserva",
+    "producer": "La Rioja Alta",
+    "vintage": "2015",
+    "region": "Rioja",
+    "country": "Spain",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Tempranillo",
+      "Garnacha",
+      "Graciano",
+      "Mazuelo"
+    ],
+    "appellation": "Rioja DOCa",
+    "averagePrice": 45,
+    "qualityScore": 92,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Lamb",
+      "Beef",
+      "Aged cheese"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Clos Erasmus",
+    "producer": "Clos Erasmus",
+    "vintage": "2018",
+    "region": "Priorat",
+    "country": "Spain",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Garnacha",
+      "Syrah"
+    ],
+    "appellation": "Priorat DOQ",
+    "averagePrice": 200,
+    "qualityScore": 95,
+    "alcoholContent": 15,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Game",
+      "Braised meats",
+      "Strong cheeses"
+    ],
+    "body": "Full",
+    "acidity": "Medium",
+    "tannins": "High",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Bollinger Special Cuvée",
+    "producer": "Bollinger",
+    "vintage": "NV",
+    "region": "Champagne",
+    "country": "France",
+    "wineType": "Sparkling",
+    "grapeVariety": [
+      "Pinot Noir",
+      "Chardonnay",
+      "Pinot Meunier"
+    ],
+    "appellation": "Champagne AOC",
+    "averagePrice": 65,
+    "qualityScore": 91,
+    "alcoholContent": 12,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 85,
+    "foodPairings": [
+      "Oysters",
+      "Seafood",
+      "Celebration"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Laurent-Perrier",
+    "producer": "Laurent-Perrier",
+    "vintage": "NV",
+    "region": "Champagne",
+    "country": "France",
+    "wineType": "Sparkling",
+    "grapeVariety": [
+      "Chardonnay",
+      "Pinot Noir",
+      "Pinot Meunier"
+    ],
+    "appellation": "Champagne AOC",
+    "averagePrice": 50,
+    "qualityScore": 90,
+    "alcoholContent": 12,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 82,
+    "foodPairings": [
+      "Seafood",
+      "Appetizers",
+      "Celebration"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Taittinger Comtes de Champagne",
+    "producer": "Taittinger",
+    "vintage": "2012",
+    "region": "Champagne",
+    "country": "France",
+    "wineType": "Sparkling",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Champagne AOC",
+    "averagePrice": 200,
+    "qualityScore": 95,
+    "alcoholContent": 12,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 90,
+    "foodPairings": [
+      "Oysters",
+      "Caviar",
+      "Fine dining"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Pol Roger Cuvée Sir Winston Churchill",
+    "producer": "Pol Roger",
+    "vintage": "2012",
+    "region": "Champagne",
+    "country": "France",
+    "wineType": "Sparkling",
+    "grapeVariety": [
+      "Pinot Noir",
+      "Chardonnay"
+    ],
+    "appellation": "Champagne AOC",
+    "averagePrice": 250,
+    "qualityScore": 96,
+    "alcoholContent": 12,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 92,
+    "foodPairings": [
+      "Oysters",
+      "Caviar",
+      "Fine dining"
+    ],
+    "body": "Full",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Ruinart Blanc de Blancs",
+    "producer": "Ruinart",
+    "vintage": "NV",
+    "region": "Champagne",
+    "country": "France",
+    "wineType": "Sparkling",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Champagne AOC",
+    "averagePrice": 80,
+    "qualityScore": 92,
+    "alcoholContent": 12,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 88,
+    "foodPairings": [
+      "Oysters",
+      "Seafood",
+      "Light dishes"
+    ],
+    "body": "Medium",
+    "acidity": "High",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "19 Crimes Red Blend",
+    "producer": "19 Crimes",
+    "vintage": "2021",
+    "region": "South Eastern Australia",
+    "country": "Australia",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Shiraz",
+      "Cabernet Sauvignon",
+      "Grenache"
+    ],
+    "appellation": "South Eastern Australia",
+    "averagePrice": 12,
+    "qualityScore": 83,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 75,
+    "foodPairings": [
+      "Barbecue",
+      "Burgers",
+      "Pizza"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Bota Box Pinot Grigio",
+    "producer": "Bota Box",
+    "vintage": "2022",
+    "region": "California",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Pinot Grigio"
+    ],
+    "appellation": "California",
+    "averagePrice": 18,
+    "qualityScore": 81,
+    "alcoholContent": 12.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 72,
+    "foodPairings": [
+      "Light dishes",
+      "Seafood",
+      "Salads"
+    ],
+    "body": "Light",
+    "acidity": "Medium",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Black Box Cabernet Sauvignon",
+    "producer": "Black Box",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "California",
+    "averagePrice": 22,
+    "qualityScore": 84,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 75,
+    "foodPairings": [
+      "Steak",
+      "Burgers",
+      "Pasta"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Franzia White Zinfandel",
+    "producer": "Franzia",
+    "vintage": "2022",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Rosé",
+    "grapeVariety": [
+      "Zinfandel"
+    ],
+    "appellation": "California",
+    "averagePrice": 6,
+    "qualityScore": 75,
+    "alcoholContent": 10,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 65,
+    "foodPairings": [
+      "Light dishes",
+      "Salads",
+      "Appetizers"
+    ],
+    "body": "Light",
+    "acidity": "Low",
+    "tannins": "Low",
+    "sweetness": "Medium-Sweet"
+  },
+  {
+    "wineName": "Barefoot Moscato",
+    "producer": "Barefoot",
+    "vintage": "2022",
+    "region": "California",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Moscato"
+    ],
+    "appellation": "California",
+    "averagePrice": 7,
+    "qualityScore": 76,
+    "alcoholContent": 9,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 68,
+    "foodPairings": [
+      "Desserts",
+      "Fruit",
+      "Light dishes"
+    ],
+    "body": "Light",
+    "acidity": "Medium",
+    "tannins": "Low",
+    "sweetness": "Sweet"
+  },
+  {
+    "wineName": "Stella Rosa Rosso",
+    "producer": "Stella Rosa",
+    "vintage": "2022",
+    "region": "Piedmont",
+    "country": "Italy",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Brachetto"
+    ],
+    "appellation": "Piedmont",
+    "averagePrice": 12,
+    "qualityScore": 79,
+    "alcoholContent": 7,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 70,
+    "foodPairings": [
+      "Desserts",
+      "Fruit",
+      "Light dishes"
+    ],
+    "body": "Light",
+    "acidity": "Medium",
+    "tannins": "Low",
+    "sweetness": "Sweet"
+  },
+  {
+    "wineName": "Decoy Cabernet Sauvignon",
+    "producer": "Duckhorn Vineyards",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "California",
+    "averagePrice": 25,
+    "qualityScore": 87,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 80,
+    "foodPairings": [
+      "Steak",
+      "Beef",
+      "Pasta"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Wente Riva Ranch Chardonnay",
+    "producer": "Wente Vineyards",
+    "vintage": "2021",
+    "region": "Livermore Valley",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay"
+    ],
+    "appellation": "Livermore Valley",
+    "averagePrice": 20,
+    "qualityScore": 86,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 78,
+    "foodPairings": [
+      "Chicken",
+      "Seafood",
+      "Pasta"
+    ],
+    "body": "Medium",
+    "acidity": "Medium",
+    "tannins": "Low",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Conundrum White",
+    "producer": "Conundrum",
+    "vintage": "2022",
+    "region": "California",
+    "country": "United States",
+    "wineType": "White",
+    "grapeVariety": [
+      "Chardonnay",
+      "Sauvignon Blanc",
+      "Semillon",
+      "Viognier",
+      "Muscat"
+    ],
+    "appellation": "California",
+    "averagePrice": 22,
+    "qualityScore": 86,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 80,
+    "foodPairings": [
+      "Seafood",
+      "Chicken",
+      "Light dishes"
+    ],
+    "body": "Medium",
+    "acidity": "Medium",
+    "tannins": "Low",
+    "sweetness": "Off-Dry"
+  },
+  {
+    "wineName": "Menage a Trois Red",
+    "producer": "Menage a Trois",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Zinfandel",
+      "Merlot",
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "California",
+    "averagePrice": 11,
+    "qualityScore": 82,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 75,
+    "foodPairings": [
+      "Barbecue",
+      "Pizza",
+      "Burgers"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Bogle Old Vine Zinfandel",
+    "producer": "Bogle Vineyards",
+    "vintage": "2020",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Zinfandel"
+    ],
+    "appellation": "California",
+    "averagePrice": 13,
+    "qualityScore": 85,
+    "alcoholContent": 14.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 78,
+    "foodPairings": [
+      "Barbecue",
+      "Pizza",
+      "Spicy dishes"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Beringer Founders' Estate Cabernet Sauvignon",
+    "producer": "Beringer",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "California",
+    "averagePrice": 12,
+    "qualityScore": 83,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 75,
+    "foodPairings": [
+      "Steak",
+      "Burgers",
+      "Pasta"
+    ],
+    "body": "Medium-Full",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Woodbridge by Robert Mondavi Cabernet Sauvignon",
+    "producer": "Robert Mondavi",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Cabernet Sauvignon"
+    ],
+    "appellation": "California",
+    "averagePrice": 8,
+    "qualityScore": 80,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 72,
+    "foodPairings": [
+      "Pizza",
+      "Burgers",
+      "Pasta"
+    ],
+    "body": "Medium",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Bread and Butter Pinot Noir",
+    "producer": "Bread and Butter",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "California",
+    "averagePrice": 15,
+    "qualityScore": 84,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 78,
+    "foodPairings": [
+      "Salmon",
+      "Chicken",
+      "Pork"
+    ],
+    "body": "Medium",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Meiomi Pinot Noir",
+    "producer": "Meiomi",
+    "vintage": "2021",
+    "region": "California",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "California",
+    "averagePrice": 20,
+    "qualityScore": 86,
+    "alcoholContent": 13.8,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 80,
+    "foodPairings": [
+      "Salmon",
+      "Pork",
+      "Chicken"
+    ],
+    "body": "Medium",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  },
+  {
+    "wineName": "Elouan Pinot Noir",
+    "producer": "Elouan",
+    "vintage": "2021",
+    "region": "Oregon",
+    "country": "United States",
+    "wineType": "Red",
+    "grapeVariety": [
+      "Pinot Noir"
+    ],
+    "appellation": "Oregon",
+    "averagePrice": 18,
+    "qualityScore": 85,
+    "alcoholContent": 13.5,
+    "source": "manual",
+    "sourceLicense": "Public Domain",
+    "dataQuality": 78,
+    "foodPairings": [
+      "Salmon",
+      "Chicken",
+      "Pork"
+    ],
+    "body": "Medium",
+    "acidity": "Medium",
+    "tannins": "Medium",
+    "sweetness": "Dry"
+  }
+

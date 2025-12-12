@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WineRecord",
+  "type": "object",
+  "required": ["wineIdentity", "geography", "composition", "market", "sensoryProfile", "compliance"],
+  "properties": {
+    "wineIdentity": {
+      "type": "object",
+      "required": ["wineName", "producer", "vintage"],
+      "properties": {
+        "wineName": { "$ref": "#/definitions/valueWithProvenance" },
+        "producer": { "$ref": "#/definitions/valueWithProvenance" },
+        "vintage": { "$ref": "#/definitions/valueWithProvenance" }
+      },
+      "additionalProperties": true
+    },
+    "geography": {
+      "type": "object",
+      "required": ["region", "appellation"],
+      "properties": {
+        "region": { "$ref": "#/definitions/valueWithProvenance" },
+        "appellation": { "$ref": "#/definitions/valueWithProvenance" }
+      },
+      "additionalProperties": true
+    },
+    "composition": {
+      "type": "object",
+      "required": ["grapeVariety", "alcoholLevel"],
+      "properties": {
+        "grapeVariety": { "$ref": "#/definitions/valueWithProvenance" },
+        "alcoholLevel": { "$ref": "#/definitions/valueWithProvenance" }
+      },
+      "additionalProperties": true
+    },
+    "market": {
+      "type": "object",
+      "required": ["pricePoint", "availability"],
+      "properties": {
+        "pricePoint": {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": { "type": ["number", "string"] },
+            "currency": { "type": ["string", "null"] },
+            "provenance": { "type": ["string", "null"] },
+            "source": { "type": ["string", "null"] }
+          },
+          "additionalProperties": true
+        },
+        "availability": { "$ref": "#/definitions/valueWithProvenance" }
+      },
+      "additionalProperties": true
+    },
+    "sensoryProfile": {
+      "type": "object",
+      "properties": {
+        "tastingNotes": { "$ref": "#/definitions/valueWithProvenance" },
+        "structureProfile": { "type": "object" },
+        "flavorProfile": { "type": "object" },
+        "finish": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "expertRatings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["publication", "score"],
+        "properties": {
+          "publication": { "type": "string" },
+          "critic": { "type": ["string", "null"] },
+          "score": { "type": ["number", "string"] },
+          "scale": { "type": ["number", "string", "null"] },
+          "date": { "type": ["string", "null"] },
+          "citation": { "type": ["string", "null"] },
+          "provenance": { "type": ["string", "null"] }
+        },
+        "additionalProperties": true
+      }
+    },
+    "averageRating": {
+      "type": "object",
+      "properties": {
+        "value": { "type": ["number", "string", "null"] },
+        "computation": { "type": ["string", "null"] },
+        "provenance": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "pairingIntelligence": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "servingGuidance": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "compliance": {
+      "type": "object",
+      "required": ["dataUseStatus"],
+      "properties": {
+        "dataUseStatus": { "type": "string" },
+        "confidenceLevel": { "type": ["string", "null"] },
+        "conflict": { "type": ["boolean", "null"] },
+        "sources": { "type": ["array", "string"] },
+        "lastUpdated": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "valueWithProvenance": {
+      "type": "object",
+      "required": ["value"],
+      "properties": {
+        "value": { "type": ["string", "number", "array", "object"] },
+        "provenance": { "type": ["string", "null"] },
+        "source": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    }
+  }
+}
+

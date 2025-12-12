@@ -1,6 +1,8 @@
 {
   "name": "pocketsomm",
   "version": "1.0.0",
+  "copyright": "Copyright (c) 2025 Aperae. All Rights Reserved.",
+  "license": "PROPRIETARY",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start --tunnel",
@@ -14,19 +16,28 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "type-check": "tsc --noEmit",
+    "ingest:wines": "ts-node scripts/ingest-wines.ts",
+    "ingest:wines:dry": "ts-node scripts/ingest-wines.ts --dry-run",
     "ui:enhanced": "node scripts/toggle-ui.js enhanced",
     "ui:original": "node scripts/toggle-ui.js original",
-    "ui:status": "node scripts/toggle-ui.js status"
+    "ui:status": "node scripts/toggle-ui.js status",
+    "audit": "npm audit",
+    "audit:fix": "npm audit fix",
+    "audit:report": "npm audit --json > audit-report.json",
+    "audit:all": "npm audit && cd backend && npm audit"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/stack": "^6.3.20",
+    "@supabase/supabase-js": "^2.47.6",
     "expo": "~54.0.0",
     "expo-camera": "^17.0.8",
     "expo-crypto": "~15.0.7",
+    "expo-file-system": "^19.0.17",
     "expo-image-picker": "~17.0.8",
     "expo-linear-gradient": "^15.0.7",
     "expo-media-library": "^18.2.0",
@@ -48,10 +59,15 @@
     "@testing-library/jest-native": "^5.4.0",
     "@testing-library/react-native": "^12.0.0",
     "@types/jest": "^29.5.0",
+    "@types/node": "^22.10.1",
     "@types/react": "~19.1.10",
     "@types/react-native": "~0.73.0",
+    "@types/yargs": "^17.0.32",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^2.1.1",
+    "dotenv": "^16.4.5",
     "eslint": "^8.0.0",
     "eslint-plugin-react": "^7.0.0",
     "eslint-plugin-react-hooks": "^4.0.0",
@@ -59,7 +75,10 @@
     "jest": "^29.0.0",
     "jest-expo": "^50.0.0",
     "react-test-renderer": "19.1.0",
-    "typescript": "~5.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.2",
+    "uuid": "^9.0.1",
+    "yargs": "^17.7.2"
   },
   "private": true
 }

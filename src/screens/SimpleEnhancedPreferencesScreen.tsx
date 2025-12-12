@@ -8,11 +8,13 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { PreferencesService } from '../services/preferencesService';
 import { WinePreferences } from '../types/wine';
 import SimpleEnhancedButton from '../components/SimpleEnhancedButton';
 
 const SimpleEnhancedPreferencesScreen: React.FC = () => {
+  const navigation = useNavigation();
   const [preferences, setPreferences] = useState<WinePreferences>({
     wineType: '',
     priceRange: '',

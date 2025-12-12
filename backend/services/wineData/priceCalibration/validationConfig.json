@@ -1,0 +1,54 @@
+{
+  "comment": "Configuration for automated price validation",
+  "sampleSize": 200,
+  "stratified": true,
+  "sources": {
+    "wineSearcher": {
+      "enabled": true,
+      "baseUrl": "https://www.wine-searcher.com",
+      "respectRobotsTxt": true,
+      "rateLimit": 3000,
+      "method": "browser_scraping"
+    },
+    "wineCom": {
+      "enabled": true,
+      "baseUrl": "https://www.wine.com",
+      "respectRobotsTxt": true,
+      "rateLimit": 3000,
+      "method": "browser_scraping"
+    },
+    "vivino": {
+      "enabled": false,
+      "baseUrl": "https://www.vivino.com",
+      "respectRobotsTxt": true,
+      "rateLimit": 3000,
+      "method": "browser_scraping",
+      "note": "More complex, enable later"
+    }
+  },
+  "validation": {
+    "maxSourcesPerWine": 2,
+    "timeoutMs": 15000,
+    "minConfidence": 0.7,
+    "crossValidate": true,
+    "retryFailed": true,
+    "maxRetries": 2
+  },
+  "compliance": {
+    "userAgent": "Mozilla/5.0 (compatible; WinePriceValidator/1.0; Research/Educational)",
+    "respectRobotsTxt": true,
+    "rateLimit": true,
+    "cacheResults": true,
+    "cacheDurationDays": 7,
+    "maxRequestsPerDay": 500
+  },
+  "sampling": {
+    "budget": { "min": 0, "max": 20, "percentage": 30 },
+    "moderate": { "min": 20, "max": 50, "percentage": 25 },
+    "premium": { "min": 50, "max": 100, "percentage": 20 },
+    "luxury": { "min": 100, "max": 500, "percentage": 15 },
+    "ultraLuxury": { "min": 500, "max": 999999, "percentage": 10 }
+  }
+}
+
+

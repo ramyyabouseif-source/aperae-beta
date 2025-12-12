@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Caymus 2015 Cabernet Sauvignon (Napa Valley)",
+    "wineName": "Cabernet Sauvignon",
+    "producer": "Caymus",
+    "vintage": "2015",
+    "region": "Napa Valley",
+    "country": "United States",
+    "kagglePrice": 85,
+    "priceYear": 2017,
+    "currentPrice": 100,
+    "currentVintage": "2021",
+    "priceSource": "wine.com",
+    "researchDate": "2024-01-15",
+    "notes": "Current vintage (2021) priced at $100. Historical 2015 vintage comparable."
+  },
+  {
+    "title": "Cloudy Bay 2022 Sauvignon Blanc (Marlborough)",
+    "wineName": "Sauvignon Blanc",
+    "producer": "Cloudy Bay",
+    "vintage": "2022",
+    "region": "Marlborough",
+    "country": "New Zealand",
+    "kagglePrice": 25,
+    "priceYear": 2017,
+    "currentPrice": 32,
+    "currentVintage": "2023",
+    "priceSource": "totalwine.com",
+    "researchDate": "2024-01-15",
+    "notes": "Current vintage priced at $32"
+  }
+]
+
+

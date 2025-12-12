@@ -1,16 +1,96 @@
+// Legacy tasting notes (string)
+type LegacyTastingNotes = string;
+
+// New tasting notes (object)
+interface NewTastingNotes {
+  aromas: string[];
+  palate: string;
+  finish: string;
+}
+
+// Union type for backward compatibility
+export type TastingNotes = LegacyTastingNotes | NewTastingNotes;
+
+// Type guard
+export function isNewTastingNotes(notes: TastingNotes): notes is NewTastingNotes {
+  return typeof notes === 'object' && notes !== null && 'aromas' in notes;
+}
+
+// Legacy confidence (number)
+type LegacyConfidence = number;
+
+// New confidence (object)
+interface NewConfidence {
+  score: number;
+  breakdown: {
+    pairingScience: number;
+    wineKnowledge: number;
+    complexityHandling: number;
+  };
+  rationale: string;
+}
+
+// Union type
+export type Confidence = LegacyConfidence | NewConfidence;
+
+// Type guard
+export function isNewConfidence(conf: Confidence): conf is NewConfidence {
+  return typeof conf === 'object' && conf !== null && 'breakdown' in conf;
+}
+
+export interface DishAnalysis {
+  dominantWeight: "light" | "medium" | "heavy";
+  fatContent: "none" | "low" | "medium" | "high";
+  primaryProtein: string;
+  dominantFlavors: string[];
+  spiceLevel: "none" | "mild" | "moderate" | "hot";
+  applicablePrinciples: string[];
+  // New optional fields
+  acidityLevel?: "low" | "medium" | "high";
+  keyChallenge?: string;
+  idealProfile?: {
+    acidity: string;
+    tannin: string;
+    body: string;
+    sweetness: string;
+    notes: string;
+  };
+}
+
 export interface WineRecommendation {
   wineName: string;
   producer: string;
   vintage: string;
   pricePoint: string; // Can be "unknown" or specific price like "$45"
   rationale: string;
-  tastingNotes: string;
-  servingGuidance: string;
-  confidenceScore: number;
+  tastingNotes: TastingNotes; // Union type for backward compatibility
+  servingGuidance: string | {
+    temperature: string;
+    glassware: string;
+    decanting: string;
+  };
+  confidenceScore?: number; // Legacy - deprecated but kept for compatibility
+  confidence?: Confidence; // New format
+  confidenceRationale?: string; // Legacy - deprecated
   expertRating: string; // Can be "unknown" or specific rating like "95 (Wine Spectator)"
   retailerSuggestion: string;
   image: string; // Can be "unknown" or specific URL
   storytellingElements: string;
+  // Existing optional fields
+  tierLabel?: string; // "Premium Selection" | "Moderate Choice" | "Budget-Friendly"
+  category?: string; // "Sparkling" | "White Wine" | "Red Wine" | "Rosé" | "Dessert"
+  grape?: string; // e.g., "Chardonnay (White)", "Cabernet Sauvignon (Red)"
+  pairingPrinciplesApplied?: string[]; // e.g., ["Weight Matching", "Acidity-Fat Cleansing"]
+  // New optional fields
+  region?: string;
+  tierFallbackApplied?: boolean;
+  story?: string;
+  alternatives?: Array<{
+    wineName: string;
+    producer: string;
+    vintage: string;
+    grape: string;
+  }>;
 }
 
 export interface WineRecommendationResponse {
@@ -18,6 +98,13 @@ export interface WineRecommendationResponse {
   recommendations: WineRecommendation[];
   closingNarrative?: string;
   disclaimer?: string;
+  dishAnalysis?: DishAnalysis;
+  pairingNotes?: string;
+  // New optional field
+  avoid?: {
+    types: string[];
+    reason: string;
+  };
 }
 
 export interface FavoriteWine extends WineRecommendation {

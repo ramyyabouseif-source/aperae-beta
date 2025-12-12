@@ -25,7 +25,9 @@ import SecureHttpClient from './secureHttpClient';
  * ```
  */
 export class WineService {
-  private static isMockMode = true;
+  // Check environment variable for mock mode, default to false (use real API)
+  // Only enable mock mode if explicitly set to 'true' in environment
+  private static isMockMode = (process.env.EXPO_PUBLIC_MOCK_MODE || '').toLowerCase() === 'true';
   private static readonly MAX_RETRIES = 3;
   private static readonly BASE_RETRY_DELAY = 800; // base backoff in ms
   private static secureClient: SecureHttpClient | null = null;
@@ -93,13 +95,14 @@ export class WineService {
    * 
    * @param dish - The food item to pair with wine (e.g., "Grilled Ribeye Steak")
    * @param preferences - Optional user preferences for wine selection
+   * @param availableWines - Optional list of available wines (for menu screen - constrains recommendations to menu)
    * @returns Promise resolving to wine recommendation response
    * 
    * @throws {Error} When all API attempts fail and no fallback is available
    * 
    * @example
    * ```typescript
-   * // Basic usage
+   * // Basic usage (home screen - no constraints)
    * const recommendations = await WineService.getWineRecommendations('Grilled Salmon');
    * 
    * // With preferences
@@ -111,11 +114,26 @@ export class WineService {
    *     preferredRegions: ['Napa Valley', 'Bordeaux']
    *   }
    * );
+   * 
+   * // With menu wines (menu screen - constrained to menu)
+   * const recommendations = await WineService.getWineRecommendations(
+   *   'Seabass',
+   *   preferences,
+   *   availableWines
+   * );
    * ```
    */
   static async getWineRecommendations(
     dish: string, 
-    preferences?: UserPreferences
+    preferences?: UserPreferences,
+    availableWines?: Array<{
+      wineName: string;
+      producer: string;
+      vintage: string;
+      pricePoint: string;
+      category: string;
+      description?: string;
+    }>
   ): Promise<WineRecommendationResponse> {
     const startTime = performance.now();
     console.log('=== WINE RECOMMENDATION REQUEST START ===');
@@ -148,7 +166,7 @@ export class WineService {
       // }
 
       // Make API call with retry logic
-      const result = await this.makeApiCallWithRetry(dish, preferences);
+      const result = await this.makeApiCallWithRetry(dish, preferences, availableWines);
       
       const endTime = performance.now();
       const responseTime = endTime - startTime;
@@ -162,14 +180,28 @@ export class WineService {
       // await CacheService.set(cacheKey, result);
       
       return result;
-    } catch (error) {
+    } catch (error: any) {
       const endTime = performance.now();
       const responseTime = endTime - startTime;
       
       console.error('=== ERROR RESPONSE TIME ===');
       console.error('Error Response Time:', responseTime.toFixed(2), 'ms');
       console.error('Error Time:', new Date().toISOString());
-      console.error('Error:', error.message);
+      console.error('Error Name:', error.name || 'Unknown');
+      console.error('Error Message:', error.message || 'No error message');
+      console.error('Error Stack:', error.stack || 'No stack trace');
+      
+      // Enhanced error logging
+      if (error.response) {
+        console.error('Response Status:', error.response.status);
+        console.error('Response Data:', JSON.stringify(error.response.data || {}).substring(0, 1000));
+      }
+      
+      if (error.request) {
+        console.error('Request failed - no response received');
+      }
+      
+      console.error('Full Error:', JSON.stringify(error, Object.getOwnPropertyNames(error)).substring(0, 2000));
       console.error('==========================');
       
       console.error('Error fetching wine recommendations:', error);
@@ -190,6 +222,7 @@ export class WineService {
    * 
    * @param dish - The food item to pair with wine
    * @param preferences - Optional user preferences
+   * @param availableWines - Optional list of available wines (constrains recommendations when provided)
    * @returns Promise resolving to wine recommendation response
    * 
    * @throws {Error} When all retry attempts fail
@@ -198,7 +231,15 @@ export class WineService {
    */
   private static async makeApiCallWithRetry(
     dish: string, 
-    preferences?: UserPreferences
+    preferences?: UserPreferences,
+    availableWines?: Array<{
+      wineName: string;
+      producer: string;
+      vintage: string;
+      pricePoint: string;
+      category: string;
+      description?: string;
+    }>
   ): Promise<WineRecommendationResponse> {
     let lastError: Error | null = null;
     
@@ -211,14 +252,22 @@ export class WineService {
         const API_BASE_URL = getApiBaseUrl();
         console.log('API_BASE_URL:', API_BASE_URL);
         console.log('Making secure request to:', `${API_BASE_URL}/recommendations`);
-        console.log('Request body:', JSON.stringify({ dish, preferences }));
+        const requestBody: any = {
+          dish: dish,
+          preferences: preferences || {}
+        };
+        
+        // Include available wines if provided (for menu screen - constrains to menu wines)
+        if (availableWines && availableWines.length > 0) {
+          requestBody.availableWines = availableWines;
+          console.log('Request includes available wines (menu context):', availableWines.length);
+        }
+        
+        console.log('Request body:', JSON.stringify(requestBody));
 
         // Use secure HTTP client with certificate pinning
         const secureClient = this.getSecureClient();
-        const response = await secureClient.post('/recommendations', {
-          dish: dish,
-          preferences: preferences || {}
-        }, {
+        const response = await secureClient.post('/recommendations', requestBody, {
           'ngrok-skip-browser-warning': 'true',
           // Add CSRF protection in production
           // 'X-CSRF-Token': csrfToken
@@ -245,14 +294,32 @@ export class WineService {
         
         return data;
         
-      } catch (error) {
+      } catch (error: any) {
         const attemptEndTime = performance.now();
         const attemptResponseTime = attemptEndTime - attemptStartTime;
         
         lastError = error as Error;
         console.error(`=== ATTEMPT ${attempt} ERROR ===`);
         console.error('Attempt Error Time:', attemptResponseTime.toFixed(2), 'ms');
-        console.error('Error:', error.message);
+        console.error('Error Name:', error.name || 'Unknown');
+        console.error('Error Message:', error.message || 'No error message');
+        console.error('Error Stack:', error.stack || 'No stack trace');
+        
+        // Enhanced error details
+        if (error.response) {
+          console.error('Response Status:', error.response.status);
+          console.error('Response Status Text:', error.response.statusText);
+          console.error('Response Headers:', JSON.stringify(error.response.headers || {}));
+          console.error('Response Data:', JSON.stringify(error.response.data || {}).substring(0, 1000));
+        }
+        
+        if (error.request) {
+          console.error('Request Details:', {
+            url: error.request.url || 'Unknown',
+            method: error.request.method || 'Unknown',
+            headers: error.request.headers || {}
+          });
+        }
         
         // Check if it's a timeout error
         if (error.name === 'AbortError' || error.message.includes('timeout')) {
@@ -260,6 +327,20 @@ export class WineService {
           lastError = new Error(`Request timed out after ${NETWORK_CONFIG.timeout / 1000} seconds. Please check your connection and try again.`);
         }
         
+        // Network errors
+        if (error.message?.includes('Network') || error.message?.includes('Failed to fetch')) {
+          console.error('Network error detected - check connection');
+        }
+        
+        // API errors
+        if (error.response?.status) {
+          console.error(`API returned error status: ${error.response.status}`);
+          if (error.response.data) {
+            console.error('API Error Response:', JSON.stringify(error.response.data).substring(0, 500));
+          }
+        }
+        
+        console.error('Full Error Object:', JSON.stringify(error, Object.getOwnPropertyNames(error)).substring(0, 2000));
         console.error('=============================');
         
         if (attempt < this.MAX_RETRIES) {
@@ -292,57 +373,200 @@ export class WineService {
    */
   private static getMockRecommendations(dish: string): WineRecommendationResponse {
     console.log('=== MOCK DATA DEBUG ===');
-    console.log('This should show the NEW mock data with $145, $59, $40');
+    console.log('Using enhanced mock data format with new fields');
     
+    // Use the enhanced mock data format matching backend/mockDataEnhanced.json (Carbonara example)
     const mockData: WineRecommendationResponse = {
-      dish: dish,
+      dish: dish.trim() || "Carbonara Spaghetti with smoked bacon, breadcrumbs, parmesan cheese, and egg yolk",
+      dishAnalysis: {
+        dominantWeight: "heavy",
+        fatContent: "high",
+        primaryProtein: "pork (smoked bacon, cured)",
+        dominantFlavors: ["salty", "umami", "savory"],
+        spiceLevel: "none",
+        acidityLevel: "low",
+        applicablePrinciples: ["Weight Matching", "Acidity–Fat Cleansing", "Bitterness & Umami Avoidance", "Flavor Bridging"],
+        keyChallenge: "High fat content from egg yolk, bacon, and cheese requires substantial acidity to cleanse palate and prevent heaviness",
+        idealProfile: {
+          acidity: "high",
+          tannin: "none to low",
+          body: "medium to full",
+          sweetness: "dry",
+          notes: "bright acidity, mineral complexity, creamy texture compatibility, savory herb or stone fruit notes"
+        }
+      },
       recommendations: [
         {
-          wineName: "Château Léoville Barton",
-          producer: "Léoville Barton",
-          vintage: "2016",
-          pricePoint: "$145",
-          rationale: "The ribeye's marbling and char demand a structured Bordeaux with balance between tannins and freshness. This wine's power complements the richness while its acidity cuts through the fat.",
-          tastingNotes: "Aromas of cassis, cedar, and graphite. On the palate, concentrated dark fruits, firm tannins, and a long, savory finish with tobacco and spice.",
-          servingGuidance: "Serve at 60–62°F in a Bordeaux glass to allow full aeration.",
-          confidenceScore: 98,
-          expertRating: "97 (Wine Spectator)",
-          retailerSuggestion: "Berry Bros. & Rudd (UK), Wine.com (US)",
-          image: "https://example.com/leoville-barton-2016.jpg",
-          storytellingElements: "Léoville Barton, a historic 1855 Second Growth, embodies Saint-Julien's elegance and power. This vintage reflects the estate's centuries of winemaking, perfect for celebratory steak dinners."
+          tierLabel: "Premium Selection",
+          tierRationale: "Premier Cru classification signal from Burgundy's Chablis hierarchy; single-vineyard terroir from documented world-class site",
+          tierFallbackApplied: false,
+          wineName: "Chablis Premier Cru Montmains",
+          producer: "William Fèvre",
+          region: "Chablis, Burgundy, France",
+          vintage: "2021",
+          grape: "Chardonnay (White)",
+          pricePoint: "$85",
+          category: "White Wine",
+          rationale: "Weight Matching and Acidity–Fat Cleansing principles are satisfied by high-acid Chardonnay that cuts through egg yolk and bacon fat. Bitterness & Umami Avoidance achieved through unoaked, mineral-driven style that complements rather than clashes with parmesan's savory depth. Flavor Bridging occurs via wine's creamy lees texture echoing carbonara's richness while citrus and mineral notes refresh the palate.",
+          pairingPrinciplesApplied: ["Weight Matching", "Acidity–Fat Cleansing", "Bitterness & Umami Avoidance", "Flavor Bridging"],
+          tastingNotes: {
+            aromas: ["green apple", "lemon zest", "wet stone", "white flowers", "oyster shell"],
+            palate: "piercing acidity with taut mineral backbone, medium body with subtle creaminess from lees aging, flavors of citrus, green fruit, and saline minerality",
+            finish: "long, clean, mineral-driven with refreshing salinity"
+          },
+          servingGuidance: {
+            temperature: "50-54°F (10-12°C)",
+            glassware: "Burgundy white wine glass",
+            decanting: "No decant needed"
+          },
+          confidence: {
+            score: 88,
+            breakdown: {
+              pairingScience: 45,
+              wineKnowledge: 28,
+              complexityHandling: 15
+            },
+            rationale: "Strong pairing science application with all four applicable principles explicitly satisfied. Slight deduction in wine knowledge for vintage uncertainty in current market. Moderate complexity dish (4 elements: pasta, bacon, cheese, egg) handled effectively with conflict resolution between fat and umami."
+          },
+          story: "Premier Cru Montmains sits on Kimmeridgian limestone, the ancient seabed that gives Chablis its signature flinty minerality and razor-sharp acidity, perfectly suited to cut through rich, creamy dishes.",
+          alternatives: [
+            {
+              wineName: "Chablis Premier Cru Fourchaume",
+              producer: "Domaine Laroche",
+              vintage: "2022",
+              grape: "Chardonnay (White)"
+            },
+            {
+              wineName: "Chablis Premier Cru Vaillons",
+              producer: "Jean-Marc Brocard",
+              vintage: "2021",
+              grape: "Chardonnay (White)"
+            }
+          ],
+          expertRating: "93 (Wine Advocate)",
+          retailerSuggestion: "Premier Cru specialists, fine wine retailers, or direct from importer",
+          image: "unknown",
+          storytellingElements: "Premier Cru Montmains sits on Kimmeridgian limestone, the ancient seabed that gives Chablis its signature flinty minerality and razor-sharp acidity, perfectly suited to cut through rich, creamy dishes."
         },
         {
-          wineName: "Ridge Vineyards 'Lytton Springs'",
-          producer: "Ridge Vineyards",
-          vintage: "2019",
-          pricePoint: "$59",
-          rationale: "Zinfandel's fruit-forward energy and subtle spice balance the ribeye's boldness while adding an approachable, distinctly Californian twist.",
-          tastingNotes: "Ripe blackberry, raspberry compote, and black pepper. Medium-plus body with lively acidity, framed by supple tannins and a lingering finish.",
-          servingGuidance: "Serve slightly cooler than room temperature (58–60°F) in a universal red wine glass.",
-          confidenceScore: 95,
-          expertRating: "94 (Wine Spectator)",
-          retailerSuggestion: "K&L Wines, Total Wine & More",
-          image: "https://example.com/ridge-lytton-2019.jpg",
-          storytellingElements: "Ridge has championed old-vine Zinfandel since the 1960s. Lytton Springs comes from gnarly 100-year-old vines, offering a piece of California history in every bottle."
+          tierLabel: "Moderate Choice",
+          tierRationale: "Village-level Burgundy classification signal; reputable estate bottling from recognized Pouilly-Fuissé terroir with distinct site character",
+          tierFallbackApplied: false,
+          wineName: "Pouilly-Fuissé",
+          producer: "Domaine J.A. Ferret",
+          region: "Mâconnais, Burgundy, France",
+          vintage: "2022",
+          grape: "Chardonnay (White)",
+          pricePoint: "$45",
+          category: "White Wine",
+          rationale: "Weight Matching achieved through medium-full body that stands up to carbonara's richness. Acidity–Fat Cleansing provided by southern Burgundy's characteristic bright acidity cutting through bacon fat and egg yolk. Flavor Bridging occurs as wine's subtle oak integration and ripe stone fruit notes complement dish's savory depth while maintaining refreshing citrus lift.",
+          pairingPrinciplesApplied: ["Weight Matching", "Acidity–Fat Cleansing", "Flavor Bridging"],
+          tastingNotes: {
+            aromas: ["white peach", "lemon", "hazelnut", "acacia flower", "butter"],
+            palate: "vibrant acidity balanced with medium-full body, creamy texture from lees contact, flavors of stone fruit, citrus, and subtle toast",
+            finish: "medium-long with lingering fruit and mineral notes"
+          },
+          servingGuidance: {
+            temperature: "52-56°F (11-13°C)",
+            glassware: "Burgundy white wine glass",
+            decanting: "No decant needed"
+          },
+          confidence: {
+            score: 85,
+            breakdown: {
+              pairingScience: 42,
+              wineKnowledge: 28,
+              complexityHandling: 15
+            },
+            rationale: "Strong pairing science with three applicable principles satisfied and no violations. Wine knowledge confident with established producer and region. Complexity handling effective for moderate dish elements. Minor deduction for fewer principle applications than premium recommendation."
+          },
+          story: "Pouilly-Fuissé's limestone slopes in southern Burgundy produce fuller-bodied Chardonnay than northern Chablis, with the region's warm microclimate adding ripe fruit while maintaining essential acidity.",
+          alternatives: [
+            {
+              wineName: "Saint-Véran",
+              producer: "Domaine des Deux Roches",
+              vintage: "2022",
+              grape: "Chardonnay (White)"
+            },
+            {
+              wineName: "Mâcon-Villages",
+              producer: "Domaine de la Bongran",
+              vintage: "2022",
+              grape: "Chardonnay (White)"
+            }
+          ],
+          expertRating: "91 (Wine Spectator)",
+          retailerSuggestion: "Total Wine & More, Wine.com, or local shops with strong Burgundy selections",
+          image: "unknown",
+          storytellingElements: "Pouilly-Fuissé's limestone slopes in southern Burgundy produce fuller-bodied Chardonnay than northern Chablis, with the region's warm microclimate adding ripe fruit while maintaining essential acidity."
         },
         {
-          wineName: "Catena Zapata 'Catena Alta'",
-          producer: "Catena Zapata",
-          vintage: "2020",
-          pricePoint: "$40",
-          rationale: "Malbec's plush fruit and smoky undertones harmonize with grilled ribeye, bringing balance between dark fruit and char.",
-          tastingNotes: "Notes of plum, violet, and cocoa. Juicy mid-palate with soft tannins, finishing with spice and mineral lift from high-altitude vineyards.",
-          servingGuidance: "Serve at 60°F in a Malbec or Bordeaux-style glass.",
-          confidenceScore: 92,
-          expertRating: "93 (James Suckling)",
-          retailerSuggestion: "Wine.com, Vivino Marketplace",
-          image: "https://example.com/catena-alta-2020.jpg",
-          storytellingElements: "The Catena family revolutionized Argentine winemaking through high-altitude viticulture, producing wines of remarkable purity and energy."
+          tierLabel: "Budget-Friendly",
+          tierRationale: "Regional-level AOC without village designation; established producer with entry-tier cuvée representing reliable Bourgogne quality",
+          tierFallbackApplied: false,
+          wineName: "Bourgogne Blanc",
+          producer: "Louis Jadot",
+          region: "Burgundy, France",
+          vintage: "2022",
+          grape: "Chardonnay (White)",
+          pricePoint: "$22",
+          category: "White Wine",
+          rationale: "Weight Matching satisfied as medium-bodied wine pairs appropriately with carbonara without overwhelming the dish. Acidity–Fat Cleansing principle met through Burgundian Chardonnay's natural high acidity that refreshes against bacon fat and egg yolk richness. Bitterness & Umami Avoidance achieved via fruit-forward, minimal-oak style that complements parmesan's umami without clashing.",
+          pairingPrinciplesApplied: ["Weight Matching", "Acidity–Fat Cleansing", "Bitterness & Umami Avoidance"],
+          tastingNotes: {
+            aromas: ["green apple", "lemon", "white flowers", "chalk"],
+            palate: "crisp acidity with medium body, clean citrus and green fruit flavors, subtle mineral undertones, light texture",
+            finish: "medium length with bright, refreshing acidity"
+          },
+          servingGuidance: {
+            temperature: "48-52°F (9-11°C)",
+            glassware: "Universal white wine glass",
+            decanting: "No decant needed"
+          },
+          confidence: {
+            score: 83,
+            breakdown: {
+              pairingScience: 42,
+              wineKnowledge: 26,
+              complexityHandling: 15
+            },
+            rationale: "Solid pairing science with three applicable principles satisfied and no violations. Wine knowledge strong with recognized producer and region, minor deduction for entry-tier style offering less complexity. Moderate complexity dish handled appropriately with structural match."
+          },
+          story: "Bourgogne Blanc represents entry-level Burgundy, sourced from various village vineyards across the region, offering classic Chardonnay character with the limestone-derived acidity essential for cutting through rich dishes.",
+          alternatives: [
+            {
+              wineName: "Petit Chablis",
+              producer: "Domaine de la Motte",
+              vintage: "2023",
+              grape: "Chardonnay (White)"
+            },
+            {
+              wineName: "Mâcon-Villages",
+              producer: "Louis Latour",
+              vintage: "2023",
+              grape: "Chardonnay (White)"
+            }
+          ],
+          expertRating: "88 (Wine Advocate)",
+          retailerSuggestion: "Trader Joe's wine section, Costco, or local wine shops with French value selections",
+          image: "unknown",
+          storytellingElements: "Bourgogne Blanc represents entry-level Burgundy, sourced from various village vineyards across the region, offering classic Chardonnay character with the limestone-derived acidity essential for cutting through rich dishes."
         }
-      ]
+      ],
+      avoid: {
+        types: ["High-tannin reds (Barolo, Cabernet Sauvignon)", "Heavily oaked Chardonnay", "Low-acid whites (Viognier, white Rhône blends)", "Sparkling wines"],
+        reason: "High tannins clash with egg yolk's fat and bacon's cured nature creating metallic bitterness. Heavy oak competes with parmesan's umami and carbonara's richness. Low-acid wines cannot cleanse palate from high fat content, leaving coating sensation. Sparkling's effervescence disrupts creamy texture and carbonation accentuates saltiness uncomfortably."
+      },
+      closingNarrative: "Carbonara demands wines with surgical precision—high acidity to slice through layers of pork fat, egg yolk, and aged cheese, while maintaining enough body to not be overwhelmed. Burgundian Chardonnay, particularly from limestone terroirs, provides this balance: mineral-driven acidity acts as a palate cleanser, while the wine's texture harmonizes with the dish's creamy richness, creating a dialogue between Old World restraint and Italian indulgence."
     };
     
     console.log('Mock data pricePoint values:', mockData.recommendations.map(w => w.pricePoint));
+    console.log('Mock data tierLabels:', mockData.recommendations.map(w => w.tierLabel));
+    console.log('Mock data has dishAnalysis:', !!mockData.dishAnalysis);
+    console.log('Mock data has avoid:', !!mockData.avoid);
+    console.log('Mock data has closingNarrative:', !!mockData.closingNarrative);
+    console.log('Mock data closingNarrative:', mockData.closingNarrative);
+    console.log('Mock data avoid:', mockData.avoid);
     return mockData;
   }
 }

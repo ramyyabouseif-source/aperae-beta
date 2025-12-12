@@ -55,8 +55,8 @@ class RequestLogger {
   }
 
   /**
-   * Track API call timing (for external API calls like uses OpenAI)
-   * @param {string} service - Service name (e.g., 'openai', 'google-vision')
+   * Track API call timing (for external API calls like Anthropic Claude)
+   * @param {string} service - Service name (e.g., 'anthropic', 'google-vision')
    * @param {string} requestId - Unique request identifier
    * @param {number} responseTime - Response time in milliseconds
    */

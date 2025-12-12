@@ -1,49 +1,123 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
   TouchableOpacity,
   Alert,
-  RefreshControl,
-  Image,
   Animated,
+  ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { FavoritesService } from '../services/favoritesService';
+import { FavoritesService, PaginationOptions } from '../services/favoritesService';
+import { LayoutPreferencesService, LayoutType } from '../services/layoutPreferencesService';
 import { WineRecommendation } from '../types/wine';
-import AdaptiveWineCard from '../components/AdaptiveWineCard';
+import MasonryGrid from '../components/favorites/MasonryGrid';
+import FavoritesListView from '../components/favorites/FavoritesListView';
+import LayoutToggleButton from '../components/favorites/LayoutToggleButton';
+import WineDetailModal from '../components/favorites/WineDetailModal';
 
 const SimpleEnhancedFavoritesScreen: React.FC = () => {
   const [favorites, setFavorites] = useState<WineRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [selectedWine, setSelectedWine] = useState<WineRecommendation | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [layout, setLayout] = useState<LayoutType>('grid');
+  const [fadeAnim] = useState(new Animated.Value(1));
   const navigation = useNavigation();
 
+  const PAGE_SIZE = 20; // Items per page
+
   useEffect(() => {
-    loadFavorites();
+    loadLayoutPreference();
+    loadFavorites(1, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loadFavorites = async () => {
+  const loadLayoutPreference = async () => {
     try {
-      setLoading(true);
-      const savedFavorites = await FavoritesService.getFavorites();
-      setFavorites(savedFavorites);
+      const savedLayout = await LayoutPreferencesService.getLayoutPreference();
+      setLayout(savedLayout);
+    } catch (error) {
+      console.error('Error loading layout preference:', error);
+    }
+  };
+
+  const handleLayoutToggle = useCallback(async (newLayout: LayoutType) => {
+    // Animate transition
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setLayout(newLayout);
+    try {
+      await LayoutPreferencesService.saveLayoutPreference(newLayout);
+    } catch (error) {
+      console.error('Error saving layout preference:', error);
+    }
+  }, [fadeAnim]);
+
+  const loadFavorites = async (page: number = 1, append: boolean = false) => {
+    try {
+      if (page === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+
+      const paginationOptions: PaginationOptions = {
+        page,
+        pageSize: PAGE_SIZE,
+        sortBy: 'date',
+        sortOrder: 'desc',
+      };
+
+      const result = await FavoritesService.getFavoritesPaginated(paginationOptions);
+      
+      if (append) {
+        setFavorites(prev => [...prev, ...result.data]);
+      } else {
+        setFavorites(result.data);
+      }
+
+      setHasMore(result.pagination.hasNextPage);
+      setCurrentPage(page);
     } catch (error) {
       console.error('Error loading favorites:', error);
       Alert.alert('Error', 'Failed to load favorites');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await loadFavorites();
+    setCurrentPage(1);
+    setHasMore(true);
+    await loadFavorites(1, false);
     setRefreshing(false);
   };
+
+  const handleLoadMore = useCallback(() => {
+    if (!loadingMore && hasMore && !loading) {
+      loadFavorites(currentPage + 1, true);
+    }
+  }, [currentPage, hasMore, loadingMore, loading]);
 
   const handleDiscoverWines = () => {
     navigation.navigate('Home' as never);
@@ -80,16 +154,15 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
     );
   };
 
-  const renderWineCard = ({ item }: { item: WineRecommendation }) => (
-    <View style={styles.cardContainer}>
-      <AdaptiveWineCard
-        wine={item}
-        onRemoveFromFavorites={confirmRemoveFavorite}
-        isFavorite={true}
-        showRemoveButton={true}
-      />
-    </View>
-  );
+  const handleWinePress = useCallback((wine: WineRecommendation) => {
+    setSelectedWine(wine);
+    setModalVisible(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setModalVisible(false);
+    setSelectedWine(null);
+  }, []);
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
@@ -112,45 +185,6 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
     </View>
   );
 
-  const renderHeader = () => (
-    <View style={styles.headerContainer}>
-      <View style={styles.headerContent}>
-        <View style={styles.headerIconContainer}>
-          <Ionicons name="heart" size={32} color="#8B0000" />
-        </View>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>My Wine Collection</Text>
-          <Text style={styles.headerSubtitle}>
-            {favorites.length} {favorites.length === 1 ? 'favorite' : 'favorites'} saved
-          </Text>
-        </View>
-      </View>
-      
-      {favorites.length > 0 && (
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>
-              {favorites.filter(w => w.pricePoint?.includes('$')).length}
-            </Text>
-            <Text style={styles.statLabel}>Price Points</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>
-              {new Set(favorites.map(w => w.producer)).size}
-            </Text>
-            <Text style={styles.statLabel}>Producers</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>
-              {new Set(favorites.map(w => w.vintage)).size}
-            </Text>
-            <Text style={styles.statLabel}>Vintages</Text>
-          </View>
-        </View>
-      )}
-    </View>
-  );
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -162,37 +196,100 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
     );
   }
 
+  const renderListHeader = () => {
+    return (
+      <View>
+        {/* Dashboard Summary */}
+        <View style={styles.dashboardSummary}>
+          <Text style={styles.dashboardTitle}>My Wine Collection</Text>
+          <Text style={styles.dashboardSubtitle}>
+            {favorites.length} {favorites.length === 1 ? 'favorite' : 'favorites'} saved
+          </Text>
+        </View>
+        
+        {/* Layout Toggle Button */}
+        {favorites.length > 0 && (
+          <View style={styles.layoutToggleContainer}>
+            <LayoutToggleButton
+              layout={layout}
+              onToggle={handleLayoutToggle}
+            />
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       {/* Wine Cellar Background */}
-      <Animated.Image
+      <ImageBackground
         source={require('../../assets/images/wine-cellar-background.jpg')}
         style={styles.wineCellarBackground}
         resizeMode="cover"
       />
-      
-      {/* Wine Cellar Overlay */}
       <View style={styles.wineCellarOverlay} />
       
-      <FlatList
-        data={favorites}
-        renderItem={renderWineCard}
-        keyExtractor={(item) => `${item.wineName}-${item.vintage}`}
-        ListEmptyComponent={renderEmptyState}
-        refreshControl={
-          <RefreshControl
+      {/* Animated Layout Container */}
+      <Animated.View
+        style={[
+          {
+            opacity: fadeAnim,
+            flex: 1,
+          },
+        ]}
+      >
+        {layout === 'grid' ? (
+          <MasonryGrid
+            data={favorites}
+            loading={loading}
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={['#8B0000']}
-            tintColor="#8B0000"
+            onRemoveFromFavorites={confirmRemoveFavorite}
+            onPress={handleWinePress}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            ListHeaderComponent={renderListHeader}
+            ListEmptyComponent={renderEmptyState}
+            contentContainerStyle={[
+              favorites.length === 0 && styles.emptyListContainer
+            ]}
           />
-        }
-        contentContainerStyle={[
-          styles.listContainer,
-          favorites.length === 0 && styles.emptyListContainer
-        ]}
-        showsVerticalScrollIndicator={false}
-        style={styles.flatList}
+        ) : (
+          <FavoritesListView
+            data={favorites}
+            loading={loading}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            onRemoveFromFavorites={confirmRemoveFavorite}
+            onPress={handleWinePress}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            ListHeaderComponent={renderListHeader}
+            ListEmptyComponent={renderEmptyState}
+            contentContainerStyle={[
+              favorites.length === 0 && styles.emptyListContainer
+            ]}
+          />
+        )}
+      </Animated.View>
+
+      {/* Wine Detail Modal */}
+      <WineDetailModal
+        visible={modalVisible}
+        wine={selectedWine}
+        onClose={handleCloseModal}
+        onRemoveFromFavorites={confirmRemoveFavorite}
+        index={selectedWine ? favorites.findIndex(w => {
+          const selectedId = (selectedWine as any).id;
+          const wineId = (w as any).id;
+          if (selectedId && wineId) {
+            return selectedId === wineId;
+          }
+          return w.wineName === selectedWine.wineName && 
+                 w.producer === selectedWine.producer && 
+                 w.vintage === selectedWine.vintage;
+        }) : 0}
       />
     </View>
   );
@@ -201,7 +298,38 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F4F0', // Light tone
+    backgroundColor: 'transparent',
+  },
+  dashboardSummary: {
+    backgroundColor: 'rgba(247, 244, 240, 0.95)', // Light tone with transparency
+    marginHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 16,
+    padding: 20,
+    borderRadius: 16,
+    shadowColor: '#BF9694', // Metallic accent
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(191, 150, 148, 0.3)', // Metallic accent
+  },
+  dashboardTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#5B2433', // Dark tone
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  dashboardSubtitle: {
+    fontSize: 16,
+    color: '#5B2433', // Dark tone
+    textAlign: 'center',
+  },
+  layoutToggleContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 16,
   },
   wineCellarBackground: {
     position: 'absolute',
@@ -223,10 +351,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: 'rgba(91, 36, 51, 0.2)', // Dark tone overlay
   },
-  flatList: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -241,90 +365,8 @@ const styles = StyleSheet.create({
     color: '#5B2433', // Dark tone
     marginTop: 16,
   },
-  listContainer: {
-    paddingBottom: 32,
-  },
   emptyListContainer: {
     flexGrow: 1,
-  },
-  headerContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    padding: 20,
-    marginTop: 20,
-    marginBottom: 16,
-    marginHorizontal: 16,
-    borderRadius: 16,
-    shadowColor: '#8B0000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 0, 0, 0.3)',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  headerIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 0, 0, 0.3)',
-  },
-  headerTextContainer: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#8B0000',
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#8B0000',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 0, 0, 0.3)',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#8B0000',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#8B0000',
-    textAlign: 'center',
-  },
-  cardContainer: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 16,
-    padding: 8,
-    shadowColor: '#8B0000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   emptyContainer: {
     flex: 1,

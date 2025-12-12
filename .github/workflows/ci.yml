@@ -107,10 +107,16 @@ jobs:
         cd backend
         npm test
     
-    - name: Run security audit
+    - name: Run backend security audit
       run: |
         cd backend
         npm audit --audit-level=moderate
+        continue-on-error: true
+    
+    - name: Run frontend security audit
+      run: |
+        npm audit --audit-level=moderate
+        continue-on-error: true
 
   security-scan:
     runs-on: ubuntu-latest

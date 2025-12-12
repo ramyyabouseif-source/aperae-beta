@@ -1,49 +1,71 @@
 ﻿[
   {
-    "dish": "Ribeye Steak with Creamed Spinach",
+    "dish": "Grilled ribeye steak with chimichurri",
+    "dishAnalysis": {
+      "dominantWeight": "heavy",
+      "fatContent": "high",
+      "primaryProtein": "beef (ribeye), grilled with char",
+      "dominantFlavors": ["umami", "rich", "herbaceous", "acidic"],
+      "spiceLevel": "mild",
+      "applicablePrinciples": ["Weight Matching", "Tannin-Protein Binding", "Acidity-Fat Cleansing", "Flavor Bridging"]
+    },
     "recommendations": [
       {
-        "wineName": "Château Léoville Barton",
-        "producer": "Léoville Barton",
+        "tierLabel": "Premium Selection",
+        "wineName": "Pauillac",
+        "producer": "Château Pichon Longueville Comtesse de Lalande",
         "vintage": "2016",
-        "pricePoint": "$145",
-        "rationale": "The ribeye's marbling and char demand a structured Bordeaux with balance between tannins and freshness. This wine's power complements the richness while its acidity cuts through the fat.",
-        "tastingNotes": "Aromas of cassis, cedar, and graphite. On the palate, concentrated dark fruits, firm tannins, and a long, savory finish with tobacco and spice.",
-        "servingGuidance": "Serve at 60–62°F in a Bordeaux glass to allow full aeration.",
-        "confidenceScore": 98,
-        "expertRating": "97 (Wine Spectator)",
-        "retailerSuggestion": "Berry Bros. & Rudd (UK), Wine.com (US)",
-        "image": "https://example.com/leoville-barton-2016.jpg",
-        "storytellingElements": "Léoville Barton, a historic 1855 Second Growth, embodies Saint-Julien's elegance and power. This vintage reflects the estate's centuries of winemaking, perfect for celebratory steak dinners."
+        "pricePoint": "$135",
+        "category": "Red Wine",
+        "rationale": "This Bordeaux blend's structured tannins bind with ribeye's abundant marbling and grilled proteins (Tannin-Protein Binding), while its full body matches the steak's substantial weight (Weight Matching). The wine's cassis and graphite notes complement the char, while underlying acidity cuts through fat and echoes chimichurri's bright vinegar-herb profile (Acidity-Fat Cleansing, Flavor Bridging).",
+        "pairingPrinciplesApplied": ["Weight Matching", "Tannin-Protein Binding", "Acidity-Fat Cleansing", "Flavor Bridging"],
+        "tastingNotes": "Aromas of blackcurrant, cedar, graphite, tobacco, and violet. Palate delivers firm but refined tannins with dark fruit, espresso, mineral depth, and savory complexity. Finish is long, structured, with persistent dark fruit and subtle herbal notes.",
+        "servingGuidance": "60-65°F, serve in a Bordeaux glass, decant 60-90 minutes to soften tannins and reveal aromatic complexity",
+        "confidenceScore": 93,
+        "confidenceRationale": "Excellent pairing science with confirmed producer and outstanding vintage. Left Bank Bordeaux is textbook for grilled beef. 2016 is a stellar year with ideal structure for ribeye.",
+        "expertRating": "96 (Wine Advocate)",
+        "retailerSuggestion": "Benchmark Wine Group, K&L Wine Merchants, or premier Bordeaux specialists like The Wine House",
+        "image": "unknown",
+        "storytellingElements": "Pichon Lalande's vineyards border Château Latour in Pauillac's prime gravelly soils. The 2016 vintage captures both power and finesse—a wine built for beef, where Cabernet Sauvignon's structure meets Merlot's plushness. The combination of French terroir and Argentine chimichurri creates an elegant cross-cultural celebration of beef traditions."
       },
       {
-        "wineName": "Ridge Vineyards 'Lytton Springs'",
-        "producer": "Ridge Vineyards",
-        "vintage": "2019",
-        "pricePoint": "$59",
-        "rationale": "Zinfandel's fruit-forward energy and subtle spice balance the ribeye's boldness while adding an approachable, distinctly Californian twist.",
-        "tastingNotes": "Ripe blackberry, raspberry compote, and black pepper. Medium-plus body with lively acidity, framed by supple tannins and a lingering finish.",
-        "servingGuidance": "Serve slightly cooler than room temperature (58–60°F) in a universal red wine glass.",
-        "confidenceScore": 95,
-        "expertRating": "94 (Wine Spectator)",
-        "retailerSuggestion": "K&L Wines, Total Wine & More",
-        "image": "https://example.com/ridge-lytton-2019.jpg",
-        "storytellingElements": "Ridge has championed old-vine Zinfandel since the 1960s. Lytton Springs comes from gnarly 100-year-old vines, offering a piece of California history in every bottle."
-      },
-      {
-        "wineName": "Catena Zapata 'Catena Alta'",
+        "tierLabel": "Moderate Choice",
+        "wineName": "Malbec Mendoza",
         "producer": "Catena Zapata",
         "vintage": "2020",
-        "pricePoint": "$40",
-        "rationale": "Malbec's plush fruit and smoky undertones harmonize with grilled ribeye, bringing balance between dark fruit and char.",
-        "tastingNotes": "Notes of plum, violet, and cocoa. Juicy mid-palate with soft tannins, finishing with spice and mineral lift from high-altitude vineyards.",
-        "servingGuidance": "Serve at 60°F in a Malbec or Bordeaux-style glass.",
-        "confidenceScore": 92,
-        "expertRating": "93 (James Suckling)",
-        "retailerSuggestion": "Wine.com, Vivino Marketplace",
-        "image": "https://example.com/catena-alta-2020.jpg",
-        "storytellingElements": "The Catena family revolutionized Argentine winemaking through high-altitude viticulture, producing wines of remarkable purity and energy."
+        "pricePoint": "$45",
+        "category": "Red Wine",
+        "rationale": "Argentine Malbec's robust tannins and full body perfectly complement ribeye's rich marbling (Tannin-Protein Binding, Weight Matching), while its ripe dark fruit and natural acidity cut through fat effectively. The wine's herbal undertones create an elegant regional bridge with chimichurri's parsley-oregano profile (Flavor Bridging), honoring Argentine beef culture authentically.",
+        "pairingPrinciplesApplied": ["Weight Matching", "Tannin-Protein Binding", "Acidity-Fat Cleansing", "Flavor Bridging", "Regional Pairing"],
+        "tastingNotes": "Aromas of blackberry, plum, violet, dried herbs, and mocha. Palate shows velvety tannins with concentrated dark fruit, espresso, subtle spice, and fresh acidity. Finish is rich and persistent with dark chocolate and herb nuances.",
+        "servingGuidance": "60-64°F, serve in a Bordeaux glass, decant 30-45 minutes to enhance aromatics and soften structure",
+        "confidenceScore": 95,
+        "confidenceRationale": "Perfect regional pairing with confirmed prestigious producer. Malbec with Argentine chimichurri is culturally authentic and scientifically ideal. High confidence in all elements.",
+        "expertRating": "93 (Wine Spectator)",
+        "retailerSuggestion": "Total Wine & More, Wine.com, or local shops with strong South American selections",
+        "image": "unknown",
+        "storytellingElements": "Catena Zapata pioneered high-altitude viticulture in Mendoza's Andean foothills, where intense sunlight and cool nights produce Malbec of exceptional concentration. This is the authentic pairing—Argentine beef meets Argentine wine and sauce, a trinity that defines the country's culinary identity, where chimichurri was born to accompany these bold, structured wines."
+      },
+      {
+        "tierLabel": "Budget-Friendly",
+        "wineName": "Côtes du Rhône",
+        "producer": "Domaine Santa Duc",
+        "vintage": "2021",
+        "pricePoint": "$22",
+        "category": "Red Wine",
+        "rationale": "This Grenache-based blend's medium-full body and moderate tannins handle ribeye's richness effectively (Weight Matching, Tannin-Protein Binding), while its peppery, herbal character creates natural flavor bridges with chimichurri's aromatic profile. The wine's bright acidity cuts through fat, and its fruit-forward nature balances the sauce's tangy intensity without overwhelming the beef.",
+        "pairingPrinciplesApplied": ["Weight Matching", "Tannin-Protein Binding", "Acidity-Fat Cleansing", "Flavor Bridging"],
+        "tastingNotes": "Aromas of red cherry, blackberry, garrigue herbs, white pepper, and dried lavender. Palate delivers supple tannins with red fruit, savory herbs, spice, and lively acidity. Finish is medium-length with persistent pepper and herbal notes.",
+        "servingGuidance": "58-62°F, serve in a Burgundy or universal red wine glass, optional 15-20 minute decant to open aromatics",
+        "confidenceScore": 90,
+        "confidenceRationale": "Strong pairing with reliable Rhône producer. Grenache-based wines offer excellent value for grilled meats. Herbal character naturally complements chimichurri. Recent vintage ensures freshness.",
+        "expertRating": "90 (Wine Advocate)",
+        "retailerSuggestion": "Trader Joe's wine section, Costco, or local wine shops with French value selections",
+        "image": "unknown",
+        "storytellingElements": "Santa Duc farms organically in Gigondas and produces exceptional value Côtes du Rhône from old-vine Grenache. These southern Rhône wines carry the essence of Mediterranean garrigue—wild herbs, lavender, and sun-baked earth—creating an aromatic harmony with chimichurri that transforms a simple steak into a Provençal-Argentine fusion celebration."
       }
-    ]
+    ],
+    "closingNarrative": "Grilled ribeye with chimichurri demands wines with substantial tannins to bind with fat and char, full body to match richness, and herbal-acidic notes to bridge the vibrant sauce. From Bordeaux's structured elegance to Argentina's authentic regional pairing to Rhône's herbal earthiness, each selection honors the dual nature of this dish—rich beef meeting bright, herbaceous contrast—creating a harmonious balance where tannin softens, acidity refreshes, and flavors intertwine.",
+    "pairingNotes": "The chimichurri sauce transforms this pairing by adding bright acidity and herbaceous complexity, allowing for wines with more pronounced fruit and structure than simple grilled steak would demand. The sauce's vinegar component means wines need sufficient acidity to match. Argentine Malbec is the culturally authentic choice, but Cabernet-based Bordeaux, Napa Cabernet Sauvignon, or southern Rhône blends all work beautifully. Avoid overly oaky or high-alcohol wines that would clash with the sauce's freshness. For white wine lovers, an oaked Chardonnay could work unconventionally, though reds remain scientifically superior for this preparation."
   }
 ]

@@ -467,9 +467,10 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 12,
-    color: '#6C6C6C',
+    color: '#FFFFFF',
     textAlign: 'center',
     marginTop: 8,
+    fontWeight: '500',
   },
 });
 

@@ -11,6 +11,8 @@ import {
 import { WineRecommendation } from '../types/wine';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '../design';
 import EnhancedButton from './EnhancedButton';
+import { getServingGuidance, getConfidenceBreakdown, getTastingNotesDisplay } from '../utils/wineTypeHelpers';
+import ConfidenceBreakdown from './ConfidenceBreakdown';
 
 interface EnhancedWineCardProps {
   wine: WineRecommendation;
@@ -173,23 +175,79 @@ const EnhancedWineCard = memo(function EnhancedWineCard({
             <View style={styles.fullDetails}>
               <View style={styles.detailSection}>
                 <Text style={styles.detailTitle}>Tasting Notes</Text>
-                <Text style={styles.detailText}>{wine.tastingNotes}</Text>
+                {(() => {
+                  const tastingNotes = getTastingNotesDisplay(wine.tastingNotes);
+                  return (
+                    <>
+                      {tastingNotes.aromas.length > 0 && (
+                        <Text style={styles.detailText}>
+                          Aromas: {tastingNotes.aromas.join(', ')}
+                        </Text>
+                      )}
+                      <Text style={styles.detailText}>{tastingNotes.palate}</Text>
+                      {tastingNotes.finish && (
+                        <Text style={styles.detailText}>Finish: {tastingNotes.finish}</Text>
+                      )}
+                    </>
+                  );
+                })()}
               </View>
               
               <View style={styles.detailSection}>
                 <Text style={styles.detailTitle}>Serving</Text>
-                <Text style={styles.detailText}>{wine.servingGuidance}</Text>
+                <Text style={styles.detailText}>{getServingGuidance(wine)}</Text>
               </View>
+              
+              {/* Confidence Breakdown (Enhanced Format) - Visual Component */}
+              {getConfidenceBreakdown(wine) && (
+                <View style={styles.detailSection}>
+                  <Text style={styles.detailTitle}>Confidence Breakdown</Text>
+                  <ConfidenceBreakdown 
+                    breakdown={getConfidenceBreakdown(wine)!} 
+                    totalScore={getConfidenceScore(wine)}
+                  />
+                </View>
+              )}
+              
+              {/* Region (Enhanced Format) */}
+              {wine.region && wine.region !== 'unknown' && (
+                <View style={styles.detailSection}>
+                  <Text style={styles.detailTitle}>Region</Text>
+                  <Text style={styles.detailText}>{wine.region}</Text>
+                </View>
+              )}
               
               <View style={styles.detailSection}>
                 <Text style={styles.detailTitle}>Where to Buy</Text>
                 <Text style={styles.detailText}>{wine.retailerSuggestion}</Text>
               </View>
               
-              {wine.storytellingElements && (
+              {/* Story (Enhanced Format - prefer story over storytellingElements) */}
+              {(wine.story || wine.storytellingElements) && (
                 <View style={styles.detailSection}>
                   <Text style={styles.detailTitle}>Story</Text>
-                  <Text style={styles.detailText}>{wine.storytellingElements}</Text>
+                  <Text style={styles.detailText}>{wine.story || wine.storytellingElements}</Text>
+                </View>
+              )}
+              
+              {/* Alternatives (Enhanced Format) */}
+              {wine.alternatives && wine.alternatives.length > 0 && (
+                <View style={[styles.detailSection, styles.alternativesSection]}>
+                  <Text style={styles.detailTitle}>Alternative Wines</Text>
+                  {wine.alternatives.map((alt, index) => (
+                    <View 
+                      key={index} 
+                      style={[
+                        styles.alternativeItem,
+                        index === wine.alternatives.length - 1 && styles.alternativeItemLast
+                      ]}
+                    >
+                      <Text style={styles.alternativeName}>{alt.wineName}</Text>
+                      <Text style={styles.alternativeDetails}>
+                        {alt.producer} • {alt.vintage} • {alt.grape}
+                      </Text>
+                    </View>
+                  ))}
                 </View>
               )}
             </View>
@@ -350,6 +408,30 @@ const styles = StyleSheet.create({
   },
   actions: {
     marginTop: SPACING.sm,
+  },
+  alternativeItem: {
+    marginBottom: SPACING.sm,
+    paddingBottom: SPACING.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.neutral[200],
+  },
+  alternativeName: {
+    ...TYPOGRAPHY.label.small,
+    color: COLORS.text.primary,
+    marginBottom: SPACING.xs / 2,
+  },
+  alternativeDetails: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.text.secondary,
+    fontStyle: 'italic',
+  },
+  alternativesSection: {
+    marginBottom: 0, // Remove extra margin
+  },
+  alternativeItemLast: {
+    marginBottom: 0, // Remove bottom margin from last item
+    paddingBottom: 0,
+    borderBottomWidth: 0, // Remove border from last item
   },
 });
 

@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Caymus Cabernet Sauvignon",
+    "producer": "Caymus",
+    "wineName": "Cabernet Sauvignon",
+    "vintage": "2020",
+    "kagglePrice": 85,
+    "priceYear": 2017,
+    "region": "Napa Valley",
+    "country": "United States"
+  },
+  {
+    "title": "Dom PÃ©rignon",
+    "producer": "MoÃ«t & Chandon",
+    "wineName": "Dom PÃ©rignon",
+    "vintage": "2013",
+    "kagglePrice": 200,
+    "priceYear": 2017,
+    "region": "Champagne",
+    "country": "France"
+  },
+  {
+    "title": "Cloudy Bay Sauvignon Blanc",
+    "producer": "Cloudy Bay",
+    "wineName": "Sauvignon Blanc",
+    "vintage": "2022",
+    "kagglePrice": 25,
+    "priceYear": 2017,
+    "region": "Marlborough",
+    "country": "New Zealand"
+  }
+]

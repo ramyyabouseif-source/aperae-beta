@@ -61,7 +61,7 @@ const EnhancedWineRecommendations: React.FC<EnhancedWineRecommendationsProps> = 
       setProgress(0);
       // Set expectation without changing skeleton behavior
       const startTs = Date.now();
-      setLoadingMessage('Generating recommendations (10–30s)...');
+      setLoadingMessage('Generating recommendations (30–90s)...');
 
       // Check privacy consent
       if (!privacyManager.hasConsentFor('wine_preferences')) {
@@ -84,7 +84,7 @@ const EnhancedWineRecommendations: React.FC<EnhancedWineRecommendationsProps> = 
       // Simulate progress updates + dynamic ETA
       const progressInterval = setInterval(() => {
         const elapsedSec = Math.floor((Date.now() - startTs) / 1000);
-        const estTotal = 30; // upper-bound estimate
+        const estTotal = 90; // upper-bound estimate - increased for Claude API response times
         const remaining = Math.max(3, estTotal - elapsedSec);
         setLoadingMessage(`Generating recommendations (~${remaining}s remaining)...`);
         setProgress(prev => {
@@ -106,7 +106,7 @@ const EnhancedWineRecommendations: React.FC<EnhancedWineRecommendationsProps> = 
         data: { dish },
         retries: 3,
         retryDelay: 1000,
-        timeout: 30000,
+        timeout: 90000, // 90 seconds - increased to handle Claude API response times
       });
 
       clearInterval(progressInterval);

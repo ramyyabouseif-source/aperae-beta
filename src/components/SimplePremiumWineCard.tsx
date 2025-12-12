@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { WineRecommendation } from '../types/wine';
+import { getWineCardImage } from '../utils/wineCardImages';
+import { getServingGuidance, getConfidenceBreakdown, getConfidenceScore } from '../utils/wineTypeHelpers';
+import ConfidenceBreakdown from './ConfidenceBreakdown';
 
 const { width: screenWidth } = Dimensions.get('window');
 const CARD_WIDTH = screenWidth - 40; // Proper centering like the button
@@ -35,7 +38,6 @@ const SimplePremiumWineCard: React.FC<SimplePremiumWineCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [favoriteAnim] = useState(new Animated.Value(0));
   const [cardScale] = useState(new Animated.Value(1));
-  const [imageScale] = useState(new Animated.Value(1));
 
   const handleFavoritePress = () => {
     // Animate heart
@@ -74,12 +76,7 @@ const SimplePremiumWineCard: React.FC<SimplePremiumWineCardProps> = ({
       }),
     ]).start();
 
-    // Image scale animation when expanding/collapsing
-    Animated.timing(imageScale, {
-      toValue: isExpanded ? 1 : 1.1, // Slightly scale up when expanded
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    // Card expansion is handled by minHeight, image will automatically extend
 
     setIsExpanded(!isExpanded);
     onPress?.(wine);
@@ -90,33 +87,11 @@ const SimplePremiumWineCard: React.FC<SimplePremiumWineCardProps> = ({
     outputRange: [1, 1.3],
   });
 
-  // Get wine image based on wine type and index for variety
-  const getWineImage = () => {
-    const wineImages = [
-      // Red Wine Bottles & Glasses
-      'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=600&fit=crop&q=80', // Classic red wine bottle
-      'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=600&fit=crop&q=80', // Wine glass with red wine
-      'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=600&fit=crop&q=80', // Wine cellar bottles
-      'https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=400&h=600&fit=crop&q=80', // Wine tasting setup
-      'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=600&fit=crop&q=80', // Wine bottle close-up
-      'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=400&h=600&fit=crop&q=80', // Wine glasses and bottle
-      
-      // White Wine Bottles & Glasses
-      'https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=400&h=600&fit=crop&q=80', // White wine bottle
-      'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=600&fit=crop&q=80', // Chardonnay bottle
-      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=600&fit=crop&q=80', // Wine glasses with white wine
-      'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=600&fit=crop&q=80', // Wine bottle in vineyard
-      
-      // Premium Wine Scenes
-      'https://images.unsplash.com/photo-1586370434639-0fe43b2d32d6?w=400&h=600&fit=crop&q=80', // Wine cellar with bottles
-      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=600&fit=crop&q=80', // Wine tasting room
-      'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=600&fit=crop&q=80', // Vineyard with wine bottles
-    ];
-    
-    // Use index to cycle through images for variety
-    const imageIndex = index % wineImages.length;
-    return wineImages[imageIndex];
-  };
+  // Get wine image from local assets - memoize to prevent unnecessary recalculations
+  const wineImageSource = useMemo(() => {
+    // Use the index prop to get a random image for each card
+    return getWineCardImage(index);
+  }, [index]);
 
   // Get wine color accent - always use dark tone for consistency
   const getWineAccentColor = () => {
@@ -137,19 +112,14 @@ const SimplePremiumWineCard: React.FC<SimplePremiumWineCardProps> = ({
         onPress={handleCardPress}
         activeOpacity={0.9}
       >
-        {/* Background Image */}
-        <Animated.Image
-          source={{ uri: getWineImage() }}
-          style={[
-            styles.backgroundImage,
-            {
-              transform: [{ scale: imageScale }],
-            },
-          ]}
+        {/* Background Image - extends to fill entire card including expanded content */}
+        <Image
+          source={wineImageSource}
+          style={styles.backgroundImage}
           resizeMode="cover"
         />
         
-        {/* Dark Overlay */}
+        {/* Dark Overlay - extends to fill entire card */}
         <View style={styles.darkOverlay} />
         
         {/* Wine Accent Bar */}
@@ -180,9 +150,26 @@ const SimplePremiumWineCard: React.FC<SimplePremiumWineCardProps> = ({
 
           {/* Tasting Notes */}
           <View style={styles.notesSection}>
-            <Text style={styles.tastingNotes} numberOfLines={isExpanded ? 0 : 2}>
-              {wine.tastingNotes}
-            </Text>
+{(() => {
+              const tastingNotes = typeof wine.tastingNotes === 'string' 
+                ? { aromas: [], palate: wine.tastingNotes, finish: '' }
+                : wine.tastingNotes;
+              return (
+                <>
+                  {tastingNotes.aromas && tastingNotes.aromas.length > 0 && (
+                    <Text style={styles.tastingNotes}>
+                      Aromas: {tastingNotes.aromas.join(', ')}
+                    </Text>
+                  )}
+                  <Text style={styles.tastingNotes} numberOfLines={isExpanded ? 0 : 2}>
+                    {tastingNotes.palate}
+                  </Text>
+                  {tastingNotes.finish && (
+                    <Text style={styles.tastingNotes}>Finish: {tastingNotes.finish}</Text>
+                  )}
+                </>
+              );
+            })()}
             {!isExpanded && (
               <Text style={styles.readMoreText}>Tap to read more</Text>
             )}
@@ -245,10 +232,68 @@ const SimplePremiumWineCard: React.FC<SimplePremiumWineCardProps> = ({
               <Text style={styles.detailsText}>{wine.rationale}</Text>
               
               <Text style={styles.detailsTitle}>Serving Guidance</Text>
-              <Text style={styles.detailsText}>{wine.servingGuidance}</Text>
+              <Text style={styles.detailsText}>
+                {typeof wine.servingGuidance === 'string' 
+                  ? wine.servingGuidance
+                  : wine.servingGuidance && typeof wine.servingGuidance === 'object'
+                  ? [
+                      wine.servingGuidance.temperature && `Temperature: ${wine.servingGuidance.temperature}`,
+                      wine.servingGuidance.glassware && `Glassware: ${wine.servingGuidance.glassware}`,
+                      wine.servingGuidance.decanting && wine.servingGuidance.decanting
+                    ].filter(Boolean).join('. ')
+                  : 'Serve at recommended temperature'}
+              </Text>
+              
+              {/* Confidence Breakdown (Enhanced Format) - Visual Component */}
+              {getConfidenceBreakdown(wine) && (
+                <>
+                  <Text style={styles.detailsTitle}>Confidence Breakdown</Text>
+                  <ConfidenceBreakdown 
+                    breakdown={getConfidenceBreakdown(wine)!} 
+                    totalScore={getConfidenceScore(wine)}
+                  />
+                </>
+              )}
+              
+              {/* Region (Enhanced Format) */}
+              {wine.region && wine.region !== 'unknown' && (
+                <>
+                  <Text style={styles.detailsTitle}>Region</Text>
+                  <Text style={styles.detailsText}>{wine.region}</Text>
+                </>
+              )}
               
               <Text style={styles.detailsTitle}>Where to Buy</Text>
               <Text style={styles.detailsText}>{wine.retailerSuggestion}</Text>
+              
+              {/* Story (Enhanced Format - prefer story over storytellingElements) */}
+              {(wine.story || wine.storytellingElements) && (
+                <>
+                  <Text style={styles.detailsTitle}>Story</Text>
+                  <Text style={styles.detailsText}>{wine.story || wine.storytellingElements}</Text>
+                </>
+              )}
+              
+              {/* Alternatives (Enhanced Format) */}
+              {wine.alternatives && wine.alternatives.length > 0 && (
+                <>
+                  <Text style={styles.detailsTitle}>Alternative Wines</Text>
+                  {wine.alternatives.map((alt, index) => (
+                    <View 
+                      key={index} 
+                      style={[
+                        styles.alternativeItem,
+                        index === wine.alternatives.length - 1 && styles.alternativeItemLast
+                      ]}
+                    >
+                      <Text style={styles.alternativeName}>{alt.wineName}</Text>
+                      <Text style={styles.alternativeDetails}>
+                        {alt.producer} • {alt.vintage} • {alt.grape}
+                      </Text>
+                    </View>
+                  ))}
+                </>
+              )}
             </View>
           </View>
         )}
@@ -263,6 +308,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20, // Match button centering
     marginVertical: 12,
     borderRadius: 20,
+    width: CARD_WIDTH,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -288,7 +334,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     // Extend beyond the card to cover expanded details
-    minHeight: CARD_HEIGHT + 200, // Extra height for expanded content
+    minHeight: CARD_HEIGHT + 300, // Extra height for expanded content
   },
   darkOverlay: {
     position: 'absolute',
@@ -468,6 +514,28 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)',
     lineHeight: 20,
     marginBottom: 8,
+  },
+  alternativeItem: {
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  alternativeName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#BF9694',
+    marginBottom: 4,
+  },
+  alternativeDetails: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontStyle: 'italic',
+  },
+  alternativeItemLast: {
+    marginBottom: 0, // Remove bottom margin from last item
+    paddingBottom: 0,
+    borderBottomWidth: 0, // Remove border from last item
   },
 });
 

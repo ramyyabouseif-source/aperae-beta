@@ -8,34 +8,68 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Alert,
 } from 'react-native';
-import { MenuAnalysisResult, MenuItem } from '../services/menuAnalysisService';
+import { MenuAnalysisResult, WineListAnalysisResult } from '../services/menuAnalysisService';
 import { FavoritesService } from '../services/favoritesService';
+import AdaptiveWineCard from './AdaptiveWineCard';
+import { SkeletonWineCard } from './LoadingStates';
+import ResponsibleDrinkingDisclaimer from './ResponsibleDrinkingDisclaimer';
+import GoogleVisionAttribution from './GoogleVisionAttribution';
+import { WineRecommendation } from '../types/wine';
+
 
 interface MenuResultsProps {
-  analysisResult: MenuAnalysisResult;
-  onClose: () => void;
+  analysisResult: MenuAnalysisResult | WineListAnalysisResult;
+  onClose?: () => void;
+  isLoading?: boolean;
 }
 
-export default function MenuResults({ analysisResult, onClose }: MenuResultsProps) {
-  const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
-
-  const toggleExpanded = (index: number) => {
-    const newExpanded = new Set(expandedItems);
-    if (newExpanded.has(index)) {
-      newExpanded.delete(index);
-    } else {
-      newExpanded.add(index);
+export default function MenuResults({ analysisResult, onClose, isLoading = false }: MenuResultsProps) {
+  // Note: onClose is kept for potential future use (e.g., collapse section)
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  
+  /**
+   * DISPLAY LAYER: Sanitize Text for User Experience
+   * 
+   * This function transforms text for display purposes ONLY. It does NOT affect data integrity.
+   * 
+   * ARCHITECTURE:
+   * - Data Layer (menuAnalysisService.ts): Preserves EXACT text from OCR/menu (e.g., "FAMIGLIA PASQUA")
+   * - Matching Layer: Uses case-insensitive comparison for accuracy
+   * - Display Layer (this function): Transforms ALL CAPS to readable title case for UX
+   * 
+   * Why sanitize?
+   * - ALL CAPS text is harder to read and looks unprofessional in UI
+   * - Improves user experience without compromising data accuracy
+   * - Original exact text remains in the data layer for matching/verification
+   * 
+   * NOTE: This sanitization only affects what users see, not what we store or match against.
+   */
+  const sanitizeText = (text: string): string => {
+    if (!text) return text;
+    // Check if text is all caps (excluding common abbreviations)
+    const isAllCaps = /^[A-Z\s.,'\-"()]+$/.test(text) && text.length > 3;
+    if (isAllCaps && text === text.toUpperCase()) {
+      // Convert to title case, preserving common wine terms
+      return text.toLowerCase()
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+        .replace(/\b(Mv|Nv|Cv)\b/gi, (match) => match.toUpperCase())
+        .replace(/\b(D'|L'|De|La|Le|Les|Du|Des)\b/gi, (match) => match.toLowerCase());
     }
-    setExpandedItems(newExpanded);
+    return text;
   };
 
-  const handleAddToFavorites = async (wine: any) => {
+  const handleAddToFavorites = async (wine: WineRecommendation) => {
     try {
-      await FavoritesService.addToFavorites(wine);
+      // Convert WineRecommendation to FavoriteWine format
+      const favoriteWine = {
+        ...wine,
+        id: `${wine.wineName}-${Date.now()}`,
+        addedAt: new Date().toISOString(),
+      };
+      await FavoritesService.addToFavorites(favoriteWine as any);
+      setFavorites(new Set([...favorites, wine.wineName]));
       Alert.alert('Success', 'Wine added to favorites!');
     } catch (error) {
       console.error('Error adding to favorites:', error);
@@ -43,121 +77,123 @@ export default function MenuResults({ analysisResult, onClose }: MenuResultsProp
     }
   };
 
-  const formatProcessingTime = (time: number) => {
-    if (time < 1000) {
-      return `${time}ms`;
+  const handleRemoveFromFavorites = async (wine: WineRecommendation) => {
+    try {
+      await FavoritesService.removeFromFavorites(wine.wineName);
+      const newFavorites = new Set(favorites);
+      newFavorites.delete(wine.wineName);
+      setFavorites(newFavorites);
+    } catch (error) {
+      console.error('Error removing from favorites:', error);
     }
-    return `${(time / 1000).toFixed(1)}s`;
   };
+
+  /**
+   * TRANSITION POINT: Data Layer → Display Layer
+   * 
+   * This function converts menu analysis results (with EXACT menu text) to display format.
+   * 
+   * IMPORTANT:
+   * - Input (rec.wine): Contains EXACT text from OCR/menu (data layer)
+   * - Output (WineRecommendation): Contains sanitized text for UI display (display layer)
+   * 
+   * This is where we apply sanitization for user experience while preserving the original
+   * exact text in the data layer for accurate matching and verification.
+   * 
+   * Example transformation:
+   * - Input: "FAMIGLIA PASQUA" (exact menu text)
+   * - Output: "Famiglia Pasqua" (sanitized for display)
+   * - Original exact text remains available in rec.wine for data integrity
+   */
+  const convertToWineRecommendation = (rec: any): WineRecommendation => {
+    return {
+      wineName: sanitizeText(rec.wine?.wineName || 'Unknown Wine'), // Sanitize for display
+      producer: sanitizeText(rec.wine?.producer || 'Unknown Producer'), // Sanitize for display
+      vintage: rec.wine?.vintage || 'NV',
+      pricePoint: rec.wine?.pricePoint || 'Price not listed',
+      rationale: rec.pairingRationale || '',
+      // Use AI-generated tasting notes if available, otherwise fall back
+      tastingNotes: rec.tastingNotes || sanitizeText(rec.wine?.description || ''),
+      servingGuidance: rec.servingGuidance || 'Serve at recommended temperature',
+      confidenceScore: rec.confidenceScore || 75,
+      expertRating: rec.expertRating || 'unknown',
+      retailerSuggestion: rec.retailerSuggestion || 'Check local wine retailers',
+      image: 'unknown',
+      storytellingElements: rec.storytellingElements || rec.pairingRationale || ''
+    };
+  };
+
+  const wineRecommendations: WineRecommendation[] = 
+    analysisResult.wineRecommendations?.map((rec) => convertToWineRecommendation(rec)) || [];
+
+  // Check if OCR was used (indicated by ocrConfidence > 0)
+  const wasOCRUsed = analysisResult.ocrConfidence && analysisResult.ocrConfidence > 0;
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Menu Analysis Results</Text>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeButtonText}>✕</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Title Section - Flows naturally with the page */}
+      {!isLoading && wineRecommendations.length > 0 && (
+        <Text style={styles.recommendationsTitle}>
+          Recommended Wines for "{analysisResult.dishAnalyzed || 'Your Dish'}"
+        </Text>
+      )}
 
-      <ScrollView style={styles.content}>
-        {/* Analysis Summary */}
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Analysis Summary</Text>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Dish Analyzed:</Text>
-            <Text style={styles.summaryValue}>{analysisResult.dishAnalyzed || 'N/A'}</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Available Wines:</Text>
-            <Text style={styles.summaryValue}>{analysisResult.availableWines?.length || 0}</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Processing Time:</Text>
-            <Text style={styles.summaryValue}>{formatProcessingTime(analysisResult.processingTime)}</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>OCR Confidence:</Text>
-            <Text style={styles.summaryValue}>{(analysisResult.ocrConfidence * 100).toFixed(1)}%</Text>
+      {/* Google Vision API Attribution - Show if OCR was used */}
+      {wasOCRUsed && (
+        <GoogleVisionAttribution compact />
+      )}
+
+      {/* Skeleton Loading State */}
+      {isLoading && (
+        <View style={styles.skeletonContainer}>
+          <Text style={styles.recommendationsTitle}>
+            Finding Perfect Wine Pairings...
+          </Text>
+          <View style={styles.skeletonCardsContainer}>
+            <SkeletonWineCard delay={0} style={styles.skeletonCard} />
+            <SkeletonWineCard delay={200} style={styles.skeletonCard} />
+            <SkeletonWineCard delay={400} style={styles.skeletonCard} />
           </View>
         </View>
+      )}
 
-        {/* Wine Recommendations */}
-        {analysisResult.wineRecommendations?.map((recommendation, index) => (
-          <View key={index} style={styles.menuItemCard}>
-            <TouchableOpacity
-              style={styles.menuItemHeader}
-              onPress={() => toggleExpanded(index)}
-            >
-              <View style={styles.menuItemInfo}>
-                <Text style={styles.menuItemName}>{recommendation.wine?.wineName || 'Wine Recommendation'}</Text>
-                <Text style={styles.menuItemDescription}>
-                  {recommendation.wine?.producer} • {recommendation.wine?.vintage}
-                </Text>
-                <Text style={styles.menuItemPrice}>{recommendation.wine?.pricePoint}</Text>
-                <Text style={styles.menuItemCategory}>{recommendation.wine?.category}</Text>
-              </View>
-              <Text style={styles.expandIcon}>
-                {expandedItems.has(index) ? '▼' : '▶'}
-              </Text>
-            </TouchableOpacity>
+      {/* Wine Recommendations */}
+      {!isLoading && wineRecommendations.length > 0 && (
+        <View style={styles.recommendationsSection}>
+          {wineRecommendations.map((wine, index) => (
+            <React.Fragment key={`${wine.wineName}-${index}`}>
+              <AdaptiveWineCard
+                wine={wine}
+                index={index}
+                isFavorite={favorites.has(wine.wineName)}
+                onAddToFavorites={handleAddToFavorites}
+                onRemoveFromFavorites={handleRemoveFromFavorites}
+              />
+              {/* Responsible Drinking Disclaimer - After third wine card */}
+              {index === 2 && (
+                <ResponsibleDrinkingDisclaimer />
+              )}
+            </React.Fragment>
+          ))}
+        </View>
+      )}
 
-            {expandedItems.has(index) && (
-              <View style={styles.wineRecommendations}>
-                <Text style={styles.wineRecommendationsTitle}>Wine Details:</Text>
-                <View style={styles.wineCard}>
-                  <View style={styles.wineHeader}>
-                    <Text style={styles.wineName}>{recommendation.wine?.wineName}</Text>
-                    <Text style={styles.winePrice}>{recommendation.wine?.pricePoint}</Text>
-                  </View>
-                  <Text style={styles.wineProducer}>
-                    {recommendation.wine?.producer} • {recommendation.wine?.vintage}
-                  </Text>
-                  <Text style={styles.wineDescription}>{recommendation.wine?.description}</Text>
-                  <Text style={styles.wineRationale}>{recommendation.pairingRationale}</Text>
-                  <Text style={styles.servingGuidance}>{recommendation.servingGuidance}</Text>
-                  <View style={styles.wineFooter}>
-                    <Text style={styles.confidenceScore}>
-                      {recommendation.confidenceScore}% confidence
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.favoriteButton}
-                      onPress={() => handleAddToFavorites(recommendation.wine)}
-                    >
-                      <Text style={styles.favoriteButtonText}>❤ Add to Favorites</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            )}
-          </View>
-        ))}
-
-        {/* Available Wines List */}
-        {analysisResult.availableWines && analysisResult.availableWines.length > 0 && (
-          <View style={styles.rawMenuCard}>
-            <Text style={styles.rawMenuTitle}>Available Wines:</Text>
-            {analysisResult.availableWines.map((wine, index) => (
-              <View key={index} style={styles.rawMenuItem}>
-                <Text style={styles.rawMenuItemName}>{wine.wineName}</Text>
-                <Text style={styles.rawMenuItemDescription}>
-                  {wine.producer} • {wine.vintage} • {wine.pricePoint}
-                </Text>
-                {wine.description && (
-                  <Text style={styles.rawMenuItemPrice}>{wine.description}</Text>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-      </ScrollView>
+      {/* No Recommendations Message */}
+      {!isLoading && wineRecommendations.length === 0 && (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>No wine recommendations available</Text>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
+    width: '100%',
+    backgroundColor: 'transparent',
+    marginTop: 20,
+    paddingHorizontal: 0,
   },
   header: {
     flexDirection: 'row',
@@ -345,41 +381,38 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
   },
-  rawMenuCard: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  recommendationsSection: {
+    marginTop: 8,
+    paddingHorizontal: 0,
+    width: '100%',
+    alignItems: 'center',
   },
-  rawMenuTitle: {
-    fontSize: 16,
+  recommendationsTitle: {
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    marginTop: 8,
+  },
+  skeletonContainer: {
+    paddingHorizontal: 0,
+    marginTop: 8,
+  },
+  skeletonCardsContainer: {
+    paddingHorizontal: 20,
+  },
+  skeletonCard: {
     marginBottom: 12,
   },
-  rawMenuItem: {
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  emptyState: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  rawMenuItemName: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 2,
-  },
-  rawMenuItemDescription: {
-    fontSize: 12,
+  emptyStateText: {
+    fontSize: 16,
     color: '#666',
-    marginBottom: 2,
-  },
-  rawMenuItemPrice: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#8B0000',
+    textAlign: 'center',
   },
 });

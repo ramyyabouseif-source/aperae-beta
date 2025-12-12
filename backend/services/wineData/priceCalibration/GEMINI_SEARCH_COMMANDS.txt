@@ -1,0 +1,78 @@
+Copy and paste these search queries into Gemini AI one at a time:
+
+NOTE: For each wine, we need the CURRENT AVERAGE RETAIL PRICE (USD) for the SPECIFIC VINTAGE listed. If that exact vintage is not available, note the closest available vintage and its price.
+
+1. What is the current average retail price in USD for "Caymus Cabernet Sauvignon" vintage 2020? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+2. What is the current average retail price in USD for "Dom Pérignon" vintage 2013? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+3. What is the current average retail price in USD for "Cloudy Bay Sauvignon Blanc" vintage 2022? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+4. What is the current average retail price in USD for "Opus One" vintage 2019? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+5. What is the current average retail price in USD for "Silver Oak Cabernet Sauvignon" vintage 2019? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+6. What is the current average retail price in USD for "Penfolds Grange" vintage 2018? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+7. What is the current average retail price in USD for "Veuve Clicquot Yellow Label" non-vintage (NV)? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+8. What is the current average retail price in USD for "Kendall-Jackson Chardonnay" vintage 2021? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+9. What is the current average retail price in USD for "Château Margaux" vintage 2018? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+10. What is the current average retail price in USD for "Belle Glos Pinot Noir" vintage 2021? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+11. What is the current average retail price in USD for "Sancerre" vintage 2022? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+12. What is the current average retail price in USD for "Rombauer Chardonnay" vintage 2021? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+13. What is the current average retail price in USD for "Josh Cellars Cabernet Sauvignon" vintage 2021? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+14. What is the current average retail price in USD for "Meiomi Pinot Noir" vintage 2021? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+15. What is the current average retail price in USD for "Barefoot Chardonnay" vintage 2022? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+16. What is the current average retail price in USD for "Yellow Tail Shiraz" vintage 2022? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+17. What is the current average retail price in USD for "La Crema Pinot Noir" vintage 2021? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+18. What is the current average retail price in USD for "Jordan Cabernet Sauvignon" vintage 2019? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+19. What is the current average retail price in USD for "Stag's Leap Wine Cellars Artemis Cabernet Sauvignon" vintage 2020? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+20. What is the current average retail price in USD for "Duckhorn Merlot" vintage 2020? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+21. What is the current average retail price in USD for "Château Lafite Rothschild" vintage 2018? Search site:wine-searcher.com OR site:wine.com for current 2024 price
+
+
+---
+RESULTS FORMAT (copy this template and fill in):
+
+For each wine, record:
+- CURRENT AVERAGE RETAIL PRICE in USD
+- The SPECIFIC VINTAGE you found (may differ from Kaggle vintage if not available)
+- Source where you found the price
+- Any notes (e.g., "exact vintage not available, using 2022 instead of 2021")
+
+Wine 1 - Caymus Cabernet Sauvignon (Kaggle vintage: 2020): $___ - [vintage found] - [source] - [notes]
+Wine 2 - Dom Pérignon (Kaggle vintage: 2013): $___ - [vintage found] - [source] - [notes]
+Wine 3 - Cloudy Bay Sauvignon Blanc (Kaggle vintage: 2022): $___ - [vintage found] - [source] - [notes]
+Wine 4 - Opus One (Kaggle vintage: 2019): $___ - [vintage found] - [source] - [notes]
+Wine 5 - Silver Oak Cabernet Sauvignon (Kaggle vintage: 2019): $___ - [vintage found] - [source] - [notes]
+Wine 6 - Penfolds Grange (Kaggle vintage: 2018): $___ - [vintage found] - [source] - [notes]
+Wine 7 - Veuve Clicquot Yellow Label (Non-Vintage): $___ - [NV] - [source] - [notes]
+Wine 8 - Kendall-Jackson Chardonnay (Kaggle vintage: 2021): $___ - [vintage found] - [source] - [notes]
+Wine 9 - Château Margaux (Kaggle vintage: 2018): $___ - [vintage found] - [source] - [notes]
+Wine 10 - Belle Glos Pinot Noir (Kaggle vintage: 2021): $___ - [vintage found] - [source] - [notes]
+Wine 11 - Sancerre (Kaggle vintage: 2022): $___ - [vintage found] - [source] - [notes]
+Wine 12 - Rombauer Chardonnay (Kaggle vintage: 2021): $___ - [vintage found] - [source] - [notes]
+Wine 13 - Josh Cellars Cabernet Sauvignon (Kaggle vintage: 2021): $___ - [vintage found] - [source] - [notes]
+Wine 14 - Meiomi Pinot Noir (Kaggle vintage: 2021): $___ - [vintage found] - [source] - [notes]
+Wine 15 - Barefoot Chardonnay (Kaggle vintage: 2022): $___ - [vintage found] - [source] - [notes]
+Wine 16 - Yellow Tail Shiraz (Kaggle vintage: 2022): $___ - [vintage found] - [source] - [notes]
+Wine 17 - La Crema Pinot Noir (Kaggle vintage: 2021): $___ - [vintage found] - [source] - [notes]
+Wine 18 - Jordan Cabernet Sauvignon (Kaggle vintage: 2019): $___ - [vintage found] - [source] - [notes]
+Wine 19 - Stag's Leap Wine Cellars Artemis (Kaggle vintage: 2020): $___ - [vintage found] - [source] - [notes]
+Wine 20 - Duckhorn Merlot (Kaggle vintage: 2020): $___ - [vintage found] - [source] - [notes]
+Wine 21 - Château Lafite Rothschild (Kaggle vintage: 2018): $___ - [vintage found] - [source] - [notes]
+

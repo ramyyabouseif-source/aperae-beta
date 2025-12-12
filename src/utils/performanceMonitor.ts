@@ -83,8 +83,8 @@ class PerformanceMonitor {
     // Log significant performance issues
     if (duration > 1000) {
       if (name.includes('api') || name.includes('recommendations')) {
-        // API calls should be faster than 30 seconds (matching timeout)
-        if (duration > 30000) {
+        // API calls should be faster than 90 seconds (matching timeout)
+        if (duration > 90000) {
           console.warn(`Slow API operation detected: ${name} took ${duration.toFixed(2)}ms`);
         }
       } else {

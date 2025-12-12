@@ -6,9 +6,9 @@ import PreferencesScreen from './PreferencesScreen';
 // This component automatically switches between original and enhanced preferences screens
 // based on the UI configuration
 const AdaptivePreferencesScreen: React.FC = () => {
-  // Use enhanced component if available and enabled
+  // Disable Preferences Screen in enhanced mode
   if (hasEnhancedComponents()) {
-    return <SimpleEnhancedPreferencesScreen />;
+    return null;
   }
 
   // Fallback to original PreferencesScreen implementation

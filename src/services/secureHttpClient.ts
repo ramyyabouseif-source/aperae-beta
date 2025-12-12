@@ -10,7 +10,7 @@ class SecureHttpClient {
   private defaultHeaders: Record<string, string>;
   private timeout: number;
 
-  constructor(baseURL: string, timeout: number = 30000) {
+  constructor(baseURL: string, timeout: number = 90000) {
     this.baseURL = baseURL;
     this.timeout = timeout;
     this.defaultHeaders = {
@@ -57,7 +57,7 @@ class SecureHttpClient {
         ...this.defaultHeaders,
         ...headers,
       },
-      timeout,
+      // Note: fetch() doesn't support timeout directly, we'll use AbortController
     };
 
     // Add body for POST/PUT requests
@@ -65,11 +65,20 @@ class SecureHttpClient {
       requestConfig.body = JSON.stringify(body);
     }
 
+    // Set up timeout using AbortController (fetch doesn't support timeout option directly)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    // Add abort signal to request config
+    requestConfig.signal = controller.signal;
+
     try {
       console.log(`Making secure request to: ${url}`);
       
       // Make the request
       const response = await fetch(url, requestConfig);
+      
+      clearTimeout(timeoutId);
       
       // Check if response is ok
       if (!response.ok) {
@@ -83,11 +92,16 @@ class SecureHttpClient {
       return data;
       
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error(`Secure request failed: ${url}`, error);
       
       // Enhanced error handling
       if (error instanceof TypeError && error.message.includes('Network request failed')) {
-        throw new Error('Network connection failed - please check your internet connection');
+        throw new Error('Network connection failed - please check your internet connection and ensure you are on the same WiFi network');
+      }
+      
+      if (error instanceof TypeError && error.message.includes('aborted') || error.name === 'AbortError') {
+        throw new Error(`Request timed out after ${timeout / 1000} seconds - please check your network connection`);
       }
       
       if (error instanceof Error && error.message.includes('timeout')) {

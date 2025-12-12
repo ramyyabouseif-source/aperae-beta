@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,9 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { WineRecommendation } from '../types/wine';
+import { getWineCardImage } from '../utils/wineCardImages';
+import { getServingGuidance, getConfidenceBreakdown, getTastingNotesDisplay, getConfidenceScore } from '../utils/wineTypeHelpers';
+import ConfidenceBreakdown from './ConfidenceBreakdown';
 
 const { width: screenWidth } = Dimensions.get('window');
 const CARD_WIDTH = screenWidth - 40;
@@ -103,22 +106,12 @@ const PremiumWineCard: React.FC<PremiumWineCardProps> = ({
     }
   };
 
-  const getWineImage = () => {
-    // Use wine-themed placeholder images
-    const wineImages = {
-      'Château Léoville Barton': 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=600&fit=crop',
-      'Ridge Vineyards': 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=600&fit=crop',
-      'Catena Zapata': 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=600&fit=crop',
-    };
-    
-    // Find matching image or use default
-    for (const [key, image] of Object.entries(wineImages)) {
-      if (wine.wineName.includes(key)) {
-        return image;
-      }
-    }
-    return 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=600&fit=crop';
-  };
+  // Get wine image from local assets - memoize to prevent unnecessary recalculations
+  const wineImageSource = useMemo(() => {
+    // Use local wine card images with random index
+    const imageIndex = index || 0;
+    return getWineCardImage(imageIndex);
+  }, [index]);
 
   return (
     <Animated.View
@@ -136,7 +129,7 @@ const PremiumWineCard: React.FC<PremiumWineCardProps> = ({
       >
         {/* Background Image */}
         <Image
-          source={{ uri: getWineImage() }}
+          source={wineImageSource}
           style={styles.backgroundImage}
           resizeMode="cover"
         />
@@ -180,9 +173,26 @@ const PremiumWineCard: React.FC<PremiumWineCardProps> = ({
 
           {/* Tasting Notes Preview */}
           <View style={styles.notesSection}>
-            <Text style={styles.tastingNotes} numberOfLines={showDetails ? 0 : 2}>
-              {wine.tastingNotes}
-            </Text>
+{(() => {
+              const tastingNotes = typeof wine.tastingNotes === 'string' 
+                ? { aromas: [], palate: wine.tastingNotes, finish: '' }
+                : wine.tastingNotes;
+              return (
+                <>
+                  {tastingNotes.aromas && tastingNotes.aromas.length > 0 && (
+                    <Text style={styles.tastingNotes}>
+                      Aromas: {tastingNotes.aromas.join(', ')}
+                    </Text>
+                  )}
+                  <Text style={styles.tastingNotes} numberOfLines={showDetails ? 0 : 2}>
+                    {tastingNotes.palate}
+                  </Text>
+                  {tastingNotes.finish && (
+                    <Text style={styles.tastingNotes}>Finish: {tastingNotes.finish}</Text>
+                  )}
+                </>
+              );
+            })()}
             {!showDetails && (
               <Text style={styles.readMoreText}>Tap to read more</Text>
             )}
@@ -253,10 +263,68 @@ const PremiumWineCard: React.FC<PremiumWineCardProps> = ({
               <Text style={styles.detailsText}>{wine.rationale}</Text>
               
               <Text style={styles.detailsTitle}>Serving Guidance</Text>
-              <Text style={styles.detailsText}>{wine.servingGuidance}</Text>
+              <Text style={styles.detailsText}>
+                {typeof wine.servingGuidance === 'string' 
+                  ? wine.servingGuidance
+                  : wine.servingGuidance && typeof wine.servingGuidance === 'object'
+                  ? [
+                      wine.servingGuidance.temperature && `Temperature: ${wine.servingGuidance.temperature}`,
+                      wine.servingGuidance.glassware && `Glassware: ${wine.servingGuidance.glassware}`,
+                      wine.servingGuidance.decanting && wine.servingGuidance.decanting
+                    ].filter(Boolean).join('. ')
+                  : 'Serve at recommended temperature'}
+              </Text>
+              
+              {/* Confidence Breakdown (Enhanced Format) - Visual Component */}
+              {getConfidenceBreakdown(wine) && (
+                <>
+                  <Text style={styles.detailsTitle}>Confidence Breakdown</Text>
+                  <ConfidenceBreakdown 
+                    breakdown={getConfidenceBreakdown(wine)!} 
+                    totalScore={getConfidenceScore(wine)}
+                  />
+                </>
+              )}
+              
+              {/* Region (Enhanced Format) */}
+              {wine.region && wine.region !== 'unknown' && (
+                <>
+                  <Text style={styles.detailsTitle}>Region</Text>
+                  <Text style={styles.detailsText}>{wine.region}</Text>
+                </>
+              )}
               
               <Text style={styles.detailsTitle}>Where to Buy</Text>
               <Text style={styles.detailsText}>{wine.retailerSuggestion}</Text>
+              
+              {/* Story (Enhanced Format - prefer story over storytellingElements) */}
+              {(wine.story || wine.storytellingElements) && (
+                <>
+                  <Text style={styles.detailsTitle}>Story</Text>
+                  <Text style={styles.detailsText}>{wine.story || wine.storytellingElements}</Text>
+                </>
+              )}
+              
+              {/* Alternatives (Enhanced Format) */}
+              {wine.alternatives && wine.alternatives.length > 0 && (
+                <>
+                  <Text style={styles.detailsTitle}>Alternative Wines</Text>
+                  {wine.alternatives.map((alt, index) => (
+                    <View 
+                      key={index} 
+                      style={[
+                        styles.alternativeItem,
+                        index === wine.alternatives.length - 1 && styles.alternativeItemLast
+                      ]}
+                    >
+                      <Text style={styles.alternativeName}>{alt.wineName}</Text>
+                      <Text style={styles.alternativeDetails}>
+                        {alt.producer} • {alt.vintage} • {alt.grape}
+                      </Text>
+                    </View>
+                  ))}
+                </>
+              )}
             </View>
           </Animated.View>
         )}
@@ -461,6 +529,28 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)',
     lineHeight: 20,
     marginBottom: 8,
+  },
+  alternativeItem: {
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  alternativeName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFD700',
+    marginBottom: 4,
+  },
+  alternativeDetails: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontStyle: 'italic',
+  },
+  alternativeItemLast: {
+    marginBottom: 0, // Remove bottom margin from last item
+    paddingBottom: 0,
+    borderBottomWidth: 0, // Remove border from last item
   },
 });
 

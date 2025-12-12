@@ -1,0 +1,143 @@
+{
+  "generatedAt": "2025-11-03T20:43:14.620Z",
+  "sampleSize": 70,
+  "model": {
+    "baseMultipliers": {
+      "budget": 1.1088120213120214,
+      "moderate": 1.1670472582972582,
+      "premium": 1.3665922343050823,
+      "luxury": 1.5348367346938774,
+      "ultraLuxury": 1.4246452380952381
+    },
+    "countryAdjustments": {
+      "United States": 0.9218194009931792,
+      "France": 1.0824464449331006,
+      "Australia": 0.9669556273116698
+    },
+    "scoreAdjustment": null,
+    "vintageAdjustment": {
+      "slope": -0.03700274157184025,
+      "intercept": 75.89131090108818,
+      "r2": 0.12122721523517643
+    },
+    "vintageQualityAdjustment": {
+      "slope": 0.004314600435755597,
+      "intercept": 0.9888217841332649,
+      "r2": 0.00022632227762797719
+    },
+    "producerReputationAdjustment": {
+      "slope": 0.07233760575834224,
+      "intercept": 0.7917183342982865,
+      "r2": 0.16384587072209167
+    },
+    "wineAgeAdjustment": {
+      "slope": 0.03700274157184025,
+      "intercept": 0.9607592181116805,
+      "r2": 0.12122721523517788
+    },
+    "globalAverage": 1.3187228334268317
+  },
+  "featureImportance": {
+    "priceRange": {
+      "budget": {
+        "avgRatio": 1.1088120213120214,
+        "variance": 0.07572563325669594,
+        "sampleSize": 16,
+        "stdDev": 0.27518290872925943
+      },
+      "moderate": {
+        "avgRatio": 1.1670472582972582,
+        "variance": 0.06637579313999094,
+        "sampleSize": 12,
+        "stdDev": 0.25763499983502036
+      },
+      "premium": {
+        "avgRatio": 1.3665922343050823,
+        "variance": 0.11061666781865641,
+        "sampleSize": 14,
+        "stdDev": 0.33259084145336354
+      },
+      "luxury": {
+        "avgRatio": 1.5348367346938774,
+        "variance": 0.20966235854402226,
+        "sampleSize": 14,
+        "stdDev": 0.45788902426682193
+      },
+      "ultraLuxury": {
+        "avgRatio": 1.4246452380952381,
+        "variance": 0.2707967979931972,
+        "sampleSize": 14,
+        "stdDev": 0.5203813966632523
+      }
+    },
+    "country": {
+      "United States": {
+        "avgRatio": 1.21562429238555,
+        "variance": 0.09550782292346399,
+        "sampleSize": 29,
+        "stdDev": 0.30904339974098133
+      },
+      "France": {
+        "avgRatio": 1.4274468428949794,
+        "variance": 0.1778751340872273,
+        "sampleSize": 25,
+        "stdDev": 0.42175245593502747
+      },
+      "Australia": {
+        "avgRatio": 1.2751464646464648,
+        "variance": 0.4658563698857259,
+        "sampleSize": 6,
+        "stdDev": 0.6825367168773603
+      },
+      "Italy": {
+        "avgRatio": 1.6461111111111113,
+        "variance": 0.155200925925926,
+        "sampleSize": 4,
+        "stdDev": 0.3939554872392641
+      }
+    },
+    "kaggleScore": {
+      "high": [],
+      "low": []
+    },
+    "vintage": {
+      "recent": {
+        "avgRatio": 1.1432288469449101,
+        "sampleSize": 39
+      },
+      "older": {
+        "avgRatio": 1.561328257340444,
+        "sampleSize": 29
+      }
+    },
+    "wineType": {
+      "red": {
+        "avgRatio": 1.2624236334013423,
+        "sampleSize": 19
+      },
+      "unknown": {
+        "avgRatio": 1.408375142422459,
+        "sampleSize": 36
+      },
+      "white": {
+        "avgRatio": 1.114360041667734,
+        "sampleSize": 13
+      }
+    }
+  },
+  "recommendations": [
+    "Current model accuracy: 30.0% within 10%",
+    "✅ Regional factors matter (variance: 0.224)",
+    "\n🎯 To achieve ~95% accuracy:",
+    "1. **Add more data**: 100-200 wines minimum (currently 70)",
+    "2. **Include critic scores**: Already in model, but need more data",
+    "3. **Vintage quality scores**: Add vintage ratings (e.g., 2015 Bordeaux = 98/100)",
+    "4. **Producer reputation index**: Score producers 1-10 based on reputation",
+    "5. **Market conditions**: Factor in market trends (bull/bear wine market)",
+    "6. **Wine age factor**: Older wines may appreciate differently",
+    "7. **Use machine learning**: Random Forest or Gradient Boosting could improve accuracy",
+    "8. **Outlier detection**: Identify and handle outliers separately",
+    "9. **Category-specific models**: Build separate models for Bordeaux, Burgundy, Napa, etc.",
+    "10. **Ensemble approach**: Combine multiple models for better accuracy"
+  ]
+}

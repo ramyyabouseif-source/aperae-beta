@@ -3,20 +3,11 @@
  * Handles sorting of wine recommendations by various criteria
  */
 
-export interface WineRecommendation {
-  wineName: string;
-  producer: string;
-  vintage: string;
-  pricePoint: string;
-  rationale: string;
-  tastingNotes: string;
-  servingGuidance: string;
-  confidenceScore: number;
-  expertRating: string;
-  retailerSuggestion: string;
-  image: string;
-  storytellingElements: string;
-}
+import { WineRecommendation } from '../types/wine';
+import { getConfidenceScore } from './wineTypeHelpers';
+
+// Re-export for backward compatibility
+export type { WineRecommendation };
 
 /**
  * Extracts numeric price from pricePoint string
@@ -107,7 +98,9 @@ export function sortWinesByPriceAscending(wines: WineRecommendation[]): WineReco
  */
 export function sortWinesByConfidence(wines: WineRecommendation[]): WineRecommendation[] {
   return [...wines].sort((a, b) => {
-    return (b.confidenceScore || 0) - (a.confidenceScore || 0);
+    const scoreA = getConfidenceScore(a);
+    const scoreB = getConfidenceScore(b);
+    return scoreB - scoreA;
   });
 }
 

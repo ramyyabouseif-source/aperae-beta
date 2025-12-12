@@ -30,7 +30,7 @@ PocketSomm is a React Native mobile application that provides AI-powered wine re
 - **Runtime**: Node.js with Express.js
 - **Authentication**: JWT tokens with refresh token rotation
 - **Security**: Helmet, CORS, rate limiting, input validation
-- **AI Integration**: OpenAI GPT-4 for wine recommendations
+- **AI Integration**: Anthropic Claude Sonnet 4.5 for wine recommendations
 - **Validation**: Express-validator for request validation
 
 ## 🚀 Getting Started
@@ -40,7 +40,19 @@ PocketSomm is a React Native mobile application that provides AI-powered wine re
 - npm or yarn
 - Expo CLI
 - iOS Simulator or Android Emulator (for mobile development)
-- OpenAI API key
+- Anthropic API key (for Claude Sonnet 4.5)
+
+### ⚠️ Important: Development Setup
+
+**For local development, use `localhost` instead of ngrok to avoid timeout issues.**
+
+- **ngrok free tier** has a 30-second request timeout
+- Our Claude API calls take 55+ seconds
+- This causes HTTP 503 errors when using ngrok free tier
+
+**Recommended:** Use `http://localhost:3001/api` for development (works with iOS Simulator, Android Emulator, and web).
+
+**See [NGROK_TIMEOUT_LIMITATION.md](./NGROK_TIMEOUT_LIMITATION.md) for details and alternatives.**
 
 ### Installation
 
@@ -66,13 +78,15 @@ PocketSomm is a React Native mobile application that provides AI-powered wine re
    
    Create a `.env` file in the `backend` directory:
    ```env
-   OPENAI_API_KEY=your_openai_api_key_here
+   ANTHROPIC_API_KEY=your_anthropic_api_key_here
    JWT_SECRET=your_super_secret_jwt_key
    REFRESH_SECRET=your_refresh_secret_key
    PORT=3001
    NODE_ENV=development
    MOCK_MODE=false
    ```
+   
+   **Note:** For frontend development, ensure `EXPO_PUBLIC_API_URL` is **not set** (or commented out) to use localhost automatically.
 
 5. **Start the backend server**
    ```bash
@@ -194,7 +208,18 @@ npm test
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**PROPRIETARY SOFTWARE - ALL RIGHTS RESERVED**
+
+Copyright (c) 2025 Aperae. All Rights Reserved.
+
+This software and associated documentation files are proprietary and confidential 
+information of Aperae. Unauthorized copying, distribution, modification, or use 
+of this software, via any medium, is strictly prohibited without the express 
+written permission of Aperae.
+
+For licensing inquiries, please contact: legal@aperae.com
+
+See the [LICENSE](LICENSE) file for full terms and conditions.
 
 ## 🙏 Acknowledgments
 
@@ -205,7 +230,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email support@pocketsomm.com or join our Discord community.
+For support, email support@aperae.com or join our Discord community.
 
 ## 🔮 Roadmap
 
@@ -230,7 +255,7 @@ For support, email support@pocketsomm.com or join our Discord community.
 
 ---
 
-**PocketSomm** - Your personal AI sommelier, always in your pocket! 🍷✨
+**Aperae** - Your personal AI sommelier, always in your pocket! 🍷✨
 
 
 

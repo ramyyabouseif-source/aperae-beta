@@ -10,7 +10,6 @@ import {
   Modal,
   TextInput,
   ImageBackground,
-  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MenuAnalysisService, WineListAnalysisResult } from '../services/menuAnalysisService';
@@ -174,6 +173,7 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
     
     console.log('Starting wine list analysis...');
     setIsAnalyzing(true);
+    setShowResults(true); // Show results area immediately for skeleton loading
     
     try {
       // Analyze wine list with dish context, serving style preference, and user wine preferences
@@ -185,7 +185,6 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
       );
       console.log('Analysis result:', result);
       setAnalysisResult(result);
-      setShowResults(true);
     } catch (error) {
       console.error('Wine list analysis error:', error);
       Alert.alert('Analysis Error', 'Failed to analyze wine list. Please try again.');
@@ -205,16 +204,8 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
 
   const renderWinePairingAssistant = () => (
     <View style={styles.winePairingContainer}>
-      <View style={styles.winePairingHeader}>
-        <View style={styles.winePairingIconContainer}>
-          <Ionicons name="restaurant" size={24} color="#5B2433" />
-        </View>
-        <View style={styles.winePairingTextContainer}>
-          <Text style={styles.winePairingTitle}>Restaurant Wine Pairing Assistant</Text>
-          <Text style={styles.winePairingSubtitle}>Get the perfect wine pairing from the restaurant's wine list</Text>
-        </View>
-      </View>
-
+      <Text style={styles.sectionTitle}>Restaurant Wine Pairing Assistant</Text>
+      <Text style={styles.sectionSubtitle}>Get the perfect wine pairing from the restaurant's wine list</Text>
       {/* Step 1: Dish Input */}
       <View style={styles.stepContainer}>
         <Text style={styles.stepTitle}>1. Describe your dish</Text>
@@ -377,55 +368,64 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
 
   return (
     <View style={styles.pageContainer}>
-      {/* Transparent Status Bar */}
-      <StatusBar 
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent={true}
-      />
-      
-      {/* Wine Cellar Background */}
+      {/* Vineyard Background */}
       <ImageBackground
         source={require('../../assets/images/vineyard-hero-background.jpg')}
         style={styles.wineCellarBackground}
         resizeMode="cover"
       />
-      
-      {/* Dark Overlay */}
       <View style={styles.wineCellarOverlay} />
-      
-      <ScrollView
+
+      <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled={true}
       >
         {/* Restaurant Wine Pairing Assistant */}
         {renderWinePairingAssistant()}
 
-        {/* Wine Pairing Tips */}
-        <View style={styles.tipsContainer}>
-          <Text style={styles.tipsTitle}>Wine Pairing Tips</Text>
-          <View style={styles.tipsList}>
-            <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-              <Text style={styles.tipText}>
-                Red wines pair well with red meats and rich sauces
-              </Text>
-            </View>
-            <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-              <Text style={styles.tipText}>
-                White wines complement seafood and light dishes
-              </Text>
-            </View>
-            <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-              <Text style={styles.tipText}>
-                Sparkling wines are perfect for celebrations and appetizers
-              </Text>
+          {/* Results Inline - Flows naturally after the form */}
+          {showResults && (
+            <MenuResults
+              analysisResult={analysisResult || { 
+              menuItems: [], 
+              wineRecommendations: [], 
+              processingTime: 0, 
+              ocrConfidence: 0,
+              dishAnalyzed: dishInput
+            }}
+            onClose={handleCloseResults}
+            isLoading={isAnalyzing}
+          />
+        )}
+
+        {/* Wine Pairing Tips - Only show if no results yet */}
+        {!showResults && (
+          <View style={styles.tipsContainer}>
+            <Text style={styles.tipsTitle}>Wine Pairing Tips</Text>
+            <View style={styles.tipsList}>
+              <View style={styles.tipItem}>
+                <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                <Text style={styles.tipText}>
+                  Red wines pair well with red meats and rich sauces
+                </Text>
+              </View>
+              <View style={styles.tipItem}>
+                <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                <Text style={styles.tipText}>
+                  White wines complement seafood and light dishes
+                </Text>
+              </View>
+              <View style={styles.tipItem}>
+                <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                <Text style={styles.tipText}>
+                  Sparkling wines are perfect for celebrations and appetizers
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
+        )}
       </ScrollView>
 
       {/* Camera Modal */}
@@ -439,20 +439,6 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
           onClose={handleCloseCamera}
         />
       </Modal>
-
-      {/* Results Modal */}
-      <Modal
-        visible={showResults}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        {analysisResult && (
-          <MenuResults
-            analysisResult={analysisResult}
-            onClose={handleCloseResults}
-          />
-        )}
-      </Modal>
     </View>
   );
 };
@@ -460,73 +446,54 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
 const styles = StyleSheet.create({
   pageContainer: {
     flex: 1,
-    backgroundColor: 'transparent', // Transparent to show wine cellar background
+    backgroundColor: 'transparent',
   },
   wineCellarBackground: {
     position: 'absolute',
-    top: -200, // Fill screen - extend beyond header
-    left: 0, // Fill screen - no horizontal offset
+    top: -200,
+    left: 0,
     right: 0,
     bottom: 0,
-    width: '100%', // Fill screen - full width
-    height: '150%', // Fill screen - extend beyond viewport
-    opacity: 0.5, // More visible to show through header
+    width: '100%',
+    height: '150%',
+    opacity: 0.5,
   },
   wineCellarOverlay: {
     position: 'absolute',
-    top: -200, // Match the screen-filling background
-    left: 0, // Match the screen-filling background
+    top: -200,
+    left: 0,
     right: 0,
     bottom: 0,
-    width: '100%', // Match the screen-filling background
-    height: '150%', // Match the screen-filling background height
-    backgroundColor: 'rgba(91, 36, 51, 0.2)', // Dark tone overlay - reduced by 20%
+    width: '100%',
+    height: '150%',
+    backgroundColor: 'rgba(91, 36, 51, 0.2)',
   },
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
+  header: {
+    backgroundColor: '#5B2433', // Dark tone background
+    padding: 20,
+    paddingTop: 60, // Push header down to prevent cutoff
+    alignItems: 'center',
+  },
+  logo: {
+    width: 120,
+    height: 40,
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#fff',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingBottom: 32,
-  },
-  headerContainer: {
-    backgroundColor: '#fff',
-    padding: 24,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  headerTextContainer: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#666',
   },
   quickSuggestionsContainer: {
     backgroundColor: 'rgba(247, 244, 240, 0.95)', // Light tone
@@ -589,32 +556,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(191, 150, 148, 0.3)', // Metallic accent
   },
-  winePairingHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  winePairingIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(191, 150, 148, 0.2)', // Light metallic accent
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  winePairingTextContainer: {
-    flex: 1,
-  },
-  winePairingTitle: {
+  sectionTitle: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#5B2433', // Dark tone
-    marginBottom: 4,
+    marginBottom: 8,
+    textAlign: 'center',
   },
-  winePairingSubtitle: {
-    fontSize: 14,
-    color: '#6C6C6C', // Secondary text
+  sectionSubtitle: {
+    fontSize: 16,
+    color: '#5B2433', // Dark tone
+    marginBottom: 20,
+    textAlign: 'center',
   },
   stepContainer: {
     marginBottom: 20,

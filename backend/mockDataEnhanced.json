@@ -1,0 +1,194 @@
+[
+  {
+    "dish": "Carbonara Spaghetti with smoked bacon, breadcrumbs, parmesan cheese, and egg yolk",
+    "dishAnalysis": {
+      "dominantWeight": "heavy",
+      "fatContent": "high",
+      "primaryProtein": "pork (smoked bacon, cured)",
+      "dominantFlavors": ["salty", "umami", "savory"],
+      "spiceLevel": "none",
+      "acidityLevel": "low",
+      "applicablePrinciples": ["Weight Matching", "Acidity–Fat Cleansing", "Bitterness & Umami Avoidance", "Flavor Bridging"],
+      "keyChallenge": "High fat content from egg yolk, bacon, and cheese requires substantial acidity to cleanse palate and prevent heaviness",
+      "idealProfile": {
+        "acidity": "high",
+        "tannin": "none to low",
+        "body": "medium to full",
+        "sweetness": "dry",
+        "notes": "bright acidity, mineral complexity, creamy texture compatibility, savory herb or stone fruit notes"
+      }
+    },
+    "recommendations": [
+      {
+        "tierLabel": "Premium Selection",
+        "tierRationale": "Premier Cru classification signal from Burgundy's Chablis hierarchy; single-vineyard terroir from documented world-class site",
+        "tierFallbackApplied": false,
+        "wineName": "Chablis Premier Cru Montmains",
+        "producer": "William Fèvre",
+        "region": "Chablis, Burgundy, France",
+        "vintage": "2021",
+        "grape": "Chardonnay (White)",
+        "rationale": "Weight Matching and Acidity–Fat Cleansing principles are satisfied by high-acid Chardonnay that cuts through egg yolk and bacon fat. Bitterness & Umami Avoidance achieved through unoaked, mineral-driven style that complements rather than clashes with parmesan's savory depth. Flavor Bridging occurs via wine's creamy lees texture echoing carbonara's richness while citrus and mineral notes refresh the palate.",
+        "pairingPrinciplesApplied": ["Weight Matching", "Acidity–Fat Cleansing", "Bitterness & Umami Avoidance", "Flavor Bridging"],
+        "tastingNotes": {
+          "aromas": ["green apple", "lemon zest", "wet stone", "white flowers", "oyster shell"],
+          "palate": "piercing acidity with taut mineral backbone, medium body with subtle creaminess from lees aging, flavors of citrus, green fruit, and saline minerality",
+          "finish": "long, clean, mineral-driven with refreshing salinity"
+        },
+        "servingGuidance": {
+          "temperature": "50-54°F (10-12°C)",
+          "glassware": "Burgundy white wine glass",
+          "decanting": "No decant needed"
+        },
+        "confidence": {
+          "score": 88,
+          "breakdown": {
+            "pairingScience": 45,
+            "wineKnowledge": 28,
+            "complexityHandling": 15
+          },
+          "rationale": "Strong pairing science application with all four applicable principles explicitly satisfied. Slight deduction in wine knowledge for vintage uncertainty in current market. Moderate complexity dish (4 elements: pasta, bacon, cheese, egg) handled effectively with conflict resolution between fat and umami."
+        },
+        "story": "Premier Cru Montmains sits on Kimmeridgian limestone, the ancient seabed that gives Chablis its signature flinty minerality and razor-sharp acidity, perfectly suited to cut through rich, creamy dishes.",
+        "alternatives": [
+          {
+            "wineName": "Chablis Premier Cru Fourchaume",
+            "producer": "Domaine Laroche",
+            "vintage": "2022",
+            "grape": "Chardonnay (White)"
+          },
+          {
+            "wineName": "Chablis Premier Cru Vaillons",
+            "producer": "Jean-Marc Brocard",
+            "vintage": "2021",
+            "grape": "Chardonnay (White)"
+          }
+        ],
+        "pricePoint": "$85",
+        "category": "White Wine",
+        "expertRating": "93 (Wine Advocate)",
+        "retailerSuggestion": "Premier Cru specialists, fine wine retailers, or direct from importer",
+        "image": "unknown",
+        "storytellingElements": "Premier Cru Montmains sits on Kimmeridgian limestone, the ancient seabed that gives Chablis its signature flinty minerality and razor-sharp acidity, perfectly suited to cut through rich, creamy dishes."
+      },
+      {
+        "tierLabel": "Moderate Choice",
+        "tierRationale": "Village-level Burgundy classification signal; reputable estate bottling from recognized Pouilly-Fuissé terroir with distinct site character",
+        "tierFallbackApplied": false,
+        "wineName": "Pouilly-Fuissé",
+        "producer": "Domaine J.A. Ferret",
+        "region": "Mâconnais, Burgundy, France",
+        "vintage": "2022",
+        "grape": "Chardonnay (White)",
+        "rationale": "Weight Matching achieved through medium-full body that stands up to carbonara's richness. Acidity–Fat Cleansing provided by southern Burgundy's characteristic bright acidity cutting through bacon fat and egg yolk. Flavor Bridging occurs as wine's subtle oak integration and ripe stone fruit notes complement dish's savory depth while maintaining refreshing citrus lift.",
+        "pairingPrinciplesApplied": ["Weight Matching", "Acidity–Fat Cleansing", "Flavor Bridging"],
+        "tastingNotes": {
+          "aromas": ["white peach", "lemon", "hazelnut", "acacia flower", "butter"],
+          "palate": "vibrant acidity balanced with medium-full body, creamy texture from lees contact, flavors of stone fruit, citrus, and subtle toast",
+          "finish": "medium-long with lingering fruit and mineral notes"
+        },
+        "servingGuidance": {
+          "temperature": "52-56°F (11-13°C)",
+          "glassware": "Burgundy white wine glass",
+          "decanting": "No decant needed"
+        },
+        "confidence": {
+          "score": 85,
+          "breakdown": {
+            "pairingScience": 42,
+            "wineKnowledge": 28,
+            "complexityHandling": 15
+          },
+          "rationale": "Strong pairing science with three applicable principles satisfied and no violations. Wine knowledge confident with established producer and region. Complexity handling effective for moderate dish elements. Minor deduction for fewer principle applications than premium recommendation."
+        },
+        "story": "Pouilly-Fuissé's limestone slopes in southern Burgundy produce fuller-bodied Chardonnay than northern Chablis, with the region's warm microclimate adding ripe fruit while maintaining essential acidity.",
+        "alternatives": [
+          {
+            "wineName": "Saint-Véran",
+            "producer": "Domaine des Deux Roches",
+            "vintage": "2022",
+            "grape": "Chardonnay (White)"
+          },
+          {
+            "wineName": "Mâcon-Villages",
+            "producer": "Domaine de la Bongran",
+            "vintage": "2022",
+            "grape": "Chardonnay (White)"
+          }
+        ],
+        "pricePoint": "$45",
+        "category": "White Wine",
+        "expertRating": "91 (Wine Spectator)",
+        "retailerSuggestion": "Total Wine & More, Wine.com, or local shops with strong Burgundy selections",
+        "image": "unknown",
+        "storytellingElements": "Pouilly-Fuissé's limestone slopes in southern Burgundy produce fuller-bodied Chardonnay than northern Chablis, with the region's warm microclimate adding ripe fruit while maintaining essential acidity."
+      },
+      {
+        "tierLabel": "Budget-Friendly",
+        "tierRationale": "Regional-level AOC without village designation; established producer with entry-tier cuvée representing reliable Bourgogne quality",
+        "tierFallbackApplied": false,
+        "wineName": "Bourgogne Blanc",
+        "producer": "Louis Jadot",
+        "region": "Burgundy, France",
+        "vintage": "2022",
+        "grape": "Chardonnay (White)",
+        "rationale": "Weight Matching satisfied as medium-bodied wine pairs appropriately with carbonara without overwhelming the dish. Acidity–Fat Cleansing principle met through Burgundian Chardonnay's natural high acidity that refreshes against bacon fat and egg yolk richness. Bitterness & Umami Avoidance achieved via fruit-forward, minimal-oak style that complements parmesan's umami without clashing.",
+        "pairingPrinciplesApplied": ["Weight Matching", "Acidity–Fat Cleansing", "Bitterness & Umami Avoidance"],
+        "tastingNotes": {
+          "aromas": ["green apple", "lemon", "white flowers", "chalk"],
+          "palate": "crisp acidity with medium body, clean citrus and green fruit flavors, subtle mineral undertones, light texture",
+          "finish": "medium length with bright, refreshing acidity"
+        },
+        "servingGuidance": {
+          "temperature": "48-52°F (9-11°C)",
+          "glassware": "Universal white wine glass",
+          "decanting": "No decant needed"
+        },
+        "confidence": {
+          "score": 83,
+          "breakdown": {
+            "pairingScience": 42,
+            "wineKnowledge": 26,
+            "complexityHandling": 15
+          },
+          "rationale": "Solid pairing science with three applicable principles satisfied and no violations. Wine knowledge strong with recognized producer and region, minor deduction for entry-tier style offering less complexity. Moderate complexity dish handled appropriately with structural match."
+        },
+        "story": "Bourgogne Blanc represents entry-level Burgundy, sourced from various village vineyards across the region, offering classic Chardonnay character with the limestone-derived acidity essential for cutting through rich dishes.",
+        "alternatives": [
+          {
+            "wineName": "Petit Chablis",
+            "producer": "Domaine de la Motte",
+            "vintage": "2023",
+            "grape": "Chardonnay (White)"
+          },
+          {
+            "wineName": "Mâcon-Villages",
+            "producer": "Louis Latour",
+            "vintage": "2023",
+            "grape": "Chardonnay (White)"
+          }
+        ],
+        "pricePoint": "$22",
+        "category": "White Wine",
+        "expertRating": "88 (Wine Advocate)",
+        "retailerSuggestion": "Trader Joe's wine section, Costco, or local wine shops with French value selections",
+        "image": "unknown",
+        "storytellingElements": "Bourgogne Blanc represents entry-level Burgundy, sourced from various village vineyards across the region, offering classic Chardonnay character with the limestone-derived acidity essential for cutting through rich dishes."
+      }
+    ],
+    "avoid": {
+      "types": ["High-tannin reds (Barolo, Cabernet Sauvignon)", "Heavily oaked Chardonnay", "Low-acid whites (Viognier, white Rhône blends)", "Sparkling wines"],
+      "reason": "High tannins clash with egg yolk's fat and bacon's cured nature creating metallic bitterness. Heavy oak competes with parmesan's umami and carbonara's richness. Low-acid wines cannot cleanse palate from high fat content, leaving coating sensation. Sparkling's effervescence disrupts creamy texture and carbonation accentuates saltiness uncomfortably."
+    },
+    "closingNarrative": "Carbonara demands wines with surgical precision—high acidity to slice through layers of pork fat, egg yolk, and aged cheese, while maintaining enough body to not be overwhelmed. Burgundian Chardonnay, particularly from limestone terroirs, provides this balance: mineral-driven acidity acts as a palate cleanser, while the wine's texture harmonizes with the dish's creamy richness, creating a dialogue between Old World restraint and Italian indulgence."
+  }
+]
+
+
+
+
+
+
+
+
+

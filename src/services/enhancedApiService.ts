@@ -326,8 +326,14 @@ class EnhancedApiService {
   }
 }
 
-// Create singleton instance
-const apiService = new EnhancedApiService(process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000');
+// Import API URL getter for consistent URL resolution
+import { getApiBaseUrl } from '../utils/api';
+
+// Create singleton instance with consistent API URL resolution
+// getApiBaseUrl() returns URL with /api suffix (e.g., 'http://localhost:3001/api')
+// EnhancedApiService expects base URL that includes /api, then adds endpoint (e.g., '/recommendations')
+// So we use getApiBaseUrl() directly
+const apiService = new EnhancedApiService(getApiBaseUrl());
 
 export default apiService;
 export { EnhancedApiService, ApiRequestConfig, RateLimitConfig, CircuitBreakerConfig };

@@ -2,9 +2,11 @@
 // This allows easy switching between design versions for A/B testing
 
 export type UIVersion = 'original' | 'enhanced';
+export type WineCardVersion = 'v1' | 'v2'; // v1 = original, v2 = enhanced with new fields
 
 export interface UIConfig {
   version: UIVersion;
+  wineCardVersion: WineCardVersion; // A/B testing for wine card enhancements
   features: {
     enhancedComponents: boolean;
     animations: boolean;
@@ -17,9 +19,13 @@ export interface UIConfig {
 // 🎛️ **MAIN TOGGLE - Change this to switch between designs**
 export const UI_VERSION: UIVersion = 'enhanced'; // Change to 'original' to revert
 
+// 🎛️ **WINE CARD VERSION - Change this to switch between wine card versions**
+export const WINE_CARD_VERSION: WineCardVersion = 'v2'; // Change to 'v1' to use original cards
+
 // Configuration based on UI version
 export const UI_CONFIG: UIConfig = {
   version: UI_VERSION,
+  wineCardVersion: WINE_CARD_VERSION,
   features: {
     enhancedComponents: UI_VERSION === 'enhanced',
     animations: UI_VERSION === 'enhanced',
@@ -48,6 +54,10 @@ export const getButtonComponent = () => {
 export const getWineCardComponent = () => {
   return hasEnhancedComponents() ? 'EnhancedWineCard' : 'WineCard';
 };
+
+// Wine card version helpers
+export const useWineCardV2 = () => UI_CONFIG.wineCardVersion === 'v2';
+export const useWineCardV1 = () => UI_CONFIG.wineCardVersion === 'v1';
 
 export const getHomeScreenComponent = () => {
   return hasEnhancedComponents() ? 'EnhancedHomeScreen' : 'HomeScreen';

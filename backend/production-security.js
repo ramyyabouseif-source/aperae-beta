@@ -90,7 +90,7 @@ const productionSecurity = {
             styleSrc: ["'self'"],
             scriptSrc: ["'self'"],
             imgSrc: ["'self'", "data:"],
-            connectSrc: ["'self'", "https://api.openai.com"],
+            connectSrc: ["'self'", "https://api.anthropic.com"],
             fontSrc: ["'self'"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
@@ -103,7 +103,7 @@ const productionSecurity = {
             styleSrc: ["'self'", "'unsafe-inline'"],
             scriptSrc: ["'self'"],
             imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'", "https://api.openai.com"],
+            connectSrc: ["'self'", "https://api.anthropic.com"],
           },
         },
     
@@ -134,7 +134,7 @@ const productionSecurity = {
   // Environment Variables Validation
   requiredEnvVars: {
     production: [
-      'OPENAI_API_KEY',
+      'ANTHROPIC_API_KEY',
       'JWT_SECRET',
       'REFRESH_SECRET',
       'API_KEYS', // Comma-separated list of valid API keys
@@ -143,7 +143,7 @@ const productionSecurity = {
       'NODE_ENV'
     ],
     development: [
-      'OPENAI_API_KEY',
+      'ANTHROPIC_API_KEY',
       'JWT_SECRET',
       'REFRESH_SECRET',
       'NODE_ENV'

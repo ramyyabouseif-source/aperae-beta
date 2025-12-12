@@ -161,25 +161,54 @@ class CertificatePinningService {
     try {
       const urlObj = new URL(url);
       
-      // Check protocol
+      // In development mode, allow HTTP and local IP addresses for local development
+      if (__DEV__) {
+        // Allow HTTP for local development (192.168.x.x, localhost, 127.0.0.1)
+        const localDevelopmentPatterns = [
+          /^192\.168\.\d+\.\d+/,
+          /^127\.0\.0\.1$/,
+          /^localhost$/i,
+          /^10\.\d+\.\d+\.\d+/,
+          /^172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+/,
+        ];
+
+        const isLocalDevelopment = localDevelopmentPatterns.some(pattern => 
+          pattern.test(urlObj.hostname)
+        );
+
+        if (isLocalDevelopment && urlObj.protocol === 'http:') {
+          console.log(`Allowing local development URL: ${url}`);
+          return true;
+        }
+
+        // In development, also allow ngrok HTTPS URLs
+        if (urlObj.hostname.includes('ngrok-free.app') && urlObj.protocol === 'https:') {
+          console.log(`Allowing ngrok development URL: ${url}`);
+          return true;
+        }
+      }
+      
+      // Check protocol (production mode or non-local URLs)
       if (urlObj.protocol !== 'https:') {
         console.warn(`Insecure protocol detected: ${urlObj.protocol}`);
         return false;
       }
 
-      // Check for suspicious patterns
-      const suspiciousPatterns = [
-        /localhost/i,
-        /127\.0\.0\.1/,
-        /192\.168\./,
-        /10\./,
-        /172\.(1[6-9]|2[0-9]|3[0-1])\./,
-      ];
+      // Check for suspicious patterns (only in production)
+      if (!__DEV__) {
+        const suspiciousPatterns = [
+          /localhost/i,
+          /127\.0\.0\.1/,
+          /192\.168\./,
+          /10\./,
+          /172\.(1[6-9]|2[0-9]|3[0-1])\./,
+        ];
 
-      for (const pattern of suspiciousPatterns) {
-        if (pattern.test(urlObj.hostname)) {
-          console.warn(`Suspicious hostname pattern detected: ${urlObj.hostname}`);
-          return false;
+        for (const pattern of suspiciousPatterns) {
+          if (pattern.test(urlObj.hostname)) {
+            console.warn(`Suspicious hostname pattern detected: ${urlObj.hostname}`);
+            return false;
+          }
         }
       }
 

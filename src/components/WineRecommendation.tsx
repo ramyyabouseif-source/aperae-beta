@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { WineRecommendationResponse } from '../types/wine';
 import WineCard from './WineCard';
+import ResponsibleDrinkingDisclaimer from './ResponsibleDrinkingDisclaimer';
+import FinalSommelierNotes from './FinalSommelierNotes';
 
 interface WineRecommendationProps {
   recommendations: WineRecommendationResponse | null;
@@ -23,6 +25,17 @@ export default function WineRecommendation({
     );
   }
 
+  // Debug logging - make it very visible
+  console.log('🎯 WineRecommendation Component RENDERED');
+  console.log('Has recommendations array:', !!recommendations.recommendations);
+  console.log('Recommendation count:', recommendations.recommendations?.length);
+  console.log('Has closingNarrative:', !!recommendations.closingNarrative);
+  console.log('Has avoid:', !!recommendations.avoid);
+  console.log('closingNarrative value:', recommendations.closingNarrative?.substring(0, 50));
+  console.log('avoid value:', JSON.stringify(recommendations.avoid));
+  console.log('All keys in recommendations object:', Object.keys(recommendations));
+  console.log('🎯 End WineRecommendation Component Debug');
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -30,7 +43,10 @@ export default function WineRecommendation({
         <Text style={styles.dish}>for {recommendations.dish}</Text>
       </View>
 
-      <ScrollView style={styles.recommendationsContainer}>
+      <ScrollView 
+        style={styles.recommendationsContainer}
+        contentContainerStyle={styles.scrollContent}
+      >
         {recommendations.recommendations.map((wine, index) => (
           <WineCard
             key={`${wine.wineName}-${index}`}
@@ -39,14 +55,22 @@ export default function WineRecommendation({
             onRemoveFromFavorites={onRemoveFromFavorites}
           />
         ))}
-      </ScrollView>
-
-      {recommendations.closingNarrative && (
-        <View style={styles.narrativeContainer}>
-          <Text style={styles.narrativeTitle}>Sommelier's Notes</Text>
-          <Text style={styles.narrativeText}>{recommendations.closingNarrative}</Text>
+        
+        {/* Final Sommelier Notes - After all wine cards, similar to Pairing Notes */}
+        {/* ALWAYS render - remove any conditional logic */}
+        <View style={[styles.finalNotesSection, { backgroundColor: '#ffff00', padding: 10 }]}>
+          <Text style={{ color: '#000', fontWeight: 'bold', marginBottom: 10 }}>
+            DEBUG: FinalSommelierNotes should appear below
+          </Text>
+          <FinalSommelierNotes
+            closingNarrative={recommendations.closingNarrative}
+            avoid={recommendations.avoid}
+          />
         </View>
-      )}
+        
+        {/* Responsible Drinking Disclaimer - at the bottom */}
+        <ResponsibleDrinkingDisclaimer />
+      </ScrollView>
     </View>
   );
 }
@@ -74,7 +98,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   recommendationsContainer: {
-    maxHeight: 600,
+    // Removed maxHeight to allow full scrolling
+  },
+  scrollContent: {
+    paddingBottom: 20,
+  },
+  finalNotesSection: {
+    marginHorizontal: 20,
+    marginTop: 24,
+    marginBottom: 16,
   },
   narrativeContainer: {
     backgroundColor: '#f8f8f8',

@@ -6,18 +6,18 @@ const requiredEnvVars = [
   'REFRESH_SECRET'
 ];
 
-// Only require OpenAI API key if not in mock mode
+// Only require Anthropic API key if not in mock mode
 if (process.env.MOCK_MODE !== 'true') {
-  requiredEnvVars.push('OPENAI_API_KEY');
+  requiredEnvVars.push('ANTHROPIC_API_KEY');
 }
 
 console.log('🔍 Validating environment variables...');
 
 // Log mock mode status
 if (process.env.MOCK_MODE === 'true') {
-  console.log('🤖 Mock mode enabled - OpenAI API key not required');
+  console.log('🤖 Mock mode enabled - Anthropic API key not required');
 } else {
-  console.log('🔑 Production mode - OpenAI API key required');
+  console.log('🔑 Production mode - Anthropic API key required');
 }
 
 requiredEnvVars.forEach(envVar => {
@@ -28,17 +28,17 @@ requiredEnvVars.forEach(envVar => {
   console.log(`✅ ${envVar} is configured`);
 });
 
-// Check for placeholder values (only if OpenAI key is required)
-if (process.env.MOCK_MODE !== 'true' && process.env.OPENAI_API_KEY) {
+// Check for placeholder values (only if Anthropic key is required)
+if (process.env.MOCK_MODE !== 'true' && process.env.ANTHROPIC_API_KEY) {
   const placeholderPatterns = [
-    'sk-your-openai-api-key-here',
-    'sk-placeholder',
+    'sk-ant-your-claude-api-key-here',
+    'sk-ant-placeholder',
     'your-api-key-here',
-    'sk-removed_for_security'
+    'sk-ant-removed_for_security'
   ];
 
-  if (placeholderPatterns.includes(process.env.OPENAI_API_KEY)) {
-    console.error('❌ OpenAI API key not configured properly - still using placeholder');
+  if (placeholderPatterns.includes(process.env.ANTHROPIC_API_KEY)) {
+    console.error('❌ Anthropic API key not configured properly - still using placeholder');
     process.exit(1);
   }
 }

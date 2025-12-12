@@ -3,7 +3,6 @@
  * Handles camera permissions and photo capture using Expo Camera
  */
 
-import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
 
@@ -26,7 +25,7 @@ export class CameraService {
    */
   static async requestCameraPermission(): Promise<CameraPermission> {
     try {
-      const { status } = await Camera.requestCameraPermissionsAsync();
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
       
       return {
         granted: status === 'granted',
@@ -48,7 +47,7 @@ export class CameraService {
    */
   static async getCameraPermission(): Promise<CameraPermission> {
     try {
-      const { status } = await Camera.getCameraPermissionsAsync();
+      const { status } = await ImagePicker.getCameraPermissionsAsync();
       
       return {
         granted: status === 'granted',
@@ -160,10 +159,14 @@ export class CameraService {
    */
   static async isCameraAvailable(): Promise<boolean> {
     try {
-      const { status } = await Camera.getCameraPermissionsAsync();
-      return status === 'granted';
+      // Check permissions - if we can get permissions, camera is likely available
+      // The permission check will fail if camera hardware is not available
+      const { status } = await ImagePicker.getCameraPermissionsAsync();
+      // Return true if permission is granted or can be asked (camera exists)
+      return status === 'granted' || status === 'undetermined';
     } catch (error) {
       console.error('Camera availability check error:', error);
+      // If there's an error checking permissions, assume camera is not available
       return false;
     }
   }

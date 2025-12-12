@@ -24,6 +24,7 @@ import { UserPreferences } from '../types/preferences';
 import { InputValidator } from '../utils/validation';
 import { SecureErrorHandler } from '../utils/errorHandler';
 import { sortWinesForAPIMode, sortWinesForMockMode } from '../utils/wineSorting';
+import { getConfidenceScore } from '../utils/wineTypeHelpers';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '../design';
 
 const { width } = Dimensions.get('window');
@@ -92,6 +93,48 @@ export default function EnhancedHomeScreen() {
         const sortedRecommendations = isMockMode 
           ? sortWinesForMockMode(result.recommendations)
           : sortWinesForAPIMode(result.recommendations);
+        
+        // Detailed logging similar to menu screen
+        console.log('=== HOME SCREEN RECOMMENDATION RESULTS ===');
+        console.log('Dish:', sanitizedDish);
+        console.log('Preferences:', userPreferences || 'none');
+        console.log('Mock Mode:', isMockMode);
+        console.log(`Generated recommendations: ${sortedRecommendations.length}`);
+        
+        // Log each recommendation with key details
+        sortedRecommendations.forEach((rec, index) => {
+          console.log(`\nRecommendation ${index + 1}:`);
+          console.log(`  Wine: ${rec.wineName || 'Unknown'}`);
+          console.log(`  Producer: ${rec.producer || 'Unknown'}`);
+          console.log(`  Vintage: ${rec.vintage || 'NV'}`);
+          console.log(`  Price Point: ${rec.pricePoint || 'Not specified'}`);
+          const confidenceScore = getConfidenceScore(rec) || 'N/A';
+          console.log(`  Confidence Score: ${confidenceScore}`);
+          console.log(`  Expert Rating: ${rec.expertRating || 'unknown'}`);
+          console.log(`  Category: ${rec.category || 'Unknown'}`);
+          if (rec.pairingRationale) {
+            console.log(`  Pairing Rationale: ${rec.pairingRationale.substring(0, 100)}...`);
+          }
+        });
+        
+        console.log('\n=== FULL RECOMMENDATION RESPONSE ===');
+        console.log(JSON.stringify({
+          dish: result.dish,
+          recommendations: sortedRecommendations.map(rec => ({
+            wineName: rec.wineName,
+            producer: rec.producer,
+            vintage: rec.vintage,
+            pricePoint: rec.pricePoint,
+            confidenceScore: getConfidenceScore(rec),
+            expertRating: rec.expertRating,
+            pairingRationale: rec.pairingRationale?.substring(0, 150),
+            tastingNotes: typeof rec.tastingNotes === 'string' 
+              ? rec.tastingNotes?.substring(0, 100)
+              : rec.tastingNotes?.palate?.substring(0, 100) || 'N/A',
+          })),
+          recommendationCount: sortedRecommendations.length,
+        }, null, 2));
+        console.log('=== END RECOMMENDATION RESULTS ===\n');
         
         setRecommendations({
           ...result,

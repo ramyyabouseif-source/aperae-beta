@@ -1,0 +1,92 @@
+version: 2
+updates:
+  # Backend npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "backend"
+      - "security"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "ramyy"
+    assignees:
+      - "ramyy"
+    
+  # Frontend npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "security"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "ramyy"
+    assignees:
+      - "ramyy"
+    
+  # Security updates (faster, for critical issues)
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "security"
+      - "dependencies"
+      - "backend"
+      - "urgent"
+    commit-message:
+      prefix: "security"
+      include: "scope"
+    # Only update security vulnerabilities
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    reviewers:
+      - "ramyy"
+    assignees:
+      - "ramyy"
+  
+  # Frontend security updates
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "security"
+      - "dependencies"
+      - "frontend"
+      - "urgent"
+    commit-message:
+      prefix: "security"
+      include: "scope"
+    # Only update security vulnerabilities
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    reviewers:
+      - "ramyy"
+    assignees:
+      - "ramyy"
+

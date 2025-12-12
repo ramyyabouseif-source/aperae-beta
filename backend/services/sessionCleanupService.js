@@ -17,6 +17,22 @@ async function cleanupExpiredSessions() {
   const startTime = Date.now();
   
   try {
+    // Check if DATABASE_URL is configured
+    if (!process.env.DATABASE_URL) {
+      logger.warn('Session cleanup skipped: DATABASE_URL not configured');
+      return {
+        success: false,
+        error: 'DATABASE_URL not configured',
+        deletedCount: 0,
+        durationMs: Date.now() - startTime
+      };
+    }
+
+    // Test database connection first
+    await prisma.$connect().catch(err => {
+      throw new Error(`Database connection failed: ${err.message}`);
+    });
+
     // Calculate cutoff date (30 days ago for revoked sessions)
     const revokedCutoff = new Date();
     revokedCutoff.setDate(revokedCutoff.getDate() - 30);
@@ -51,11 +67,26 @@ async function cleanupExpiredSessions() {
   } catch (error) {
     const duration = Date.now() - startTime;
     
-    logger.error('Session cleanup failed', {
-      error: error.message,
-      stack: error.stack,
-      durationMs: duration
-    });
+    // Don't log full stack trace for connection errors - just the message
+    const isConnectionError = error.message && (
+      error.message.includes('Can\'t reach database server') ||
+      error.message.includes('connection') ||
+      error.message.includes('DATABASE_URL')
+    );
+
+    if (isConnectionError) {
+      logger.warn('Session cleanup skipped: Database connection issue', {
+        error: error.message,
+        durationMs: duration,
+        hint: 'Check DATABASE_URL environment variable and database connectivity'
+      });
+    } else {
+      logger.error('Session cleanup failed', {
+        error: error.message,
+        stack: error.stack,
+        durationMs: duration
+      });
+    }
 
     return {
       success: false,
@@ -79,9 +110,13 @@ function startPeriodicCleanup(intervalHours = 24) {
     intervalMs
   });
 
-  // Run immediately on start
+  // Run immediately on start (non-blocking, won't crash if DB unavailable)
   cleanupExpiredSessions().catch(err => {
-    logger.error('Initial session cleanup failed', { error: err.message });
+    // Only log as warning - connection issues are expected during initial startup
+    logger.warn('Initial session cleanup skipped (will retry on next interval)', { 
+      error: err.message,
+      hint: 'This is normal if database connection is still being established'
+    });
   });
 
   // Then run periodically
@@ -102,5 +137,6 @@ module.exports = {
   cleanupExpiredSessions,
   startPeriodicCleanup
 };
+
 
 

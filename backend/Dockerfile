@@ -16,7 +16,10 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Copy Prisma schema (needed for postinstall script)
+COPY prisma ./prisma
+
+# Install dependencies (this will run postinstall -> prisma generate)
 RUN npm ci --only=production && npm cache clean --force
 
 # Copy application code

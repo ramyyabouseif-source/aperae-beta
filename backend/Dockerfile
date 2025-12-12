@@ -4,10 +4,12 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies including OpenSSL and glibc compatibility for Prisma
 RUN apk add --no-cache \
     curl \
-    dumb-init
+    dumb-init \
+    openssl \
+    gcompat
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -16,8 +18,16 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Copy Prisma schema (needed for postinstall script)
+COPY prisma ./prisma
+
+# Install dependencies (this will run postinstall -> prisma generate)
 RUN npm ci --only=production && npm cache clean --force
+
+# Create OpenSSL 1.1 compatibility symlinks for Prisma 5.22.0
+# Alpine 3.21 uses OpenSSL 3.0, but Prisma 5.22.0 expects 1.1 libraries
+RUN ln -sf /usr/lib/libssl.so.3 /usr/lib/libssl.so.1.1 && \
+    ln -sf /usr/lib/libcrypto.so.3 /usr/lib/libcrypto.so.1.1
 
 # Copy application code
 COPY . .

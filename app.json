@@ -55,7 +55,8 @@
     "extra": {
       "eas": {
         "projectId": "f7a7ae2e-cc06-42c5-a3f6-7c3dbd218b1e"
-      }
+      },
+      "apiBaseUrl": "https://api.aperae.com/api"
     },
     "scheme": "pocketsomm",
     "privacy": "public",

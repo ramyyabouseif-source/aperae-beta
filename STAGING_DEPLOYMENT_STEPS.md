@@ -81,22 +81,21 @@ Fill in these exact values:
 
 ### **2.5 Build & Deploy Settings**
 
-**For Docker deployments, use these values:**
+**For Docker deployments, these MUST be empty/default:**
 
-- **Build Command:** Leave as default (Render will use `docker build` automatically)
-  - If field is required and won't accept empty, use: `docker build -t app .`
-  - But typically, leaving it empty/default is fine for Docker
+- **Build Command:** ⚠️ **LEAVE EMPTY** - Do NOT set this!
+  - Render automatically runs `docker build` when Runtime is Docker
+  - If you set a build command, it will fail with "docker: command not found"
+  - The field should be empty or use Render's default
   
-- **Start Command:** Leave as default (Dockerfile CMD will be used)
-  - If field is required and won't accept empty, use: `node server.js`
-  - But typically, leaving it empty/default is fine since Dockerfile has `CMD ["node", "server.js"]`
+- **Start Command:** ⚠️ **LEAVE EMPTY** - Do NOT set this!
+  - Render uses your Dockerfile's `CMD ["node", "server.js"]` automatically
+  - If you set a start command, it may conflict with Dockerfile
+  - The field should be empty or use Render's default
   
 - **Plan:** Select **"Free"** (same as production)
 
-**Note:** If Render's UI requires values in Build/Start Command fields:
-- **Build Command:** `docker build -t app .` (or leave default if available)
-- **Start Command:** `node server.js` (or leave default if available)
-- Render will use the Dockerfile's CMD instruction, so these are fallbacks
+**Important:** When Runtime is set to "Docker", Render handles everything automatically. Setting Build/Start commands will cause errors!
 
 ### **2.6 Create Service**
 

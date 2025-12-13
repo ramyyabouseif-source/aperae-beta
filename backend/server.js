@@ -2058,9 +2058,7 @@ app.post('/api/recommendations',
         apiConfig = {
           model: "claude-sonnet-4-5-20250929",
           system: promptParts.staticSystemPrompt,
-          cache_control: {
-            type: "ephemeral"
-          },
+          // Note: cache_control not supported by API - removed
           messages: [
             {
               role: "user",
@@ -2071,11 +2069,10 @@ app.post('/api/recommendations',
           temperature: 0.5 // Lower for more deterministic responses
         };
         
-        logger.debug('Using V7.0 with prompt caching', { 
+        logger.debug('Using V7.0 prompt (cache_control not available in API)', { 
           requestId,
           staticPromptLength: promptParts.staticSystemPrompt.length,
-          dynamicPromptLength: promptParts.dynamicUserMessage.length,
-          cachingEnabled: true
+          dynamicPromptLength: promptParts.dynamicUserMessage.length
         });
       } else {
         // Original prompt (no caching)

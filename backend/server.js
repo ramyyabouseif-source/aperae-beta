@@ -2056,7 +2056,7 @@ app.post('/api/recommendations',
         const promptParts = v7PromptService.buildV7PromptWithCaching(dish);
         
         apiConfig = {
-          model: "claude-3-5-sonnet-20241022",
+          model: "claude-sonnet-4-5-20250929",
           system: promptParts.staticSystemPrompt,
           cache_control: {
             type: "ephemeral"
@@ -2080,7 +2080,7 @@ app.post('/api/recommendations',
       } else {
         // Original prompt (no caching)
         apiConfig = {
-          model: "claude-3-5-sonnet-20241022",
+          model: "claude-sonnet-4-5-20250929",
           system: enhancedPrompt,
           messages: [
             {

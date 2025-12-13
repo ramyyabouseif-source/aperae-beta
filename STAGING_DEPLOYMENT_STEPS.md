@@ -151,31 +151,60 @@ Key: REFRESH_SECRET
 Value: [PASTE YOUR REFRESH_SECRET FROM STEP 1]
 ```
 
-#### **API Keys (Copy from Production):**
-
-Get these from your **production** Render service environment variables:
+#### **API Keys:**
 
 ```
 Key: ANTHROPIC_API_KEY
-Value: [COPY FROM PRODUCTION]
+Value: [COPY FROM PRODUCTION - Environment tab]
 ```
+
+**How to find ANTHROPIC_API_KEY:**
+1. Go to [Render Dashboard](https://dashboard.render.com/)
+2. Open your **production service** (the one running `api.aperae.com`)
+3. Click **"Environment"** tab
+4. Find `ANTHROPIC_API_KEY` and copy its value
+
+#### **Google Cloud Vision API (Optional - Only if OCR is needed):**
+
+**Option 1: If you have Google Cloud credentials set up**
+
+If your production service uses Google Vision API, you can either:
+
+**A. Get from Google Cloud Console:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Select your project (or create one)
+3. Go to **IAM & Admin** → **Service Accounts**
+4. Create or select a service account
+5. Click **"Keys"** tab → **"Add Key"** → **"Create new key"** → **JSON**
+6. Download the JSON file
+7. Extract these values from the JSON:
+   - `GOOGLE_CLOUD_PROJECT_ID` = `project_id` field
+   - `GOOGLE_CLOUD_CLIENT_EMAIL` = `client_email` field  
+   - `GOOGLE_CLOUD_PRIVATE_KEY` = `private_key` field
+
+**B. Skip for now (use MOCK_MODE):**
+- If OCR/menu scanning isn't critical for staging, you can skip these
+- The service will run in mock mode for OCR features
+- You can add these later when needed
+
+**Add these only if you have them:**
 
 ```
 Key: GOOGLE_CLOUD_PROJECT_ID
-Value: [COPY FROM PRODUCTION]
+Value: [From Google Cloud Console JSON file - project_id field]
 ```
 
 ```
 Key: GOOGLE_CLOUD_CLIENT_EMAIL
-Value: [COPY FROM PRODUCTION]
+Value: [From Google Cloud Console JSON file - client_email field]
 ```
 
 ```
 Key: GOOGLE_CLOUD_PRIVATE_KEY
-Value: [COPY FROM PRODUCTION]
+Value: [From Google Cloud Console JSON file - private_key field]
 ```
 
-**Important:** For `GOOGLE_CLOUD_PRIVATE_KEY`, make sure to include the entire value with quotes if it has newlines.
+**Note:** If you don't add these, OCR features will use mock data. This is fine for staging testing.
 
 #### **CORS Configuration:**
 

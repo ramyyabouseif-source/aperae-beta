@@ -121,3 +121,4 @@ COMMENT ON TABLE dish_recommendations IS
   'Stores individual dish recommendations with full wine analysis data for quality evaluation. One row per recommendation (3 rows per request: Complex, Moderate, Simple).';
 
 
+

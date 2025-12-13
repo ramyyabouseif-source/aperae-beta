@@ -2056,7 +2056,7 @@ app.post('/api/recommendations',
         const promptParts = v7PromptService.buildV7PromptWithCaching(dish);
         
         apiConfig = {
-          model: "claude-sonnet-4-5-20250929",
+          model: "claude-3-5-sonnet-20241022",
           system: promptParts.staticSystemPrompt,
           cache_control: {
             type: "ephemeral"
@@ -2080,7 +2080,7 @@ app.post('/api/recommendations',
       } else {
         // Original prompt (no caching)
         apiConfig = {
-          model: "claude-sonnet-4-5-20250929",
+          model: "claude-3-5-sonnet-20241022",
           system: enhancedPrompt,
           messages: [
             {
@@ -2562,17 +2562,39 @@ app.post('/api/recommendations',
     } catch (error) {
       const responseTime = Date.now() - requestStartTime;
       
-      // Enhanced error logging
+      // Enhanced error logging with full error details
+      const errorDetails = {
+        requestId,
+        error: error.message,
+        errorName: error.name,
+        errorStack: error.stack,
+        responseTime
+      };
+      
+      // Add Anthropic-specific error details if available
       if (error.status) {
-        logger.error('Claude API error', {
-          requestId,
-          error: error.message,
-          status: error.status,
-          responseTime
-        });
-      } else {
-        RequestLogger.logRequestError('recommendations', requestId, responseTime, error);
+        errorDetails.status = error.status;
       }
+      if (error.statusCode) {
+        errorDetails.statusCode = error.statusCode;
+      }
+      if (error.type) {
+        errorDetails.type = error.type;
+      }
+      if (error.error) {
+        errorDetails.errorDetails = error.error;
+      }
+      
+      logger.error('Claude API error', errorDetails);
+      console.error('=== CLAUDE API ERROR DETAILS ===');
+      console.error('Error Message:', error.message);
+      console.error('Error Name:', error.name);
+      console.error('Error Status:', error.status || error.statusCode || 'none');
+      console.error('Error Type:', error.type || 'none');
+      console.error('Full Error:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      console.error('=================================');
+      
+      RequestLogger.logRequestError('recommendations', requestId, responseTime, error);
       
       // Track error
       monitoring.trackError(error, req);

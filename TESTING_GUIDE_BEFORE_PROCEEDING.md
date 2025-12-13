@@ -1,7 +1,8 @@
 # Testing Guide - Before Proceeding
 
 **Date:** December 13, 2025  
-**Purpose:** Verify mobile app and API still work after infrastructure changes
+**Purpose:** Verify mobile app and API still work after infrastructure changes  
+**Required Tool:** Windows PowerShell (not Command Prompt, not Git Bash)
 
 ---
 
@@ -22,314 +23,503 @@
 
 ---
 
-## 🔍 **Quick API Health Checks (2 minutes)**
+## 📋 **Prerequisites**
 
-### **1. Production API**
-```bash
-curl https://api.aperae.com/api/health
+### **Required Application:**
+- **Windows PowerShell** (Windows 10/11 built-in)
+  - Open by pressing `Windows Key + X` and selecting "Windows PowerShell" or "Terminal"
+  - OR search "PowerShell" in Start Menu
+  - **Do NOT use:** Command Prompt (cmd), Git Bash, or WSL
+
+### **Current Working Directory:**
+```
+C:\Users\ramyy\Production\Aperae
 ```
 
-**Expected:** JSON response with status
-```json
-{
-  "status": "healthy" or "degraded",
-  "uptime": 123.45,
-  "requests": 10,
-  "timestamp": "2025-12-13T..."
-}
-```
-
-### **2. Staging API**
-```bash
-curl https://staging-api.aperae.com/api/health
-```
-
-**Expected:** Same format as production
-
----
-
-## 📱 **Mobile App Testing Checklist**
-
-### **Prerequisites**
-1. **Check API URL Configuration:**
-   - Mobile app uses `src/utils/api.ts`
-   - Checks `EXPO_PUBLIC_API_URL` first (explicit override)
-   - Then `EXPO_PUBLIC_ENV` (production/staging/development)
-   - Defaults to localhost for development
-
-2. **Production URL:** `https://api.aperae.com/api`
-3. **Staging URL:** `https://staging-api.aperae.com/api`
-
-### **Test 1: Verify API Connection**
-- [ ] Open mobile app
-- [ ] Check console logs for API URL
-- [ ] Verify it shows `https://api.aperae.com/api` (if using production)
-- [ ] Status: ⏳ Pending
-
-### **Test 2: Wine Recommendation**
-- [ ] Navigate to home screen
-- [ ] Enter a dish (e.g., "Grilled Salmon")
-- [ ] Request wine recommendation
-- [ ] Expected: Recommendations appear
-- [ ] Status: ⏳ Pending
-
-### **Test 3: User Authentication**
-- [ ] Test registration (new account)
-- [ ] Test login (existing account)
-- [ ] Expected: Authentication works
-- [ ] Status: ⏳ Pending
-
-### **Test 4: Menu OCR** (if implemented)
-- [ ] Take/upload menu photo
-- [ ] Request pairing
-- [ ] Expected: OCR and recommendations work
-- [ ] Status: ⏳ Pending
-
-### **Test 5: Error Handling**
-- [ ] Test with no internet connection
-- [ ] Test with invalid API URL
-- [ ] Expected: User-friendly error messages
-- [ ] Status: ⏳ Pending
-
----
-
-## 🔧 **API Endpoint Testing (10 minutes)**
-
-### **Using curl (PowerShell)**
-
-#### **1. Health Check**
+### **Verify You're in the Right Place:**
+Open PowerShell and run:
 ```powershell
-curl https://api.aperae.com/api/health
+pwd
 ```
 
-#### **2. Wine Recommendation**
+**Expected Output:**
+```
+Path
+----
+C:\Users\ramyy\Production\Aperae
+```
+
+If you're not in this directory, navigate there:
+```powershell
+cd C:\Users\ramyy\Production\Aperae
+```
+
+---
+
+## 🔍 **TEST 1: Production API Health Check (2 minutes)**
+
+### **Step 1: Open Windows PowerShell**
+1. Press `Windows Key + X`
+2. Select "Windows PowerShell" or "Terminal"
+3. Verify you're in: `C:\Users\ramyy\Production\Aperae`
+
+### **Step 2: Run Health Check Command**
+Copy and paste this exact command:
+
+```powershell
+Invoke-RestMethod -Uri "https://api.aperae.com/api/health" -Method Get
+```
+
+### **Expected Result:**
+You should see JSON output similar to:
+```json
+status       : healthy
+errorRate    : 0
+uptime       : 12345.67
+requests     : 10
+errors       : 0
+mockMode     : False
+timestamp    : 2025-12-13T12:00:00.000Z
+dependencies : @{database=; redis=; anthropic=; googleVision=}
+```
+
+**OR** you might see it formatted as a single-line JSON string:
+```json
+{"status":"healthy","errorRate":0,"uptime":12345.67,"requests":10,"errors":0,"mockMode":false,"timestamp":"2025-12-13T12:00:00.000Z","dependencies":{...}}
+```
+
+### **✅ What to Check:**
+- [ ] Command runs without errors
+- [ ] You get JSON response (not an error)
+- [ ] Status shows "healthy" or "degraded" (both are OK - degraded just means dependencies)
+- [ ] Timestamp is recent (current date/time)
+
+### **❌ If It Fails:**
+- **Error:** "The remote name could not be resolved"
+  - **Meaning:** DNS issue or internet connection problem
+  - **Action:** Check internet connection, verify DNS
+
+- **Error:** "The underlying connection was closed"
+  - **Meaning:** SSL/certificate issue
+  - **Action:** Check if service is running in Render
+
+- **Error:** "404 Not Found"
+  - **Meaning:** Wrong URL path
+  - **Action:** Verify URL is correct: `https://api.aperae.com/api/health`
+
+**Test Result:** [ ] PASS / [ ] FAIL  
+**Notes:** ___________________________
+
+---
+
+## 🔍 **TEST 2: Staging API Health Check (2 minutes)**
+
+### **Step 1: Run Health Check Command**
+Copy and paste this exact command in PowerShell:
+
+```powershell
+Invoke-RestMethod -Uri "https://staging-api.aperae.com/api/health" -Method Get
+```
+
+### **Expected Result:**
+Same format as production API - JSON with status, uptime, etc.
+
+### **✅ What to Check:**
+- [ ] Command runs without errors
+- [ ] You get JSON response
+- [ ] Status shows "healthy" or "degraded"
+
+**Test Result:** [ ] PASS / [ ] FAIL  
+**Notes:** ___________________________
+
+---
+
+## 🍷 **TEST 3: Wine Recommendation API Test (5 minutes)**
+
+### **Step 1: Run Wine Recommendation Command**
+Copy and paste this exact command in PowerShell:
+
 ```powershell
 $body = @{
     dish = "Grilled Salmon"
 } | ConvertTo-Json
 
-curl -Method Post -Uri "https://api.aperae.com/api/recommendations" `
+Invoke-RestMethod -Uri "https://api.aperae.com/api/recommendations" `
+    -Method Post `
     -ContentType "application/json" `
     -Body $body
 ```
 
-#### **3. User Registration**
+**Note:** The backtick (`) at the end of lines is PowerShell's line continuation character. Make sure each line ends with a backtick before the next line.
+
+### **Expected Result:**
+You should see JSON output with wine recommendations, including:
+- `dish`: "Grilled Salmon"
+- `recommendations`: Array of 3 wines (Premium, Moderate, Budget-Friendly)
+- Each wine should have: `wineName`, `producer`, `vintage`, `pricePoint`, `rationale`, etc.
+
+**Example (first few lines):**
+```
+dish           : Grilled Salmon
+recommendations : {@{tierLabel=Premium Selection; wineName=...; producer=...; ...}}
+```
+
+### **✅ What to Check:**
+- [ ] Command runs without errors
+- [ ] You get recommendations (array of 3 wines)
+- [ ] Each recommendation has wine details
+- [ ] Response takes 30-60 seconds (normal for AI API calls)
+
+### **❌ If It Fails:**
+- **Error:** "401 Unauthorized"
+  - **Meaning:** API key issue
+  - **Action:** Check Render environment variables
+
+- **Error:** "Timeout" or takes too long
+  - **Meaning:** API might be slow or overloaded
+  - **Action:** Try again, check Render logs
+
+**Test Result:** [ ] PASS / [ ] FAIL  
+**Notes:** ___________________________
+
+---
+
+## 👤 **TEST 4: User Registration API Test (3 minutes)**
+
+### **Step 1: Generate Unique Test Email**
+We'll use a timestamp to make each test email unique. Run this in PowerShell:
+
+```powershell
+$timestamp = Get-Date -Format "yyyyMMddHHmmss"
+$testEmail = "test-$timestamp@example.com"
+Write-Host "Test email: $testEmail"
+```
+
+### **Step 2: Run Registration Command**
+Copy and paste this exact command (use the email from Step 1):
+
 ```powershell
 $body = @{
-    email = "test@example.com"
+    email = "test-$timestamp@example.com"
     password = "Test1234!"
     firstName = "Test"
     lastName = "User"
 } | ConvertTo-Json
 
-curl -Method Post -Uri "https://api.aperae.com/api/auth/register" `
+Invoke-RestMethod -Uri "https://api.aperae.com/api/auth/register" `
+    -Method Post `
     -ContentType "application/json" `
     -Body $body
 ```
 
-#### **4. User Login**
+### **Expected Result:**
+You should see JSON output with:
+- `success`: true
+- `user`: Object with user details (id, email, etc.)
+- `accessToken`: Long string (JWT token)
+- `refreshToken`: Long string (refresh token)
+
+**Example:**
+```
+success       : True
+user          : @{id=...; email=test-...@example.com; ...}
+accessToken   : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+refreshToken  : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+### **✅ What to Check:**
+- [ ] Command runs without errors
+- [ ] You get `success: True`
+- [ ] You get both `accessToken` and `refreshToken`
+- [ ] User object has email and id
+
+### **❌ If It Fails:**
+- **Error:** "400 Bad Request" with "Email already exists"
+  - **Meaning:** Test email already registered
+  - **Action:** Use different timestamp, try again
+
+- **Error:** "500 Internal Server Error"
+  - **Meaning:** Server error, check database connection
+  - **Action:** Check Render logs
+
+**Test Result:** [ ] PASS / [ ] FAIL  
+**Notes:** ___________________________
+
+---
+
+## 🔐 **TEST 5: User Login API Test (3 minutes)**
+
+### **Step 1: Use Same Email from Registration**
+If you just registered, use that same email. Otherwise, use an existing test account.
+
+### **Step 2: Run Login Command**
+Copy and paste this exact command (replace email with your test email):
+
 ```powershell
 $body = @{
-    email = "test@example.com"
+    email = "test-20251213120000@example.com"
     password = "Test1234!"
 } | ConvertTo-Json
 
-curl -Method Post -Uri "https://api.aperae.com/api/auth/login" `
+Invoke-RestMethod -Uri "https://api.aperae.com/api/auth/login" `
+    -Method Post `
     -ContentType "application/json" `
     -Body $body
 ```
 
----
+**Note:** Replace `test-20251213120000@example.com` with the actual email you used in registration.
 
-## 📋 **Testing Priority**
+### **Expected Result:**
+Same format as registration - JSON with:
+- `success`: true
+- `user`: User object
+- `accessToken`: JWT token
+- `refreshToken`: Refresh token
 
-### **🔴 CRITICAL (Do First - 10 minutes)**
-1. ✅ Production API health check
-2. ✅ Mobile app can connect to API
-3. ✅ Wine recommendation works
-4. ✅ User authentication works
+### **✅ What to Check:**
+- [ ] Command runs without errors
+- [ ] You get `success: True`
+- [ ] You get both tokens
 
-### **🟡 IMPORTANT (Do Second - 10 minutes)**
-5. ⚠️ Staging API health check
-6. ⚠️ Menu OCR (if implemented)
-7. ⚠️ Error handling
-8. ⚠️ Token refresh
-
-### **🟢 NICE TO HAVE (Optional)**
-9. Advanced features
-10. Edge cases
-11. Performance testing
+**Test Result:** [ ] PASS / [ ] FAIL  
+**Notes:** ___________________________
 
 ---
 
-## 🎯 **How to Test Mobile App API Connection**
+## 📱 **TEST 6: Mobile App API Connection (10 minutes)**
 
-### **Method 1: Check Console Logs**
-1. Start Expo app
-2. Look for console output like:
-   ```
-   API_BASE_URL: https://api.aperae.com/api
-   ```
-3. Verify the URL is correct
+### **Step 1: Check Mobile App Configuration File**
 
-### **Method 2: Environment Variable Check**
-Check your `.env` file (if using Expo):
-```bash
-# Production
-EXPO_PUBLIC_ENV=production
-# OR explicit URL
-EXPO_PUBLIC_API_URL=https://api.aperae.com/api
-
-# Staging
-EXPO_PUBLIC_ENV=staging
-# OR explicit URL
-EXPO_PUBLIC_API_URL=https://staging-api.aperae.com/api
-
-# Development (localhost)
-EXPO_PUBLIC_ENV=development
-# OR no env vars (defaults to localhost)
+**File Path:**
+```
+C:\Users\ramyy\Production\Aperae\src\utils\api.ts
 ```
 
-### **Method 3: Test Actual API Call**
-1. Open app
-2. Try to get wine recommendation
-3. Check network tab/logs for:
-   - Request URL (should be `https://api.aperae.com/api/recommendations`)
-   - Response status (should be 200)
-   - Response data (should contain recommendations)
+**How to Check:**
+1. Open file in your code editor (VS Code, etc.)
+2. Look at the `getApiBaseUrl()` function (lines 17-63)
+3. Verify the production URL is: `https://api.aperae.com/api`
+
+**Expected Code (lines 35-37):**
+```typescript
+if (env === 'production') {
+    // Production: use api.aperae.com
+    return 'https://api.aperae.com/api';
+}
+```
+
+### **Step 2: Check Environment Variables**
+
+**File Path:**
+```
+C:\Users\ramyy\Production\Aperae\.env
+```
+
+**OR if using Expo:**
+```
+C:\Users\ramyy\Production\Aperae\.env.local
+```
+
+**What to Check:**
+- If you want to use production API, you should have:
+  ```
+  EXPO_PUBLIC_ENV=production
+  ```
+  OR
+  ```
+  EXPO_PUBLIC_API_URL=https://api.aperae.com/api
+  ```
+
+- If you want to use staging API, you should have:
+  ```
+  EXPO_PUBLIC_ENV=staging
+  ```
+  OR
+  ```
+  EXPO_PUBLIC_API_URL=https://staging-api.aperae.com/api
+  ```
+
+- If file doesn't exist or has neither, app defaults to localhost (development mode)
+
+### **Step 3: Start Mobile App**
+
+**Open PowerShell in project root:**
+```powershell
+cd C:\Users\ramyy\Production\Aperae
+```
+
+**Start Expo:**
+```powershell
+npm start
+```
+
+**OR if using Expo CLI directly:**
+```powershell
+npx expo start
+```
+
+### **Step 4: Check Console Logs for API URL**
+
+When the app starts, look in the PowerShell console for output like:
+```
+API_BASE_URL: https://api.aperae.com/api
+Making secure request to: https://api.aperae.com/api/recommendations
+```
+
+**✅ What to Check:**
+- [ ] Console shows the correct API URL
+- [ ] URL matches what you configured (production or staging)
+- [ ] No errors about "cannot connect" or "network failed"
+
+### **Step 5: Test Wine Recommendation in App**
+
+1. Open the app on your device/simulator
+2. Navigate to home screen
+3. Enter a dish (e.g., "Grilled Salmon")
+4. Request wine recommendation
+5. Wait for response (30-60 seconds is normal)
+
+**✅ What to Check:**
+- [ ] App successfully connects to API
+- [ ] Wine recommendations appear
+- [ ] No error messages about connection failures
+
+**Test Result:** [ ] PASS / [ ] FAIL  
+**Notes:** ___________________________
 
 ---
 
-## 📊 **Test Results Template**
+## 📊 **Complete Test Results Template**
+
+Copy this template and fill it out:
 
 ```
-## Test Results - [DATE/TIME]
+## Test Results - [FILL IN DATE/TIME]
 
-### Production API
-- [ ] Health Check: PASS / FAIL
-  - Response: [paste JSON or status]
-  - Notes: [any issues]
-  
-- [ ] Wine Recommendation: PASS / FAIL
-  - Test: [what you tested]
-  - Result: [did it work?]
-  
-- [ ] Authentication: PASS / FAIL
-  - Register: PASS / FAIL
-  - Login: PASS / FAIL
-  - Notes: [any issues]
+### Test 1: Production API Health Check
+- [ ] PASS / [ ] FAIL
+- Response: [PASTE RESPONSE OR NOTE IF FAILED]
+- Notes: _________________________________
 
-### Staging API
-- [ ] Health Check: PASS / FAIL
-  - Notes: [any issues]
+### Test 2: Staging API Health Check
+- [ ] PASS / [ ] FAIL
+- Response: [PASTE RESPONSE OR NOTE IF FAILED]
+- Notes: _________________________________
 
-### Mobile App
-- [ ] API Connection: PASS / FAIL
-  - API URL: [what URL is being used]
-  - Connection: [works / doesn't work]
-  
-- [ ] Wine Recommendation: PASS / FAIL
-  - Test: [what you tested]
-  - Result: [did it work?]
-  
-- [ ] Authentication: PASS / FAIL
-  - Register: PASS / FAIL
-  - Login: PASS / FAIL
-  
-- [ ] Menu OCR: PASS / FAIL / N/A
-  - Notes: [if not implemented, mark N/A]
+### Test 3: Wine Recommendation API
+- [ ] PASS / [ ] FAIL
+- Response Time: _____ seconds
+- Notes: _________________________________
+
+### Test 4: User Registration
+- [ ] PASS / [ ] FAIL
+- Test Email Used: _______________________
+- Notes: _________________________________
+
+### Test 5: User Login
+- [ ] PASS / [ ] FAIL
+- Notes: _________________________________
+
+### Test 6: Mobile App Connection
+- [ ] PASS / [ ] FAIL
+- API URL Used: _________________________
+- Wine Recommendation Works: [ ] YES / [ ] NO
+- Notes: _________________________________
 
 ### Overall Status
-- ✅ ALL TESTS PASS - Safe to proceed
-- ⚠️ SOME TESTS FAIL - Review issues before proceeding
-- 🔴 CRITICAL TESTS FAIL - Fix before proceeding
+- [ ] ✅ ALL TESTS PASS - Safe to proceed
+- [ ] ⚠️ SOME TESTS FAIL - Review issues before proceeding
+- [ ] 🔴 CRITICAL TESTS FAIL - Fix before proceeding
 
 ### Issues Found
 [List any issues discovered]
+________________________________________
+________________________________________
 ```
 
 ---
 
-## 🚨 **What to Do If Tests Fail**
+## 🚨 **Troubleshooting Common Issues**
 
-### **If Production API Health Check Fails:**
-1. Check Render dashboard
-2. Check service logs
-3. Verify DNS is correct
-4. Don't proceed until fixed
+### **Issue: "Invoke-RestMethod : The remote name could not be resolved"**
+**Cause:** DNS issue or no internet connection  
+**Fix:**
+1. Check internet connection
+2. Try: `ping api.aperae.com` in PowerShell
+3. If ping fails, DNS issue - check network settings
 
-### **If Mobile App Can't Connect:**
-1. Check API URL configuration
-2. Verify environment variables
-3. Check CORS settings
-4. Verify SSL certificates
+### **Issue: "Invoke-RestMethod : The underlying connection was closed"**
+**Cause:** SSL/certificate issue or service down  
+**Fix:**
+1. Check Render dashboard to see if service is running
+2. Try the command again
+3. Check Render logs for errors
 
-### **If Authentication Fails:**
-1. Check database connection
-2. Verify JWT secrets
-3. Check session storage
-4. Review error logs
+### **Issue: "401 Unauthorized"**
+**Cause:** API key missing or invalid  
+**Fix:**
+1. Check Render environment variables
+2. Verify `ANTHROPIC_API_KEY` is set
+3. Check API key is valid
+
+### **Issue: "500 Internal Server Error"**
+**Cause:** Server error  
+**Fix:**
+1. Check Render logs for detailed error
+2. Verify database connection
+3. Check environment variables are all set
+
+### **Issue: Mobile App Can't Connect**
+**Cause:** Wrong API URL or CORS issue  
+**Fix:**
+1. Verify `.env` file has correct `EXPO_PUBLIC_ENV` or `EXPO_PUBLIC_API_URL`
+2. Check console logs for actual URL being used
+3. Verify CORS settings in `backend/server.js` include your origin
 
 ---
 
-## ✅ **Expected Outcomes**
+## ✅ **Next Steps After Testing**
 
-### **✅ All Tests Pass**
-**Action:** Proceed with confidence!
-- Continue with production readiness tasks
-- Infrastructure changes are safe
-- No regressions found
+### **If All Tests Pass:**
+1. ✅ Document results in template above
+2. ✅ Proceed with production readiness tasks
+3. ✅ Continue with roadmap
 
-### **⚠️ Some Tests Fail**
-**Action:** Review and fix before proceeding
-- Identify root cause
-- Fix broken functionality
-- Re-test before continuing
+### **If Some Tests Fail:**
+1. 🔧 Identify root cause
+2. 🔧 Fix issues
+3. 🔄 Re-run failed tests
+4. ✅ Verify fixes work
+5. ✅ Then proceed
 
-### **🔴 Critical Tests Fail**
-**Action:** STOP and fix immediately
-- Production API down? → Fix now
-- Mobile app broken? → Fix now
-- Don't proceed until critical issues resolved
+### **If Critical Tests Fail:**
+1. 🔴 STOP immediately
+2. 🔴 Fix production API if down
+3. 🔴 Fix mobile app if broken
+4. 🔄 Re-test everything
+5. ✅ Don't proceed until all critical tests pass
 
 ---
 
 ## ⏱️ **Time Estimate**
 
-- **Quick Health Checks:** 2-3 minutes
-- **Full API Testing:** 10-15 minutes
-- **Mobile App Testing:** 15-20 minutes
-- **Total:** ~30-40 minutes
+- **Test 1 (Production Health):** 2 minutes
+- **Test 2 (Staging Health):** 2 minutes
+- **Test 3 (Wine Recommendation):** 5 minutes
+- **Test 4 (Registration):** 3 minutes
+- **Test 5 (Login):** 3 minutes
+- **Test 6 (Mobile App):** 10 minutes
+- **Documentation:** 5 minutes
 
-**Worth the time to catch issues early!**
-
----
-
-## 📝 **Next Steps After Testing**
-
-1. **Document Results:** Fill out test results template
-2. **If All Pass:** Proceed with roadmap tasks
-3. **If Issues Found:** Fix them first, then re-test
-4. **Then Continue:** Production readiness tasks
+**Total: ~30 minutes**
 
 ---
 
-## 💡 **Why This Matters**
+## ✅ **Summary**
 
-- **Catch Issues Early:** Better now than in production
-- **Verify Infrastructure:** DNS/SSL changes didn't break anything
-- **User Confidence:** Mobile app working = happy users
-- **Risk Reduction:** Know what works before adding complexity
-
----
-
-## ✅ **Agreed: Testing Before Proceeding is Smart!**
-
-This testing will:
-- ✅ Verify everything still works
-- ✅ Catch any regressions early
-- ✅ Give confidence to proceed
-- ✅ Only takes 30-40 minutes
+**Tool Required:** Windows PowerShell  
+**Working Directory:** `C:\Users\ramyy\Production\Aperae`  
+**Time Required:** ~30 minutes  
+**Critical Tests:** 1, 2, 3, 6 (API health and mobile app)
 
 **Let's test, document results, then proceed based on outcomes!**
-

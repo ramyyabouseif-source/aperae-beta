@@ -1942,15 +1942,15 @@ app.post('/api/recommendations',
         enhancedPrompt = enhancedPrompt.replace('[MENU_WINES_LIST]', menuWinesList);
         enhancedPrompt = enhancedPrompt.replace(/\[INSERT DISH HERE\]/g, dish);
       } else {
-        // Check for V7.0 prompt first (highest priority)
+        // V7.0 is now the default prompt (enabled by default unless explicitly disabled)
         useV7PromptFlag = isFeatureEnabled('ENABLE_V7_PROMPT');
         
         // Diagnostic logging
         logger.info('Prompt selection diagnostic', {
           requestId,
-          ENABLE_V7_PROMPT_raw: process.env.ENABLE_V7_PROMPT,
+          ENABLE_V7_PROMPT_raw: process.env.ENABLE_V7_PROMPT || 'undefined (defaults to true)',
           useV7PromptFlag,
-          isFeatureEnabled_result: isFeatureEnabled('ENABLE_V7_PROMPT')
+          note: 'V7.0 is the default prompt. Set ENABLE_V7_PROMPT=false to disable.'
         });
         
         if (useV7PromptFlag) {
@@ -2373,25 +2373,18 @@ app.post('/api/recommendations',
         });
       }
       
-      // Enhance recommendations with wine database data and normalize formats
+      // Normalize expert ratings (wine validation removed - not needed)
       if (responseData.recommendations && Array.isArray(responseData.recommendations)) {
         try {
-          logger.debug('Enhancing recommendations with wine database', { requestId });
-          responseData.recommendations = await wineDatabaseService.enhanceRecommendations(
-            responseData.recommendations
-          );
-          logger.debug(`Enhanced ${responseData.recommendations.length} recommendations`, { requestId });
+          responseData.recommendations = responseData.recommendations.map(rec => ({
+            ...rec,
+            expertRating: wineDatabaseService.normalizeExpertRating(rec.expertRating || 'unknown')
+          }));
         } catch (error) {
-          logger.warn('Failed to enhance recommendations with database, normalizing formats only', { 
+          logger.warn('Failed to normalize expert ratings', { 
             requestId, 
             error: error.message 
           });
-          // Normalize expert ratings and add categories even if database enhancement fails
-          responseData.recommendations = responseData.recommendations.map(rec => ({
-            ...rec,
-            expertRating: wineDatabaseService.normalizeExpertRating(rec.expertRating),
-            category: rec.category || wineDatabaseService.inferCategory(rec)
-          }));
         }
       }
       

@@ -152,3 +152,99 @@ model WinePairing {
   @@map("wine_pairings")
 }
 
+// =============================================================================
+// WINE RECOMMENDATION STORAGE (Individual Recommendations from API)
+// =============================================================================
+
+model WineRecommendation {
+  id                        String    @id @default(uuid())
+  request_id                String
+  dish                      String
+  created_at                DateTime  @default(now())
+  user_id                   String?   @db.Uuid
+  prompt_version            String
+  api_response_time_ms      Int
+  model_used                String
+  
+  // Dish Analysis
+  dominant_weight           String?
+  fat_content               String?
+  primary_protein           String?
+  dominant_flavors          String[]
+  spice_level               String?
+  acidity_level             String?
+  applicable_principles     String[]
+  key_challenge             String?   @db.Text
+  
+  // Extracted/Inferred Fields
+  cooking_method            String?
+  cooking_method_impact     String?
+  sauce                     String?
+  sauce_characteristic      String?
+  sauce_priority            String?
+  max_abv                   Float?
+  
+  // Ideal Profile
+  ideal_acidity             String?
+  ideal_acid_type           String?
+  ideal_tannin              String?
+  ideal_body                String?
+  ideal_sweetness           String?
+  ideal_notes               String?   @db.Text
+  
+  // Wine Recommendation Data
+  tier_label                String?
+  tier_rationale            String?   @db.Text
+  tier_fallback_applied     Boolean   @default(false)
+  wine_name                 String?
+  producer                  String?
+  region                    String?
+  vintage                   String?
+  grape                     String?
+  
+  // Pairing Rationale
+  rationale                 String?   @db.Text
+  pairing_principles_applied String[]
+  
+  // Tasting Notes
+  aromas                    String[]
+  palate                    String?   @db.Text
+  finish                    String?   @db.Text
+  
+  // Serving Guidance
+  serving_temperature       String?
+  serving_glassware         String?
+  serving_decanting         String?
+  
+  // Confidence Scoring
+  confidence_score          Int?
+  confidence_pairing_science Int?
+  confidence_wine_knowledge Int?
+  confidence_complexity_handling Int?
+  confidence_rationale      String?   @db.Text
+  
+  // Additional Fields
+  vintage_rationale         String?   @db.Text
+  story                     String?   @db.Text
+  expert_rating             String?
+  price_point               String?
+  category                  String?
+  retailer_suggestion       String?
+  image_url                 String?
+  
+  // Full Response Data (for debugging/analysis)
+  full_response_json        Json?
+  
+  // Avoid Data (from parent response)
+  avoid_types               String[]
+  avoid_reason              String?   @db.Text
+  
+  // Closing Narrative
+  closing_narrative         String?   @db.Text
+  
+  @@index([request_id])
+  @@index([dish])
+  @@index([created_at])
+  @@map("wine_recommendations")
+}
+

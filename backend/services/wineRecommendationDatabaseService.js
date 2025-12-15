@@ -152,63 +152,106 @@ async function storeRecommendations(fullResponse, requestId, apiResponseTimeMs, 
       };
     });
     
-    // Insert records one by one using raw SQL (simpler and more reliable)
-    // Prisma doesn't support all PostgreSQL array/JSONB operations easily
+    // Insert records using Prisma (handles arrays and JSONB automatically)
+    // Use createMany for better performance, but we'll do individual creates to handle errors gracefully
     let insertedCount = 0;
     
     for (const data of insertData) {
       try {
-        await prisma.$executeRaw`
-          INSERT INTO wine_recommendations (
-            request_id, dish, created_at, user_id, prompt_version, api_response_time_ms, model_used,
-            dominant_weight, fat_content, primary_protein, dominant_flavors, spice_level, acidity_level,
-            applicable_principles, key_challenge,
-            cooking_method, cooking_method_impact, sauce, sauce_characteristic, sauce_priority, max_abv,
-            ideal_acidity, ideal_acid_type, ideal_tannin, ideal_body, ideal_sweetness, ideal_notes,
-            tier_label, tier_rationale, tier_fallback_applied, wine_name, producer, region, vintage, grape,
-            rationale, pairing_principles_applied,
-            aromas, palate, finish,
-            serving_temperature, serving_glassware, serving_decanting,
-            confidence_score, confidence_pairing_science, confidence_wine_knowledge,
-            confidence_complexity_handling, confidence_rationale,
-            vintage_rationale,
-            story, expert_rating, price_point, category, retailer_suggestion, image_url,
-            full_response_json,
-            avoid_types, avoid_reason,
-            closing_narrative
-          ) VALUES (
-            ${data.request_id}, ${data.dish}, ${data.created_at}, ${data.user_id}, ${data.prompt_version},
-            ${data.api_response_time_ms}, ${data.model_used},
-            ${data.dominant_weight}, ${data.fat_content}, ${data.primary_protein}, 
-            ${JSON.stringify(data.dominant_flavors)}::text[],
-            ${data.spice_level}, ${data.acidity_level}, 
-            ${JSON.stringify(data.applicable_principles)}::text[], 
-            ${data.key_challenge},
-            ${data.cooking_method}, ${data.cooking_method_impact}, ${data.sauce}, ${data.sauce_characteristic},
-            ${data.sauce_priority}, ${data.max_abv},
-            ${data.ideal_acidity}, ${data.ideal_acid_type}, ${data.ideal_tannin}, ${data.ideal_body},
-            ${data.ideal_sweetness}, ${data.ideal_notes},
-            ${data.tier_label}, ${data.tier_rationale}, ${data.tier_fallback_applied}, ${data.wine_name},
-            ${data.producer}, ${data.region}, ${data.vintage}, ${data.grape},
-            ${data.rationale}, ${JSON.stringify(data.pairing_principles_applied)}::text[],
-            ${JSON.stringify(data.aromas)}::text[], ${data.palate}, ${data.finish},
-            ${data.serving_temperature}, ${data.serving_glassware}, ${data.serving_decanting},
-            ${data.confidence_score}, ${data.confidence_pairing_science}, ${data.confidence_wine_knowledge},
-            ${data.confidence_complexity_handling}, ${data.confidence_rationale},
-            ${data.vintage_rationale},
-            ${data.story}, ${data.expert_rating}, ${data.price_point}, ${data.category},
-            ${data.retailer_suggestion}, ${data.image_url},
-            ${JSON.stringify(data.full_response_json)}::jsonb,
-            ${JSON.stringify(data.avoid_types)}::text[], ${data.avoid_reason},
-            ${data.closing_narrative}
-          )
-        `;
+        await prisma.wineRecommendation.create({
+          data: {
+            request_id: data.request_id,
+            dish: data.dish,
+            created_at: data.created_at,
+            user_id: data.user_id,
+            prompt_version: data.prompt_version,
+            api_response_time_ms: data.api_response_time_ms,
+            model_used: data.model_used,
+            
+            // Dish Analysis
+            dominant_weight: data.dominant_weight,
+            fat_content: data.fat_content,
+            primary_protein: data.primary_protein,
+            dominant_flavors: data.dominant_flavors, // Prisma handles arrays automatically
+            spice_level: data.spice_level,
+            acidity_level: data.acidity_level,
+            applicable_principles: data.applicable_principles, // Prisma handles arrays automatically
+            key_challenge: data.key_challenge,
+            
+            // Extracted/Inferred Fields
+            cooking_method: data.cooking_method,
+            cooking_method_impact: data.cooking_method_impact,
+            sauce: data.sauce,
+            sauce_characteristic: data.sauce_characteristic,
+            sauce_priority: data.sauce_priority,
+            max_abv: data.max_abv,
+            
+            // Ideal Profile
+            ideal_acidity: data.ideal_acidity,
+            ideal_acid_type: data.ideal_acid_type,
+            ideal_tannin: data.ideal_tannin,
+            ideal_body: data.ideal_body,
+            ideal_sweetness: data.ideal_sweetness,
+            ideal_notes: data.ideal_notes,
+            
+            // Wine Recommendation Data
+            tier_label: data.tier_label,
+            tier_rationale: data.tier_rationale,
+            tier_fallback_applied: data.tier_fallback_applied,
+            wine_name: data.wine_name,
+            producer: data.producer,
+            region: data.region,
+            vintage: data.vintage,
+            grape: data.grape,
+            
+            // Pairing Rationale
+            rationale: data.rationale,
+            pairing_principles_applied: data.pairing_principles_applied, // Prisma handles arrays automatically
+            
+            // Tasting Notes
+            aromas: data.aromas, // Prisma handles arrays automatically
+            palate: data.palate,
+            finish: data.finish,
+            
+            // Serving Guidance
+            serving_temperature: data.serving_temperature,
+            serving_glassware: data.serving_glassware,
+            serving_decanting: data.serving_decanting,
+            
+            // Confidence Scoring
+            confidence_score: data.confidence_score,
+            confidence_pairing_science: data.confidence_pairing_science,
+            confidence_wine_knowledge: data.confidence_wine_knowledge,
+            confidence_complexity_handling: data.confidence_complexity_handling,
+            confidence_rationale: data.confidence_rationale,
+            
+            // Additional Fields
+            vintage_rationale: data.vintage_rationale,
+            story: data.story,
+            expert_rating: data.expert_rating,
+            price_point: data.price_point,
+            category: data.category,
+            retailer_suggestion: data.retailer_suggestion,
+            image_url: data.image_url,
+            
+            // Full Response Data (Prisma handles JSONB automatically)
+            full_response_json: data.full_response_json,
+            
+            // Avoid Data
+            avoid_types: data.avoid_types, // Prisma handles arrays automatically
+            avoid_reason: data.avoid_reason,
+            
+            // Closing Narrative
+            closing_narrative: data.closing_narrative
+          }
+        });
         insertedCount++;
       } catch (insertError) {
         logger.error('Failed to insert individual recommendation', {
           requestId,
           index: insertedCount,
           error: insertError.message,
+          stack: insertError.stack,
           wineName: data.wine_name
         });
         // Continue with next record

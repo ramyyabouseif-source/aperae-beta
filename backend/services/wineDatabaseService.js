@@ -410,12 +410,6 @@ class WineDatabaseService {
           expertRating: existingWine.criticScores
             ? this.formatCriticScores(existingWine.criticScores)
             : this.normalizeExpertRating(aiRecommendation.expertRating),
-          // Add category if missing
-          category: existingWine.wineType || aiRecommendation.category || this.inferCategory(aiRecommendation),
-          // Use database price if available
-          pricePoint: existingWine.averagePrice
-            ? `$${existingWine.averagePrice.toFixed(0)}`
-            : aiRecommendation.pricePoint,
           // Enhance tasting notes if available
           tastingNotes: existingWine.tastingNotes || aiRecommendation.tastingNotes,
           // Keep original confidence score - database verification adjustments disabled until database is more robust
@@ -427,11 +421,10 @@ class WineDatabaseService {
 
         return enhanced;
       } else {
-        // Wine not found - normalize rating and add category, but keep original confidence score
+        // Wine not found - normalize rating, but keep original confidence score
         return {
           ...aiRecommendation,
           expertRating: this.normalizeExpertRating(aiRecommendation.expertRating),
-          category: aiRecommendation.category || this.inferCategory(aiRecommendation),
           // Keep original confidence score - database verification adjustments disabled until database is more robust
           confidenceScore: aiRecommendation.confidenceScore || 75,
           verified: false
@@ -439,11 +432,10 @@ class WineDatabaseService {
       }
     } catch (error) {
       logger.error('Error enhancing recommendation:', error);
-      // Return original with normalized rating and category if enhancement fails
+      // Return original with normalized rating if enhancement fails
       return {
         ...aiRecommendation,
         expertRating: this.normalizeExpertRating(aiRecommendation.expertRating),
-        category: aiRecommendation.category || this.inferCategory(aiRecommendation),
         verified: false
       };
     }
@@ -492,7 +484,13 @@ class WineDatabaseService {
         wineName.includes('riesling') || wineName.includes('pinot grigio') ||
         wineName.includes('pinot gris') || wineName.includes('gewürztraminer') ||
         wineName.includes('vermentino') || wineName.includes('soave') ||
-        wineName.includes('blanc') || tastingNotes.includes('white') ||
+        wineName.includes('albariño') || wineName.includes('albarino') ||
+        wineName.includes('grüner veltliner') || wineName.includes('gruener veltliner') ||
+        wineName.includes('viognier') || wineName.includes('verdejo') ||
+        wineName.includes('sémillon') || wineName.includes('semillon') ||
+        wineName.includes('chenin blanc') || wineName.includes('torrontés') ||
+        wineName.includes('torrontes') || wineName.includes('blanc') || 
+        tastingNotes.includes('white') ||
         producer.includes('beaucastel') && wineName.includes('blanc')) {
       return 'White Wine';
     }

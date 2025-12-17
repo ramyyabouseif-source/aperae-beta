@@ -300,6 +300,7 @@ app.use(express.urlencoded({
 
 // Load mock data
 const mockData = require('./mockData.json');
+const mockDishData = require('./mockDishData.json');
 
 // =============================================================================
 // GENERAL WINE RECOMMENDATION PROMPT (Home Screen)
@@ -2613,6 +2614,107 @@ app.post('/api/recommendations',
 );
 
 // =============================================================================
+// Master Chef Prompt V1.0 - Wine-to-Dish Pairing (Wine -> Dish)
+// =============================================================================
+
+/**
+ * Builds the Master Chef v1.0 system prompt for reverse pairing (Wine -> Dish).
+ * Detailed spec lives in backend/prompts/MASTER_CHEF_V1_PROMPT_SPEC.md.
+ * This prompt asks Claude to return ONLY a single JSON object in the schema below.
+ */
+function buildMasterChefSystemPrompt() {
+  return `ROLE: You are a Master Chef and wine-pairing specialist. You design dishes to match a given wine using rigorous food–wine pairing science.
+
+TASK: Given a single wine, analyze its structure, aromatics, typicity, and vintage, then recommend exactly three dishes:
+- One Complex Pairing (60–90 min cook time)
+- One Moderate Pairing (30–60 min)
+- One Simple Pairing (15–30 min)
+
+REVERSE PAIRING PRINCIPLES (MANDATORY):
+- Color–Protein framework, acidity management, tannin–protein binding, tannin–umami safety, sweetness hierarchy, ABV & spice, weight matching, flavor bridging, regional pairing culture, vintage & aging.
+- All three dishes must be structurally compatible with the wine and collectively showcase different aspects of the wine.
+
+CONFIDENCE SCORING:
+- Pairing Science (0–50) + Wine Knowledge (0–30) + Recipe Quality (0–20) = Max 100.
+- Each dish must have confidence score >= 85.
+
+STRICT RULES:
+- NEVER invent wine details. When uncertain, use the string "unknown" for producer/region/vintage.
+- Recipes must be realistic and executable: clear ingredients with quantities for 2 servings, sequential numbered steps with times/temps, and coherent total cook times aligned to complexity.
+- Respond with ONLY ONE JSON object in the exact format below. NO markdown, NO code fences, NO prose before or after.
+
+JSON OUTPUT FORMAT:
+{
+  "wine": "exact wine name as provided",
+  "wineAnalysis": {
+    "producer": "specific OR 'unknown'",
+    "region": "specific OR 'unknown'",
+    "vintage": "YYYY OR 'NV' OR 'unknown'",
+    "vintageAge": "X years OR 'unknown'",
+    "color": "red/white/rosé/sparkling/fortified",
+    "structure": {
+      "body": "light/light-medium/medium/medium-full/full",
+      "acidity": "low/medium/medium-high/high",
+      "acidType": "malic/tartaric/balanced",
+      "tannin": "none/low/low-medium/medium/medium-high/high",
+      "tanninCharacter": "soft/silky/fine-grained/polished/firm/structured/grippy",
+      "sweetness": "dry/off-dry/sweet",
+      "abv": "X.X%"
+    },
+    "aromaticProfile": {
+      "primaryAromas": ["descriptor 1", "descriptor 2"],
+      "secondaryAromas": ["descriptor"] or [],
+      "tertiaryAromas": ["descriptor"] or [],
+      "dominantCompounds": ["compound"] or []
+    },
+    "keyStrength": "what the wine does best (2–3 sentences)",
+    "idealDishProfile": "structural and flavor profile of ideal dishes (2–3 sentences)"
+  },
+  "wineServingGuidance": {
+    "temperature": "XX-XX°F (XX-XX°C)",
+    "glassware": "specific glass type",
+    "decanting": "timing OR 'No decant needed'"
+  },
+  "dishRecommendations": [
+    {
+      "complexityLabel": "Complex Pairing" | "Moderate Pairing" | "Simple Pairing",
+      "dishName": "specific descriptive name",
+      "pairingRationale": "2–3 sentences: strategy, principles, bridge, wine characteristics",
+      "pairingPrinciplesApplied": ["principle 1", "principle 2", "principle 3"],
+      "ingredients": {
+        "protein": ["item with quantity"],
+        "sauce": ["item with quantity"],
+        "sides": ["item with quantity"]
+      },
+      "recipe": [
+        "Step 1: Detailed instruction with temps/times",
+        "Step 2: Next instruction"
+      ],
+      "cookTime": {
+        "prep": "X minutes",
+        "cook": "X minutes",
+        "total": "X minutes"
+      },
+      "servingSuggestion": "optional plating/garnish guidance",
+      "confidence": {
+        "score": 90,
+        "breakdown": {
+          "pairingScience": 47,
+          "wineKnowledge": 28,
+          "recipeQuality": 15
+        },
+        "rationale": "scoring summary (2–3 sentences)"
+      }
+    }
+  ]
+}`;
+}
+
+function buildMasterChefUserMessage(wine) {
+  return `Analyze this wine and generate three dish recommendations (Complex, Moderate, Simple) following the JSON schema and rules in the system prompt. Wine: "${wine}".`;
+}
+
+// =============================================================================
 // DISH RECOMMENDATIONS ENDPOINT (Wine-to-Dish Pairing)
 // =============================================================================
 /**
@@ -2665,90 +2767,255 @@ app.post('/api/dish-recommendations',
         return res.status(400).json({ error: 'Wine parameter is required', requestId });
       }
       
-      // TODO: Implement Master Chef Prompt V1.0 API call here
-      // For now, this endpoint will store responses to database once the Master Chef prompt is implemented
-      // Once the Master Chef prompt is implemented, replace mockResponseData with actual Claude API response
+      const useMockMode = MOCK_MODE || !process.env.ANTHROPIC_API_KEY;
+      logger.debug('Dish recommendations request received', { requestId, wine, useMockMode });
       
-      logger.debug('Dish recommendations request received', { requestId, wine });
-      
-      // Placeholder response structure - replace with actual Claude API call
-      // This matches the expected structure from dishService.ts
-      const mockResponseData = {
-        wine: wine,
-        wineAnalysis: {
-          producer: "unknown",
-          region: "unknown",
-          vintage: "unknown",
-          vintageAge: "unknown",
-          color: "red",
-          structure: {
-            body: "medium",
-            acidity: "medium",
-            acidType: "balanced",
-            tannin: "medium",
-            tanninCharacter: "polished",
-            sweetness: "dry",
-            abv: "13.5%"
-          },
-          aromaticProfile: {
-            primaryAromas: [],
-            secondaryAromas: [],
-            tertiaryAromas: [],
-            dominantCompounds: []
-          },
-          keyStrength: "Placeholder - will be replaced with actual analysis",
-          idealDishProfile: "Placeholder - will be replaced with actual analysis"
-        },
-        wineServingGuidance: {
-          temperature: "58-62°F (14-17°C)",
-          glassware: "Bordeaux or Universal red wine glass",
-          decanting: "30 minutes recommended"
-        },
-        dishRecommendations: []
+      // Helper function to extract complexity level from label
+      const getComplexityLevel = (label) => {
+        const lower = (label || '').toLowerCase();
+        if (lower.includes('complex')) return 'complex';
+        if (lower.includes('moderate')) return 'moderate';
+        if (lower.includes('simple')) return 'simple';
+        return 'moderate'; // default
       };
       
-      const claudeResponseTime = Date.now() - requestStartTime;
-      const promptVersion = 'master-chef-v1.0';
+      // Helper function to combine nested ingredients into flat array
+      const combineIngredients = (ingredients) => {
+        const all = [];
+        if (!ingredients) return all;
+        if (ingredients.protein) all.push(...ingredients.protein);
+        if (ingredients.sauce) all.push(...ingredients.sauce);
+        if (ingredients.sides) all.push(...ingredients.sides);
+        return all;
+      };
+      
+      // Helper function to clean recipe steps (remove "Step X:" prefix)
+      const cleanSteps = (steps) => {
+        if (!Array.isArray(steps)) return [];
+        return steps.map(step => String(step || '').replace(/^Step \d+:\s*/, ''));
+      };
+      
+      // Helper function to estimate servings from ingredients
+      const estimateServings = (ingredients) => {
+        const allIngredients = combineIngredients(ingredients);
+        // Look for protein quantities to estimate servings
+        for (const ing of allIngredients) {
+          const lower = ing.toLowerCase();
+          if (lower.includes('8 lamb rib chops') || lower.includes('8-12 pieces')) {
+            return 4;
+          }
+          if (lower.includes('2 duck breasts') || lower.includes('2 bone-in pork chops')) {
+            return 2;
+          }
+        }
+        // Default estimate based on typical serving sizes
+        return 2;
+      };
+      
+      // If mock mode is enabled or Anthropic is not configured, use local mock data
+      if (useMockMode) {
+        const mockDishEntry = mockDishData[0]; // Use first entry from JSON file
+        
+        const transformedRecommendations = mockDishEntry.dishRecommendations.map(dish => {
+          const complexityLevel = getComplexityLevel(dish.complexityLabel);
+          const complexityLabel = (dish.complexityLabel || '').replace(' Pairing', ''); // "Complex Pairing" -> "Complex"
+          
+          return {
+            dishName: dish.dishName,
+            complexity: {
+              level: complexityLevel,
+              label: complexityLabel
+            },
+            recipe: {
+              ingredients: combineIngredients(dish.ingredients),
+              steps: cleanSteps(dish.recipe),
+              cookTime: dish.cookTime.total,
+              servings: estimateServings(dish.ingredients),
+              difficulty: complexityLabel === 'Complex' ? 'Advanced' : complexityLabel === 'Moderate' ? 'Medium' : 'Easy'
+            },
+            pairingRationale: dish.pairingRationale,
+            servingSuggestion: dish.servingSuggestion,
+            confidenceScore: dish.confidence.score,
+            confidence: dish.confidence
+          };
+        });
+        
+        const mockResponseData = {
+          wine: wine,
+          wineAnalysis: mockDishEntry.wineAnalysis,
+          wineServingGuidance: mockDishEntry.wineServingGuidance,
+          dishRecommendations: transformedRecommendations,
+          closingNarrative: `These dishes showcase the versatility of ${wine}, from simple grilling to complex braising techniques. Each recommendation highlights different aspects of the wine's profile, from its structured tannins to its aromatic complexity.`
+        };
+        
+        const claudeResponseTime = 0;
+        const promptVersion = 'master-chef-v1.0-mock';
+        
+        const fullResponseForDB = JSON.parse(JSON.stringify(mockResponseData));
+        
+        if (fullResponseForDB && fullResponseForDB.dishRecommendations && Array.isArray(fullResponseForDB.dishRecommendations) && fullResponseForDB.dishRecommendations.length > 0) {
+          dishRecommendationDatabaseService.saveRecommendations(
+            fullResponseForDB,
+            requestId,
+            claudeResponseTime,
+            promptVersion
+          ).then(result => {
+            if (result.success) {
+              logger.info('Dish recommendations stored to database', {
+                requestId,
+                insertedCount: result.insertedCount,
+                durationMs: result.durationMs
+              });
+            } else {
+              logger.warn('Failed to store dish recommendations to database', {
+                requestId,
+                error: result.error,
+                insertedCount: result.insertedCount
+              });
+            }
+          }).catch(dbError => {
+            logger.error('Database storage error (non-blocking)', {
+              requestId,
+              error: dbError.message,
+              stack: dbError.stack
+            });
+          });
+        }
+        
+        const totalResponseTime = Date.now() - requestStartTime;
+        
+        RequestLogger.logRequestSuccess('dish-recommendations', requestId, totalResponseTime, {
+          mode: 'mock',
+          claudeTime: claudeResponseTime,
+          recommendationCount: mockResponseData.dishRecommendations.length
+        });
+        
+        return res.json(mockResponseData);
+      }
+      
+      // Live mode: call Master Chef v1.0 prompt via Anthropic Claude
+      const anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+      
+      const claudeStartTime = Date.now();
+      
+      const message = await anthropic.messages.create({
+        model: "claude-sonnet-4-5-20250929",
+        system: buildMasterChefSystemPrompt(),
+        messages: [
+          {
+            role: "user",
+            content: buildMasterChefUserMessage(wine)
+          }
+        ],
+        max_tokens: 2000,
+        temperature: 0.5
+      });
+      
+      const claudeResponseTime = Date.now() - claudeStartTime;
+      RequestLogger.logExternalApiCall('anthropic', requestId, claudeResponseTime);
+      
+      logger.debug('Master Chef Claude API response received', { requestId });
+      
+      // Extract raw text from Claude response
+      let responseText = '';
+      if (message.content && message.content.length > 0) {
+        responseText = message.content
+          .filter(block => block && block.type === 'text')
+          .map(block => block.text || '')
+          .join('');
+      }
+      
+      if (!responseText || !responseText.trim()) {
+        throw new Error('Master Chef API returned empty response');
+      }
+      
+      // Basic cleanup in case model still used code fences
+      responseText = responseText
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
+      
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (jsonError) {
+        logger.error('Master Chef JSON parse error', {
+          requestId,
+          error: jsonError.message,
+          responsePreview: responseText.substring(0, 500)
+        });
+        throw jsonError;
+      }
+      
+      if (!responseData || !Array.isArray(responseData.dishRecommendations) || responseData.dishRecommendations.length === 0) {
+        throw new Error('Master Chef response missing dishRecommendations');
+      }
+      
+      // Transform Claude dishRecommendations into API shape
+      const transformedRecommendations = responseData.dishRecommendations.map(dish => {
+        const complexityLevel = getComplexityLevel(dish.complexityLabel);
+        const complexityLabel = (dish.complexityLabel || '').replace(' Pairing', '');
+        
+        return {
+          dishName: dish.dishName,
+          complexity: {
+            level: complexityLevel,
+            label: complexityLabel
+          },
+          recipe: {
+            ingredients: combineIngredients(dish.ingredients || {}),
+            steps: cleanSteps(dish.recipe || []),
+            cookTime: dish.cookTime?.total || '',
+            servings: estimateServings(dish.ingredients || {}),
+            difficulty: complexityLabel === 'Complex' ? 'Advanced' : complexityLabel === 'Moderate' ? 'Medium' : 'Easy'
+          },
+          pairingRationale: dish.pairingRationale,
+          servingSuggestion: dish.servingSuggestion,
+          confidenceScore: dish.confidence?.score,
+          confidence: dish.confidence
+        };
+      });
+      
+      const masterChefResponse = {
+        wine: responseData.wine || wine,
+        wineAnalysis: responseData.wineAnalysis || null,
+        wineServingGuidance: responseData.wineServingGuidance || null,
+        dishRecommendations: transformedRecommendations,
+        closingNarrative: responseData.closingNarrative
+      };
       
       // Store full response for database BEFORE any modifications
-      const fullResponseForDB = JSON.parse(JSON.stringify(mockResponseData));
+      const fullResponseForDB = JSON.parse(JSON.stringify(responseData));
       
-      // Store dish recommendations in database (async, non-blocking)
-      // Only store if we got a valid response with dishRecommendations
       if (fullResponseForDB && fullResponseForDB.dishRecommendations && Array.isArray(fullResponseForDB.dishRecommendations) && fullResponseForDB.dishRecommendations.length > 0) {
         dishRecommendationDatabaseService.saveRecommendations(
           fullResponseForDB,
           requestId,
           claudeResponseTime,
-          promptVersion
+          'master-chef-v1.0'
         ).then(result => {
           if (result.success) {
-            logger.info('Dish recommendations stored to database', {
+            logger.info('Dish recommendations stored to database (Master Chef)', {
               requestId,
               insertedCount: result.insertedCount,
               durationMs: result.durationMs
             });
           } else {
-            logger.warn('Failed to store dish recommendations to database', {
+            logger.warn('Failed to store dish recommendations to database (Master Chef)', {
               requestId,
               error: result.error,
               insertedCount: result.insertedCount
             });
           }
         }).catch(dbError => {
-          logger.error('Database storage error (non-blocking)', {
+          logger.error('Database storage error (non-blocking) for Master Chef', {
             requestId,
             error: dbError.message,
             stack: dbError.stack
           });
-          // Don't fail the request if database storage fails
-        });
-      } else {
-        logger.debug('Skipping database storage - no dish recommendations in response', {
-          requestId,
-          hasDishRecommendations: !!(fullResponseForDB && fullResponseForDB.dishRecommendations),
-          isArray: Array.isArray(fullResponseForDB?.dishRecommendations),
-          length: fullResponseForDB?.dishRecommendations?.length || 0
         });
       }
       
@@ -2757,10 +3024,10 @@ app.post('/api/dish-recommendations',
       RequestLogger.logRequestSuccess('dish-recommendations', requestId, totalResponseTime, {
         mode: 'live',
         claudeTime: claudeResponseTime,
-        recommendationCount: mockResponseData.dishRecommendations.length
+        recommendationCount: masterChefResponse.dishRecommendations.length
       });
       
-      res.json(mockResponseData);
+      return res.json(masterChefResponse);
       
     } catch (error) {
       const responseTime = Date.now() - requestStartTime;

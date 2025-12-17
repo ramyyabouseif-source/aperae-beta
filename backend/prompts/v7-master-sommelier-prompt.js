@@ -67,15 +67,14 @@ function getOptimizedJSONSchema() {
     "spiceLevel": "none/mild/moderate/hot",
     "acidityLevel": "low/medium/medium-high/high",
     "applicablePrinciples": ["list from Section 2"],
-    "keyChallenge": "Max 20 words (see Section 7.G): critical constraint",
+    "keyChallenge": "critical constraint (2-3 sentences)",
     "idealProfile": {
       "acidity": "low/medium/medium-high/high",
       "acidType": "malic/tartaric/balanced",
       "tannin": "none/low/low-medium/medium/medium-high/high",
       "body": "light/light-medium/medium/medium-full/full",
       "sweetness": "dry/off-dry/sweet",
-      "maxABV": "13.5% (only if capsaicin, else omit)",
-      "notes": "Max 20 words (see Section 7.G): traits, compounds if applicable"
+      "notes": "traits, compounds if applicable (2-3 sentences)"
     }
   },
   "recommendations": [
@@ -86,12 +85,12 @@ function getOptimizedJSONSchema() {
       "region": "specific OR 'unknown'",
       "vintage": "YYYY / YYYY-YYYY (if approved) / NV / unknown",
       "grape": "Variety (Color) OR Variety (Color, Sweetness)",
-      "rationale": "Max 35 words (see Section 7.G): strategy, prep/sauce, principles, bridge, acid type if needed",
+      "rationale": "2-3 sentences: strategy, prep/sauce, principles, bridge, acid type if needed",
       "pairingPrinciplesApplied": ["list"],
       "tastingNotes": {
-        "aromas": ["Max 15 chars each, 2-3 descriptors"],
-        "palate": "Max 50 chars (see Section 7.G): flavors + structure",
-        "finish": "Max 30 chars (see Section 7.G): brief character"
+        "aromas": ["descriptor 1", "descriptor 2"],
+        "palate": "flavors + structure",
+        "finish": "brief"
       },
       "servingGuidance": {
         "temperature": "XX-XX°F (XX-XX°C)",
@@ -105,16 +104,16 @@ function getOptimizedJSONSchema() {
           "wineKnowledge": 28,
           "complexityHandling": 15
         },
-        "rationale": "Max 25 words (see Section 7.G): scoring summary, components, deductions, verification per Section 6"
+        "rationale": "scoring summary (2-3 sentences)"
       },
-      "story": "Max 15 words (see Section 7.G) OR omit"
+      "story": "brief context (2-3 sentences)",
     }
   ],
   "avoid": {
     "types": ["type 1", "type 2", "type 3"],
-    "reason": "Max 20 words (see Section 7.G): why violates principles, reference Section 2.L"
+    "reason": "why violates principles (2-3 plain english sentences)"
   },
-  "closingNarrative": "Max 20 words (see Section 7.G) OR omit"
+  "closingNarrative": "brief summary (2-3 sentences)"
 }`;
 }
 

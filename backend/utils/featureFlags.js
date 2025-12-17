@@ -16,7 +16,17 @@ function isFeatureEnabled(flagName) {
   const envKey = flagName.toUpperCase().replace(/-/g, '_');
   const value = process.env[envKey];
   
-  // Default to false for safety
+  // Special handling for ENABLE_V7_PROMPT - default to true (V7.0 is now the standard)
+  if (flagName === 'ENABLE_V7_PROMPT') {
+    // Default to true if not explicitly set
+    if (value === undefined) {
+      return true; // V7.0 is the default prompt
+    }
+    // Only disable if explicitly set to 'false'
+    return value.toLowerCase() !== 'false';
+  }
+  
+  // Default to false for other feature flags (for safety)
   if (value === undefined) {
     return false;
   }

@@ -1,4 +1,5 @@
 const logger = require('./logger');
+const { safeRequestMetadata: getSafeRequestMetadata } = require('./utils/logRedaction');
 
 /**
  * Request logging utility to standardize logging across endpoints
@@ -70,40 +71,38 @@ class RequestLogger {
 
   /**
    * Sanitize metadata to prevent logging sensitive information
-   * Removes passwords, tokens, API keys, and other sensitive fields
+   * Uses enhanced redaction utility for comprehensive sensitive data removal
    * @param {object} metadata - Metadata object to sanitize
    * @returns {object} Sanitized metadata
    */
   static sanitizeMetadata(metadata) {
-    const sensitiveKeys = [
-      'password',
-      'passwordHash',
-      'token',
-      'accessToken',
-      'refreshToken',
-      'apiKey',
-      'secret',
-      'authorization',
-      'cookie',
-      'headers'
-    ];
+    const { redactSensitiveData } = require('./utils/logRedaction');
+    return redactSensitiveData(metadata);
+  }
 
-    const sanitized = { ...metadata };
-    
-    for (const key of sensitiveKeys) {
-      if (sanitized[key]) {
-        sanitized[key] = '[REDACTED]';
-      }
-    }
+  /**
+   * Create safe request metadata for logging
+   * Includes request context without sensitive data
+   * @param {object} req - Express request object
+   * @returns {object} Safe request metadata
+   */
+  static safeRequestMetadata(req) {
+    return getSafeRequestMetadata(req);
+  }
 
-    // Sanitize nested objects
-    for (const key in sanitized) {
-      if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
-        sanitized[key] = this.sanitizeMetadata(sanitized[key]);
-      }
-    }
-
-    return sanitized;
+  /**
+   * Log request with full context (safe metadata only)
+   * @param {object} req - Express request object
+   * @param {string} endpoint - Endpoint name
+   * @param {string} requestId - Request ID
+   */
+  static logRequestWithContext(req, endpoint, requestId) {
+    const safeMetadata = getSafeRequestMetadata(req);
+    logger.info(`[${endpoint}] Request context`, {
+      requestId,
+      ...safeMetadata,
+      timestamp: new Date().toISOString()
+    });
   }
 
   /**

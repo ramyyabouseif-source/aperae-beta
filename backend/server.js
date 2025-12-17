@@ -2900,7 +2900,7 @@ app.post('/api/dish-recommendations',
       
       const claudeStartTime = Date.now();
       
-      // Call Master Chef with JSON-enforced response format to guarantee parseable output
+      // Call Master Chef (JSON will be parsed and validated below)
       const message = await anthropic.messages.create({
         model: "claude-sonnet-4-5-20250929",
         system: buildMasterChefSystemPrompt(),
@@ -2912,8 +2912,7 @@ app.post('/api/dish-recommendations',
         ],
         // Allow enough room for full JSON response while keeping within reasonable limits
         max_tokens: 3000,
-        temperature: 0.5,
-        response_format: { type: "json_object" }
+        temperature: 0.5
       });
       
       const claudeResponseTime = Date.now() - claudeStartTime;

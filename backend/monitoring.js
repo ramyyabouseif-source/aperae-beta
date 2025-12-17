@@ -94,8 +94,10 @@ class MonitoringService {
       this.metrics.requests.fiveXx++;
     }
     
-    // Log slow requests
-    if (responseTime > 5000) {
+    // Log slow requests (endpoint-specific thresholds)
+    // Master Chef calls take 60-90 seconds, so use higher threshold for dish-recommendations
+    const slowThreshold = endpoint.includes('dish-recommendations') ? 90000 : 5000;
+    if (responseTime > slowThreshold) {
       logger.warn(`Slow request detected: ${method} ${endpoint} took ${responseTime}ms`);
     }
   }

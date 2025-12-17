@@ -164,7 +164,7 @@ async function saveRecommendations(fullResponse, requestId, apiResponseTimeMs, p
           $43, -- confidence_wine_knowledge
           $44, -- confidence_recipe_quality
           $45, -- confidence_rationale
-          $46 -- full_response_json (JSONB)
+          CAST($46::text AS jsonb) -- full_response_json (JSONB)
         )
       `;
       

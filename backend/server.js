@@ -2707,11 +2707,17 @@ JSON OUTPUT FORMAT:
       }
     }
   ]
-}`;
+}
+
+CRITICAL: You MUST return COMPLETE, VALID JSON. The response must start with { and end with } with all brackets, braces, and arrays properly closed. Do NOT truncate or cut off the response mid-JSON. Ensure all 3 dishRecommendations are fully included with complete recipe steps, ingredients, and confidence scoring.`;
 }
 
 function buildMasterChefUserMessage(wine) {
-  return `Analyze this wine and generate three dish recommendations (Complex, Moderate, Simple) following the JSON schema and rules in the system prompt. Wine: "${wine}".`;
+  return `Analyze this wine and generate three dish recommendations (Complex, Moderate, Simple) following the JSON schema and rules in the system prompt. 
+
+IMPORTANT: Return ONLY valid, complete JSON. Ensure all brackets and braces are properly closed. Include all 3 dishes fully.
+
+Wine: "${wine}"`;
 }
 
 // =============================================================================
@@ -2910,8 +2916,9 @@ app.post('/api/dish-recommendations',
             content: buildMasterChefUserMessage(wine)
           }
         ],
-        // Allow enough room for full JSON response while keeping within reasonable limits
-        max_tokens: 3000,
+        // Master Chef responses are large (3 dishes with full recipes, wine analysis, etc.)
+        // Increase token limit to ensure complete JSON responses
+        max_tokens: 6000,
         temperature: 0.5
       });
       

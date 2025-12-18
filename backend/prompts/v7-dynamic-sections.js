@@ -61,9 +61,9 @@ OUTPUT (2-3 sentences each):
 
 Recommendations must be realistically obtainable and prioritized by likely U.S. availability based on typical distribution patterns.
 
-PERMITTED: Current releases, active producers, library (winery-sold), major retailer, recent vintages in distribution
+PERMITTED: Current releases, active producers, and recent vintages that are realistically obtainable via mainstream U.S. retail or major online merchants (not just isolated secondary listings). Library releases sold directly by the winery or via major, non collector focused retailers are also allowed when clearly in active distribution.
 
-PROHIBITED: Auction-only (pre-1990 rarities), defunct producers, discontinued labels, no commercial distribution
+PROHIBITED: Auction only bottles, pre 1990 rarities, defunct producers, discontinued labels, or wines whose practical access is primarily through secondary/collector or auction platforms, even if post 1990. Wines where current availability is limited to scattered, one off listings on specialist collector marketplaces should be treated as non compliant for purchasability.
 
 VINTAGE WINDOWS:
 •	Premium: Last 3-12 years (exceptions: aged Barolo 15-20, Burgundy 12-18, Vintage Port 10-20, aged Riesling 10-15)
@@ -71,7 +71,10 @@ VINTAGE WINDOWS:
 •	Budget: Last 1-5 years
 •	NV: Champagne, Cava, Prosecco, Sherry, Madeira, Tawny Port
 
-If primary = auction-only: Select (1) recent vintage same producer, (2) similar wine different producer, (3) "unknown"
+If a candidate vintage passes structure rules but fails purchasability (primarily auction-only, secondary/collector availability), apply this fallback priority before final selection:
+1. Select a more recent, structurally suitable vintage of the same wine and producer that is broadly available in the U.S.
+2. If unavailable, select a structurally similar wine from a different, widely distributed producer in the same region/appellation.
+3. If still uncertain = "unknown"
 `,
 
   /**

@@ -16,7 +16,8 @@ CORE PAIRING PRINCIPLES:
 
 A. PREPARATION & SAUCE PRIORITY (20% weight)
 •	Wine choice determined by cooking method + sauce, NOT protein alone.
-•	Rationale must state: (1) method impact, (2) sauce dictates structure, (3) overrides protein Missing = -10 points
+•	Rationale must state: (1) method impact, (2) sauce dictates structure, (3) overrides protein 
+•	Missing = -10 points
 
 B. PROTEIN → WINE COLOR FRAMEWORK
 
@@ -33,7 +34,7 @@ PREPARATION-DEPENDENT:
 •	Pork: grilled/char→red; roasted→red or white; cream→white
 •	Chicken/turkey: grilled/char→red OK; poached/cream→white
 •	Salmon/tuna/swordfish are FIRM fish (not delicate): white strongly preferred, reds permitted only with grilled/charred preparation + explicit justification
-•	Shellfish: reds only if intense prep justified
+•	Shellfish: reds only if intense prep justified (e.g., grilled lobster with compound butter)
 
 MANDATORY WHITE (zero tannin):
 •	Delicate fish (sole/halibut/bass/trout/cod/flounder)
@@ -142,6 +143,7 @@ Common Dishes:
 Specialty:
 •	Eugenol: Cinnamon, clove, port reduction → Gewürztraminer, oaked Syrah, aged Port-style
 •	Sotolon: Soy sauce, aged sake → Aged Riesling (10y+), Sherry, Vin Jaune
+•	Beta-damascenone: Rose water, lychee, tropical fruit → Gewürztraminer, Viognier, Torrontés
 
 Luxury:
 •	Linalool: Lavender, floral notes → Riesling, Muscat, Gewürztraminer

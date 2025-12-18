@@ -171,14 +171,14 @@ export class DishService {
         producer: "unknown",
         region: "unknown",
         vintage: "2016",
-        vintageAge: "9 years",
+        // Note: vintageAge removed - calculated server-side
         color: "red" as 'red',
         structure: {
           body: "medium-full" as 'medium-full',
           acidity: "medium" as 'medium',
           acidType: "balanced",
           tannin: "medium" as 'medium',
-          tanninCharacter: "polished",
+          // Note: tanninCharacter removed from output
           sweetness: "dry" as 'dry',
           abv: "14.5%"
         },
@@ -289,9 +289,8 @@ export class DishService {
           difficulty: complexityLabel === 'Complex' ? 'Advanced' : complexityLabel === 'Moderate' ? 'Medium' : 'Easy'
         },
         pairingRationale: dish.pairingRationale,
-        servingSuggestion: dish.servingSuggestion || '',
-        confidenceScore: dish.confidence.score,
-        confidence: dish.confidence
+        servingSuggestion: dish.servingSuggestion || ''
+        // Note: confidence removed from output to reduce API burden (matches live mode)
       };
     });
 
@@ -299,8 +298,8 @@ export class DishService {
       wine: wine,
       wineAnalysis: mockDishEntry.wineAnalysis,
       wineServingGuidance: mockDishEntry.wineServingGuidance,
-      dishRecommendations: transformedRecommendations,
-      closingNarrative: `These dishes showcase the versatility of ${wine}, from simple grilling to complex braising techniques. Each recommendation highlights different aspects of the wine's profile, from its structured tannins to its aromatic complexity.`
+      dishRecommendations: transformedRecommendations
+      // Note: closingNarrative removed to match UI requirements
     };
   }
 

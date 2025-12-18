@@ -34,7 +34,6 @@ const FlipDishCard: React.FC<FlipDishCardProps> = ({
   const [expanded, setExpanded] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [hasBeenFlipped, setHasBeenFlipped] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const flipAnimation = useRef(new Animated.Value(0)).current;
   const isFlippedRef = useRef(false);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -170,7 +169,7 @@ const FlipDishCard: React.FC<FlipDishCardProps> = ({
               source={dishImage}
               style={styles.dishImage}
               resizeMode="cover"
-              onError={() => setImageError(true)}
+                onError={() => {}}
             />
             
             {/* Dark Overlay */}
@@ -193,13 +192,6 @@ const FlipDishCard: React.FC<FlipDishCardProps> = ({
                   <Text style={styles.complexityText}>{dish.complexity.label}</Text>
                 </View>
                 
-                {/* Confidence Score - Top Right (if available) */}
-                {dish.confidenceScore && (
-                  <View style={styles.confidenceScoreTop}>
-                    <Ionicons name="star" size={14} color="rgba(255, 255, 255, 0.9)" />
-                    <Text style={styles.confidenceScoreTopText}>{dish.confidenceScore}%</Text>
-                  </View>
-                )}
               </View>
 
               {/* Content */}
@@ -333,17 +325,9 @@ const FlipDishCard: React.FC<FlipDishCardProps> = ({
 
                 {/* Serving Suggestion */}
                 {dish.servingSuggestion && (
-                  <View style={styles.rationaleContainerBack}>
-                    <Text style={styles.rationaleLabelBack}>Serving Suggestion:</Text>
-                    <Text style={styles.rationaleTextBack}>{dish.servingSuggestion}</Text>
-                  </View>
-                )}
-
-                {/* Closing Notes (from confidence rationale) */}
-                {dish.confidence?.rationale && (
-                  <View style={styles.closingNotesContainer}>
-                    <Text style={styles.closingNotesLabel}>Closing Notes:</Text>
-                    <Text style={styles.closingNotesText}>{dish.confidence.rationale}</Text>
+                  <View style={styles.servingSuggestionContainer}>
+                    <Text style={styles.servingSuggestionLabel}>Serving Suggestion:</Text>
+                    <Text style={styles.servingSuggestionText}>{dish.servingSuggestion}</Text>
                   </View>
                 )}
               </View>
@@ -444,23 +428,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     textTransform: 'uppercase',
-  },
-  confidenceScoreTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  confidenceScoreTopText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.9)',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   content: {
     position: 'relative',
@@ -704,6 +671,27 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   closingNotesText: {
+    fontSize: 14,
+    color: COLORS.text.primary,
+    lineHeight: 20,
+  },
+  servingSuggestionContainer: {
+    backgroundColor: '#F5F5F5',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.primary[500],
+  },
+  servingSuggestionLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.primary[700],
+    marginBottom: 6,
+    textTransform: 'uppercase',
+  },
+  servingSuggestionText: {
     fontSize: 14,
     color: COLORS.text.primary,
     lineHeight: 20,

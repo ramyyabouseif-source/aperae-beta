@@ -15,8 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { MyCellarWine, WineRecommendation } from '../types/wine';
 import { getWineCardImage } from '../utils/wineCardImages';
-import { getTastingNotesDisplay, getConfidenceScore, getConfidenceRationale, getServingGuidance, getConfidenceBreakdown } from '../utils/wineTypeHelpers';
-import ConfidenceBreakdown from './ConfidenceBreakdown';
+import { getTastingNotesDisplay, getServingGuidance } from '../utils/wineTypeHelpers';
 import StatusSelector from './myCellar/StatusSelector';
 import NotesInput from './myCellar/NotesInput';
 import TagsBadgeSelector from './myCellar/TagsBadgeSelector';
@@ -76,9 +75,6 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
   
   // Get tasting notes display (handles both string and object formats)
   const tastingNotes = getTastingNotesDisplay(wine.tastingNotes);
-  const confidenceScore = getConfidenceScore(wine);
-  const confidenceRationale = getConfidenceRationale(wine);
-  const confidenceBreakdown = getConfidenceBreakdown(wine);
   const servingGuidance = getServingGuidance(wine);
 
   // Get tier badge color
@@ -90,13 +86,6 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
     return styles.tierBadgeDefault;
   };
 
-  // Get confidence color
-  const getConfidenceColor = (score: number) => {
-    if (score >= 90) return '#2E7D32';
-    if (score >= 80) return '#F57C00';
-    if (score >= 70) return '#E65100';
-    return '#C62828';
-  };
 
   // Get wine image from local assets - memoize to prevent unnecessary recalculations
   const wineImageSource = useMemo(() => {
@@ -414,26 +403,6 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                 <Ionicons name="return-up-back-outline" size={20} color="#8B0000" />
                 <Text style={styles.flipButtonText}>Flip Back</Text>
               </TouchableOpacity>
-            </View>
-
-            {/* Confidence Score */}
-            <View style={styles.detailSection}>
-              <Text style={styles.detailTitle}>
-                <Ionicons name="analytics" size={16} color="#8B0000" /> Confidence Score
-              </Text>
-              <View style={styles.confidenceScoreBack}>
-                <Text style={styles.confidenceScoreValue}>{confidenceScore}%</Text>
-              </View>
-              
-              {/* Confidence Breakdown (Enhanced Format) - Visual Component */}
-              {confidenceBreakdown && (
-                <View style={styles.confidenceBreakdownContainer}>
-                  <ConfidenceBreakdown 
-                    breakdown={confidenceBreakdown} 
-                    totalScore={confidenceScore}
-                  />
-                </View>
-              )}
             </View>
 
             {/* Serving Guidance */}
@@ -824,14 +793,6 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 10,
   },
-  confidenceScoreTop: {
-    fontSize: 12,
-    fontStyle: 'italic',
-    color: 'rgba(255, 255, 255, 0.7)',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
   tierBadge: {
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -965,15 +926,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#5B2433',
     marginLeft: 4,
-  },
-  confidenceScoreBack: {
-    marginTop: 4,
-  },
-  confidenceScoreValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 8,
   },
   servingGuidanceContainer: {
     backgroundColor: '#F5F5F5',
@@ -1223,9 +1175,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     lineHeight: 14,
-  },
-  confidenceBreakdownContainer: {
-    marginTop: 12,
   },
   alternativesSection: {
     marginBottom: 0, // Remove extra margin

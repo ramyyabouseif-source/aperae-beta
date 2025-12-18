@@ -21,6 +21,7 @@ interface FavoritesListViewProps {
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
   ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null;
   contentContainerStyle?: any;
+  onWineUpdated?: () => void; // Callback when wine data is updated
 }
 
 const FavoritesListView: React.FC<FavoritesListViewProps> = ({
@@ -35,6 +36,7 @@ const FavoritesListView: React.FC<FavoritesListViewProps> = ({
   ListHeaderComponent,
   ListEmptyComponent,
   contentContainerStyle,
+  onWineUpdated,
 }) => {
   const renderItem: ListRenderItem<WineRecommendation> = useCallback(
     ({ item, index }) => (
@@ -44,8 +46,9 @@ const FavoritesListView: React.FC<FavoritesListViewProps> = ({
           onRemoveFromFavorites={onRemoveFromFavorites}
           isFavorite={true}
           showRemoveButton={true}
-          onPress={onPress}
+          onPress={undefined}
           index={index}
+          onWineUpdated={onWineUpdated}
         />
       </View>
     ),

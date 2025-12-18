@@ -196,3 +196,5 @@ console.log('API Base URL:', getApiBaseUrl());
 **Your frontend is ready for production! Just set the environment variable when building.** 🚀
 
 
+
+

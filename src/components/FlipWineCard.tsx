@@ -9,21 +9,30 @@ import {
   Animated,
   Dimensions,
   Easing,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { WineRecommendation } from '../types/wine';
+import { MyCellarWine, WineRecommendation } from '../types/wine';
 import { getWineCardImage } from '../utils/wineCardImages';
 import { getTastingNotesDisplay, getConfidenceScore, getConfidenceRationale, getServingGuidance, getConfidenceBreakdown } from '../utils/wineTypeHelpers';
 import ConfidenceBreakdown from './ConfidenceBreakdown';
+import StatusSelector from './myCellar/StatusSelector';
+import NotesInput from './myCellar/NotesInput';
+import TagsBadgeSelector from './myCellar/TagsBadgeSelector';
+import StarRating from './myCellar/StarRating';
+import { FavoritesService } from '../services/favoritesService';
+import StatusBadge from './myCellar/StatusBadge';
 
 interface FlipWineCardProps {
-  wine: WineRecommendation;
+  wine: WineRecommendation | MyCellarWine;
   onAddToFavorites?: (wine: WineRecommendation) => void;
   onRemoveFromFavorites?: (wine: WineRecommendation) => void;
   isFavorite?: boolean;
   onPress?: (wine: WineRecommendation) => void;
   showRemoveButton?: boolean;
   index?: number; // For unique image selection
+  onWineUpdated?: () => void; // Callback when wine data is updated
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -37,8 +46,28 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
   onPress,
   showRemoveButton = false,
   index = 0,
+  onWineUpdated,
 }) => {
+  const cellarWine = wine as MyCellarWine;
+  // Show My Cellar section if wine has an ID (indicating it's saved in My Cellar)
+  // All wines in My Cellar will have ID after migration
+  const isMyCellarWine = !!(cellarWine.id || (wine as any).id);
+  
+  // Local state for My Cellar editing
+  const [localStatus, setLocalStatus] = useState<('wantToTry' | 'haveTried' | 'favorite')>(
+    cellarWine.status || 'favorite'
+  );
+  const [localWineRating, setLocalWineRating] = useState<number | undefined>(cellarWine.wineRating);
+  const [localPairingRating, setLocalPairingRating] = useState<number | undefined>(cellarWine.pairingRating);
+  const [localWineNotes, setLocalWineNotes] = useState<string>(cellarWine.wineNotes || '');
+  const [localPairingNotes, setLocalPairingNotes] = useState<string>(cellarWine.pairingNotes || '');
+  const [localTags, setLocalTags] = useState<string[]>(cellarWine.tags || []);
   const [isFlipped, setIsFlipped] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const wineNotesInputRef = useRef<any>(null);
+  const pairingNotesInputRef = useRef<any>(null);
+  const wineNotesContainerRef = useRef<View>(null);
+  const pairingNotesContainerRef = useRef<View>(null);
   const [expanded, setExpanded] = useState(false);
   const [backExpanded, setBackExpanded] = useState(false);
   const [hasBeenFlipped, setHasBeenFlipped] = useState(false); // Track if card has been flipped
@@ -234,6 +263,17 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                   <Text style={styles.tierBadgeText}>{wine.tierLabel}</Text>
                 </View>
               )}
+              
+              {/* Status Badge - Top Right (My Cellar) */}
+              {isMyCellarWine && (
+                <View style={styles.statusBadgeTopRight}>
+                  <StatusBadge 
+                    status={(localStatus === 'wantToTry' ? 'wantToTry' : localStatus === 'haveTried' ? 'haveTried' : 'favorite') as 'wantToTry' | 'haveTried' | 'favorite'} 
+                    size="small"
+                    showLabel={false}
+                  />
+                </View>
+              )}
             </View>
             {/* Favorite Button */}
             <TouchableOpacity
@@ -265,6 +305,24 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                 {(wine.grape || wine.category) && (
                   <Text style={styles.category}>{wine.grape || wine.category}</Text>
                 )}
+                
+                
+                {/* User Rating - My Cellar Feature */}
+                {(() => {
+                  const cellarWine = wine as MyCellarWine;
+                  if (cellarWine.wineRating && cellarWine.wineRating > 0) {
+                    return (
+                      <View style={styles.userRatingContainer}>
+                        <StarRating 
+                          rating={cellarWine.wineRating} 
+                          size={14} 
+                          readonly 
+                        />
+                      </View>
+                    );
+                  }
+                  return null;
+                })()}
               </View>
 
             {/* Rationale - Essential Pairing Info */}
@@ -329,8 +387,20 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
             backAnimatedStyle,
           ]}
         >
-        <View style={styles.cardTouchable}>
-          <View style={styles.backContent}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoidingView}
+          keyboardVerticalOffset={100}
+        >
+          <ScrollView
+            ref={scrollViewRef}
+            style={styles.backScrollView}
+            contentContainerStyle={styles.backScrollContent}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
+            showsVerticalScrollIndicator={true}
+          >
+            <View style={styles.backContent}>
             {/* Back Header */}
             <View style={styles.backHeader}>
               <Text style={styles.backTitle}>Wine Details</Text>
@@ -346,16 +416,13 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
               </TouchableOpacity>
             </View>
 
-            {/* Confidence Score & Rationale */}
+            {/* Confidence Score */}
             <View style={styles.detailSection}>
               <Text style={styles.detailTitle}>
                 <Ionicons name="analytics" size={16} color="#8B0000" /> Confidence Score
               </Text>
               <View style={styles.confidenceScoreBack}>
                 <Text style={styles.confidenceScoreValue}>{confidenceScore}%</Text>
-                {confidenceRationale && (
-                  <Text style={styles.confidenceRationaleTextBack}>{confidenceRationale}</Text>
-                )}
               </View>
               
               {/* Confidence Breakdown (Enhanced Format) - Visual Component */}
@@ -370,11 +437,9 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
             </View>
 
             {/* Serving Guidance */}
-            <View style={styles.detailSection}>
-              <Text style={styles.detailTitle}>
-                <Ionicons name="thermometer" size={16} color="#8B0000" /> Serving Guidance
-              </Text>
-              <Text style={styles.detailText}>
+            <View style={styles.servingGuidanceContainer}>
+              <Text style={styles.servingGuidanceLabel}>Serving Suggestion:</Text>
+              <Text style={styles.servingGuidanceText}>
                 {servingGuidance}
               </Text>
             </View>
@@ -398,6 +463,195 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                 <Text style={styles.detailText}>
                   {wine.story || wine.storytellingElements}
                 </Text>
+              </View>
+            )}
+
+            {/* My Cellar Section - Only show if wine is in My Cellar */}
+            {isMyCellarWine && (
+              <View style={styles.myCellarSection}>
+                <Text style={styles.myCellarSectionTitle}>
+                  <Ionicons name="wine" size={16} color="#8B0000" /> My Cellar
+                </Text>
+                
+                {/* Status Selector - Only Want to Try / Have Tried (favorite removed since all wines in My Cellar are favorites) */}
+                <StatusSelector
+                  currentStatus={localStatus === 'wantToTry' ? 'wantToTry' : localStatus === 'haveTried' ? 'haveTried' : 'wantToTry'}
+                  onStatusChange={async (newStatus) => {
+                    setLocalStatus(newStatus);
+                    if (cellarWine.id) {
+                      try {
+                        await FavoritesService.updateWineStatus(cellarWine.id, newStatus);
+                        onWineUpdated?.();
+                      } catch (error) {
+                        console.error('Error updating status:', error);
+                      }
+                    }
+                  }}
+                />
+
+                {/* Ratings */}
+                <View style={styles.ratingsContainer}>
+                  <View style={styles.ratingItem}>
+                    <Text style={styles.ratingLabel}>Wine Rating</Text>
+                    <StarRating
+                      rating={localWineRating || 0}
+                      size={20}
+                      readonly={false}
+                      onRatingChange={async (rating) => {
+                        setLocalWineRating(rating);
+                        if (cellarWine.id) {
+                          try {
+                            await FavoritesService.updateWineRating(cellarWine.id, rating);
+                            onWineUpdated?.();
+                          } catch (error) {
+                            console.error('Error updating wine rating:', error);
+                          }
+                        }
+                      }}
+                    />
+                  </View>
+                  <View style={styles.ratingItem}>
+                    <Text style={styles.ratingLabel}>Pairing Rating</Text>
+                    <StarRating
+                      rating={localPairingRating || 0}
+                      size={20}
+                      readonly={false}
+                      onRatingChange={async (rating) => {
+                        setLocalPairingRating(rating);
+                        if (cellarWine.id) {
+                          try {
+                            await FavoritesService.updatePairingRating(cellarWine.id, rating);
+                            onWineUpdated?.();
+                          } catch (error) {
+                            console.error('Error updating pairing rating:', error);
+                          }
+                        }
+                      }}
+                    />
+                  </View>
+                </View>
+
+                {/* Notes */}
+                <View ref={wineNotesContainerRef}>
+                  <NotesInput
+                    label="Wine Notes"
+                    placeholder="Add your tasting notes..."
+                    value={localWineNotes}
+                    onChangeText={setLocalWineNotes}
+                    inputRef={wineNotesInputRef}
+                    onFocus={() => {
+                      // Scroll to input when keyboard appears (same pattern as home screen)
+                      setTimeout(() => {
+                        if (wineNotesInputRef.current && scrollViewRef.current) {
+                          // Use measureLayout to get position relative to ScrollView
+                          wineNotesInputRef.current.measureLayout(
+                            scrollViewRef.current as any,
+                            (_x, y, _width, _height) => {
+                              scrollViewRef.current?.scrollTo({
+                                y: Math.max(0, y - 150), // Scroll to show input with padding above
+                                animated: true,
+                              });
+                            },
+                            () => {
+                              // Fallback to measure if measureLayout fails
+                              wineNotesInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
+                                scrollViewRef.current?.scrollTo({
+                                  y: Math.max(0, pageY - 150),
+                                  animated: true,
+                                });
+                              });
+                            }
+                          );
+                        }
+                      }, 300); // Delay to allow keyboard to appear
+                    }}
+                    onBlur={async () => {
+                      if (cellarWine.id) {
+                        try {
+                          await FavoritesService.updateWineNotes(cellarWine.id, localWineNotes);
+                          onWineUpdated?.();
+                        } catch (error) {
+                          console.error('Error updating wine notes:', error);
+                        }
+                      }
+                    }}
+                  />
+                </View>
+                
+                <View ref={pairingNotesContainerRef}>
+                  <NotesInput
+                    label="Pairing Notes"
+                    placeholder="How did this pair with your dish?"
+                    value={localPairingNotes}
+                    onChangeText={setLocalPairingNotes}
+                    inputRef={pairingNotesInputRef}
+                    onFocus={() => {
+                      // Scroll to input when keyboard appears (same pattern as home screen)
+                      setTimeout(() => {
+                        if (pairingNotesInputRef.current && scrollViewRef.current) {
+                          // Use measureLayout to get position relative to ScrollView
+                          pairingNotesInputRef.current.measureLayout(
+                            scrollViewRef.current as any,
+                            (_x, y, _width, _height) => {
+                              scrollViewRef.current?.scrollTo({
+                                y: Math.max(0, y - 150), // Scroll to show input with padding above
+                                animated: true,
+                              });
+                            },
+                            () => {
+                              // Fallback to measure if measureLayout fails
+                              pairingNotesInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
+                                scrollViewRef.current?.scrollTo({
+                                  y: Math.max(0, pageY - 150),
+                                  animated: true,
+                                });
+                              });
+                            }
+                          );
+                        }
+                      }, 300); // Delay to allow keyboard to appear
+                    }}
+                    onBlur={async () => {
+                      if (cellarWine.id) {
+                        try {
+                          await FavoritesService.updatePairingNotes(cellarWine.id, localPairingNotes);
+                          onWineUpdated?.();
+                        } catch (error) {
+                          console.error('Error updating pairing notes:', error);
+                        }
+                      }
+                    }}
+                  />
+                </View>
+
+                {/* Tags */}
+                <TagsBadgeSelector
+                  label="Tags"
+                  selectedTags={localTags}
+                  onTagsChange={async (tags) => {
+                    setLocalTags(tags);
+                    if (cellarWine.id) {
+                      try {
+                        await FavoritesService.updateWineTags(cellarWine.id, tags);
+                        onWineUpdated?.();
+                      } catch (error) {
+                        console.error('Error updating tags:', error);
+                      }
+                    }
+                  }}
+                  availableTags={[
+                    'Special Occasions',
+                    'Dinner Parties',
+                    'Date Night',
+                    'Weekend',
+                    'Holiday',
+                    'Gift',
+                    'Celebration',
+                    'Everyday',
+                    'Fine Dining',
+                    'Casual',
+                  ]}
+                />
               </View>
             )}
 
@@ -458,7 +712,8 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
               </Text>
             </View>
           </View>
-        </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
         </Animated.View>
       )}
     </View>
@@ -557,11 +812,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     left: 12,
-    right: 20, // Match content paddingRight to align price badge with expertRating
+    right: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     zIndex: 2,
+  },
+  statusBadgeTopRight: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 10,
   },
   confidenceScoreTop: {
     fontSize: 12,
@@ -647,6 +908,14 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 4,
   },
+  statusBadgeContainer: {
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  userRatingContainer: {
+    marginTop: 6,
+    marginBottom: 4,
+  },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -706,10 +975,25 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 8,
   },
-  confidenceRationaleTextBack: {
+  servingGuidanceContainer: {
+    backgroundColor: '#F5F5F5',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#8B0000',
+  },
+  servingGuidanceLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#8B0000',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+  },
+  servingGuidanceText: {
     fontSize: 14,
-    color: '#666',
-    fontStyle: 'italic',
+    color: '#333',
     lineHeight: 20,
   },
   rationaleContainer: {

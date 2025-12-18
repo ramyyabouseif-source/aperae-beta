@@ -7,28 +7,33 @@ import {
   Alert,
   Animated,
   ImageBackground,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { FavoritesService, PaginationOptions } from '../services/favoritesService';
 import { LayoutPreferencesService, LayoutType } from '../services/layoutPreferencesService';
-import { WineRecommendation } from '../types/wine';
+import { MyCellarWine } from '../types/wine';
 import MasonryGrid from '../components/favorites/MasonryGrid';
 import FavoritesListView from '../components/favorites/FavoritesListView';
 import LayoutToggleButton from '../components/favorites/LayoutToggleButton';
 import WineDetailModal from '../components/favorites/WineDetailModal';
+import StatusBadge from '../components/myCellar/StatusBadge';
+import StarRating from '../components/myCellar/StarRating';
 
 const SimpleEnhancedFavoritesScreen: React.FC = () => {
-  const [favorites, setFavorites] = useState<WineRecommendation[]>([]);
+  const [favorites, setFavorites] = useState<MyCellarWine[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [selectedWine, setSelectedWine] = useState<WineRecommendation | null>(null);
+  const [selectedWine, setSelectedWine] = useState<MyCellarWine | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [layout, setLayout] = useState<LayoutType>('grid');
   const [fadeAnim] = useState(new Animated.Value(1));
+  const [stats, setStats] = useState({ total: 0, wantToTry: 0, haveTried: 0, favorites: 0, averageRating: 0 });
+  const [statusFilter, setStatusFilter] = useState<'all' | 'wantToTry' | 'haveTried' | 'favorite'>('all');
   const navigation = useNavigation();
 
   const PAGE_SIZE = 20; // Items per page
@@ -36,8 +41,22 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
   useEffect(() => {
     loadLayoutPreference();
     loadFavorites(1, false);
+    loadStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    loadStats();
+  }, [favorites]);
+
+  const loadStats = async () => {
+    try {
+      const statsData = await FavoritesService.getMyCellarStats();
+      setStats(statsData);
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  };
 
   const loadLayoutPreference = async () => {
     try {
@@ -123,30 +142,21 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
     navigation.navigate('Home' as never);
   };
 
-  const handleRemoveFavorite = async (wine: WineRecommendation) => {
+  const handleRemoveFavorite = async (wine: MyCellarWine) => {
     try {
-      // Pass the wine object directly - the service will handle ID matching
-      await FavoritesService.removeFromFavorites(wine as any);
-      // Update local state by filtering out the removed wine
-      setFavorites(prev => prev.filter(fav => {
-        // Match by ID if available, otherwise match by wine details
-        if ((fav as any).id && (wine as any).id) {
-          return (fav as any).id !== (wine as any).id;
-        }
-        return !(fav.wineName === wine.wineName && 
-                fav.producer === wine.producer && 
-                fav.vintage === wine.vintage);
-      }));
+      await FavoritesService.removeFromFavorites(wine);
+      setFavorites(prev => prev.filter(fav => fav.id !== wine.id));
+      await loadStats();
     } catch (error) {
-      console.error('Error removing favorite:', error);
-      Alert.alert('Error', 'Failed to remove favorite');
+      console.error('Error removing wine:', error);
+      Alert.alert('Error', 'Failed to remove wine from My Cellar');
     }
   };
 
-  const confirmRemoveFavorite = (wine: WineRecommendation) => {
+  const confirmRemoveFavorite = (wine: MyCellarWine) => {
     Alert.alert(
-      'Remove Favorite',
-      `Are you sure you want to remove ${wine.wineName} from your favorites?`,
+      'Remove from My Cellar',
+      `Are you sure you want to remove ${wine.wineName} from your cellar?`,
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Remove', style: 'destructive', onPress: () => handleRemoveFavorite(wine) },
@@ -154,10 +164,26 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
     );
   };
 
-  const handleWinePress = useCallback((wine: WineRecommendation) => {
-    setSelectedWine(wine);
-    setModalVisible(true);
+  const handleWinePress = useCallback((wine: MyCellarWine) => {
+    // Removed modal - let cards flip instead
+    // Cards now handle their own flip interaction
+    // setSelectedWine(wine);
+    // setModalVisible(true);
   }, []);
+
+  const handleStatusChange = async (wine: MyCellarWine, newStatus: 'wantToTry' | 'haveTried' | 'favorite') => {
+    try {
+      await FavoritesService.updateWineStatus(wine.id, newStatus);
+      // Update local state
+      setFavorites(prev => prev.map(w => 
+        w.id === wine.id ? { ...w, status: newStatus } : w
+      ));
+      await loadStats();
+    } catch (error) {
+      console.error('Error updating status:', error);
+      Alert.alert('Error', 'Failed to update wine status');
+    }
+  };
 
   const handleCloseModal = useCallback(() => {
     setModalVisible(false);
@@ -167,11 +193,11 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <View style={styles.emptyIconContainer}>
-        <Ionicons name="heart-outline" size={80} color="#ccc" />
+        <Ionicons name="wine-outline" size={80} color="#ccc" />
       </View>
-      <Text style={styles.emptyTitle}>No Favorites Yet</Text>
+      <Text style={styles.emptyTitle}>My Cellar is Empty</Text>
       <Text style={styles.emptySubtitle}>
-        Start exploring wines and add your favorites here. Your personal wine collection awaits!
+        Start exploring wines and add them to your cellar. Track what you've tried, what you want to try, and your favorites!
       </Text>
       <TouchableOpacity 
         style={styles.emptyActionContainer}
@@ -190,25 +216,85 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
       <View style={styles.loadingContainer}>
         <View style={styles.loadingContent}>
           <Ionicons name="wine" size={48} color="#8B0000" />
-          <Text style={styles.loadingText}>Loading your favorites...</Text>
+          <Text style={styles.loadingText}>Loading your cellar...</Text>
         </View>
       </View>
     );
   }
 
   const renderListHeader = () => {
+    // Filter wines by status
+    const filteredWines = statusFilter === 'all' 
+      ? favorites 
+      : favorites.filter(w => w.status === statusFilter);
+
     return (
       <View>
         {/* Dashboard Summary */}
         <View style={styles.dashboardSummary}>
-          <Text style={styles.dashboardTitle}>My Wine Collection</Text>
-          <Text style={styles.dashboardSubtitle}>
-            {favorites.length} {favorites.length === 1 ? 'favorite' : 'favorites'} saved
-          </Text>
+          <Text style={styles.dashboardTitle}>My Cellar</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.total}</Text>
+              <Text style={styles.statLabel}>Total</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.wantToTry}</Text>
+              <Text style={styles.statLabel}>Want to Try</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.haveTried}</Text>
+              <Text style={styles.statLabel}>Have Tried</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.favorites}</Text>
+              <Text style={styles.statLabel}>Favorites</Text>
+            </View>
+          </View>
+          {stats.averageRating > 0 && (
+            <View style={styles.ratingRow}>
+              <Text style={styles.ratingLabel}>Average Rating:</Text>
+              <StarRating rating={stats.averageRating} size={16} readonly showLabel />
+            </View>
+          )}
         </View>
+
+        {/* Status Filter */}
+        {favorites.length > 0 && (
+          <View style={styles.filterContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+              {(['all', 'favorite', 'wantToTry', 'haveTried'] as const).map((filter) => (
+                <TouchableOpacity
+                  key={filter}
+                  style={[
+                    styles.filterButton,
+                    statusFilter === filter && styles.filterButtonActive,
+                  ]}
+                  onPress={() => setStatusFilter(filter)}
+                >
+                  <Text
+                    style={[
+                      styles.filterButtonText,
+                      statusFilter === filter && styles.filterButtonTextActive,
+                    ]}
+                  >
+                    {filter === 'all' ? 'All' : filter === 'wantToTry' ? 'Want to Try' : filter === 'haveTried' ? 'Have Tried' : 'Favorites'}
+                  </Text>
+                  {statusFilter === filter && favorites.filter(w => w.status === filter).length > 0 && (
+                    <View style={styles.filterBadge}>
+                      <Text style={styles.filterBadgeText}>
+                        {filter === 'all' ? favorites.length : favorites.filter(w => w.status === filter).length}
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
         
         {/* Layout Toggle Button */}
-        {favorites.length > 0 && (
+        {filteredWines.length > 0 && (
           <View style={styles.layoutToggleContainer}>
             <LayoutToggleButton
               layout={layout}
@@ -218,6 +304,13 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
         )}
       </View>
     );
+  };
+
+  // Get filtered wines for display
+  const getFilteredWines = () => {
+    return statusFilter === 'all' 
+      ? favorites 
+      : favorites.filter(w => w.status === statusFilter);
   };
 
   return (
@@ -241,41 +334,45 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
       >
         {layout === 'grid' ? (
           <MasonryGrid
-            data={favorites}
+            data={getFilteredWines()}
             loading={loading}
             refreshing={refreshing}
             onRefresh={handleRefresh}
             onRemoveFromFavorites={confirmRemoveFavorite}
-            onPress={handleWinePress}
+            onPress={undefined}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             ListHeaderComponent={renderListHeader}
             ListEmptyComponent={renderEmptyState}
             contentContainerStyle={[
-              favorites.length === 0 && styles.emptyListContainer
+              getFilteredWines().length === 0 && styles.emptyListContainer
             ]}
           />
         ) : (
           <FavoritesListView
-            data={favorites}
+            data={getFilteredWines()}
             loading={loading}
             refreshing={refreshing}
             onRefresh={handleRefresh}
             onRemoveFromFavorites={confirmRemoveFavorite}
-            onPress={handleWinePress}
+            onPress={undefined}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             ListHeaderComponent={renderListHeader}
             ListEmptyComponent={renderEmptyState}
             contentContainerStyle={[
-              favorites.length === 0 && styles.emptyListContainer
+              getFilteredWines().length === 0 && styles.emptyListContainer
             ]}
+            onWineUpdated={async () => {
+              await loadFavorites(currentPage, false);
+              await loadStats();
+            }}
           />
         )}
       </Animated.View>
 
-      {/* Wine Detail Modal */}
-      <WineDetailModal
+      {/* Wine Detail Modal - Disabled: Cards now flip instead */}
+      {/* <WineDetailModal
         visible={modalVisible}
         wine={selectedWine}
         onClose={handleCloseModal}
@@ -290,7 +387,7 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
                  w.producer === selectedWine.producer && 
                  w.vintage === selectedWine.vintage;
         }) : 0}
-      />
+      /> */}
     </View>
   );
 };
@@ -364,6 +461,86 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#5B2433', // Dark tone
     marginTop: 16,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(191, 150, 148, 0.2)',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#8B0000',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#5B2433',
+    textAlign: 'center',
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(191, 150, 148, 0.2)',
+    justifyContent: 'center',
+  },
+  ratingLabel: {
+    fontSize: 14,
+    color: '#5B2433',
+    marginRight: 8,
+  },
+  filterContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  filterScroll: {
+    flexGrow: 0,
+  },
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginRight: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(247, 244, 240, 0.95)',
+    borderWidth: 1,
+    borderColor: 'rgba(191, 150, 148, 0.3)',
+  },
+  filterButtonActive: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
+  },
+  filterButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#5B2433',
+  },
+  filterButtonTextActive: {
+    color: '#FFFFFF',
+  },
+  filterBadge: {
+    marginLeft: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    minWidth: 20,
+    alignItems: 'center',
+  },
+  filterBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   emptyListContainer: {
     flexGrow: 1,

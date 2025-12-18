@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 import { WineService } from '../services/wineService';
+import { DishService } from '../services/dishService';
 
 interface MockModeToggleProps {
   onToggle?: (isMockMode: boolean) => void;
@@ -11,7 +12,9 @@ export default function MockModeToggle({ onToggle }: MockModeToggleProps) {
 
   const handleToggle = (value: boolean) => {
     setIsMockMode(value);
+    // Set mock mode for both services
     WineService.setMockMode(value);
+    DishService.setMockMode(value);
     onToggle?.(value);
   };
 

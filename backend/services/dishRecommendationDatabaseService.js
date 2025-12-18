@@ -180,7 +180,8 @@ async function saveRecommendations(fullResponse, requestId, apiResponseTimeMs, p
         wineAnalysis.producer || null,
         wineAnalysis.region || null,
         wineAnalysis.vintage || null,
-        wineAnalysis.vintageAge || null,
+        // Calculate vintageAge server-side if not provided: 2025 - vintage year
+        wineAnalysis.vintageAge || (wineAnalysis.vintage && wineAnalysis.vintage !== 'unknown' && wineAnalysis.vintage !== 'NV' && !isNaN(parseInt(wineAnalysis.vintage)) ? `${2025 - parseInt(wineAnalysis.vintage)} years` : null),
         wineAnalysis.color || null,
         // Wine Structure
         wineStructure.body || null,

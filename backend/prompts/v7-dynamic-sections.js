@@ -154,7 +154,7 @@ MANDATORY ELEMENTS:
 1.	Strategy: "Contrast: [wine opposes dish]" OR "Congruent: [wine mirrors dish]"
 2.	Prep/Sauce: Both cooking method AND sauce addressed
 3.	Principles: 2-3 named (use short forms)
-4.	Bridge: Flavor bridging identified with specifics (compound name (Tier 1) / category (Tier 2) / structural (Tier 3))
+4.	Bridge: Flavor bridging identified with specifics (compound name / category / structural)
 5.	Acid type: If all 3 conditions met (Section 2.C)
 
 BREVITY GUIDANCE:

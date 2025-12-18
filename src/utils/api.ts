@@ -42,24 +42,26 @@ const getApiBaseUrl = (): string => {
     return 'https://staging-api.aperae.com/api';
   }
   
-  // Priority 3: Development (default) - use localhost
-  // Check if we're in development mode
+  // Priority 3: Development (default) - use production API for physical devices
+  // Physical devices can't access localhost, so default to production API
+  // For local development with simulators, set EXPO_PUBLIC_API_URL=http://localhost:3001/api
   const isDevelopment = __DEV__ || process.env.NODE_ENV === 'development';
   
   if (isDevelopment) {
     if (Platform.OS === 'web') {
+      // Web can use localhost
       return 'http://localhost:3001/api';
     }
-    // For iOS Simulator and Android Emulator, localhost works
-    // For physical devices, you may need to use your computer's IP address
-    return 'http://localhost:3001/api';
+    // For physical devices, use production API (localhost doesn't work)
+    // For simulators/emulators, you can override with EXPO_PUBLIC_API_URL
+    return 'https://api.aperae.com/api';
   }
 
-  // Fallback: default to localhost
+  // Fallback: default to production API
   if (Platform.OS === 'web') {
     return 'http://localhost:3001/api';
   }
-  return 'http://localhost:3001/api';
+  return 'https://api.aperae.com/api';
 };
 
 export { getApiBaseUrl };

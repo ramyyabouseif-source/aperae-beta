@@ -165,3 +165,5 @@ postgresql://postgres:[YOUR_PASSWORD]@db.andzllkyflcdtrfrqwes.supabase.co:5432/p
 
 But **Transaction Pooler is still recommended** for Render deployment.
 
+
+

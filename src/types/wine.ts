@@ -107,10 +107,44 @@ export interface WineRecommendationResponse {
   };
 }
 
-export interface FavoriteWine extends WineRecommendation {
+// Pairing experience tracking
+export interface PairedDish {
+  dish: string;
+  rating: number; // 1-5 stars
+  notes?: string;
+  date: string;
+}
+
+// My Cellar Wine (rebranded from FavoriteWine)
+export interface MyCellarWine extends WineRecommendation {
   id: string;
   addedAt: string;
+  
+  // Status tracking
+  status: 'wantToTry' | 'haveTried' | 'favorite';
+  hasTried: boolean;
+  triedDate?: string;
+  wantsToTry: boolean;
+  
+  // Pairing experience tracking
+  pairingRating?: number; // 1-5 stars
+  pairingNotes?: string; // User notes about the pairing
+  pairedDishes?: PairedDish[]; // Array of dishes paired with this wine
+  
+  // Wine experience
+  wineRating?: number; // Overall wine rating 1-5
+  wineNotes?: string; // Tasting notes from user
+  purchaseLocation?: string;
+  purchasePrice?: string;
+  purchaseDate?: string;
+  
+  // Collection/organization
+  tags?: string[]; // e.g., ["Special Occasions", "Dinner Parties"]
+  occasion?: string; // "Date Night", "Dinner Party", etc.
 }
+
+// Legacy alias for backward compatibility during migration
+export type FavoriteWine = MyCellarWine;
 
 export interface WinePreferences {
   wineType: string;

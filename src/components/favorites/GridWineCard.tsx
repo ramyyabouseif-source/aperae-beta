@@ -9,14 +9,17 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { WineRecommendation } from '../../types/wine';
+import { MyCellarWine, WineRecommendation } from '../../types/wine';
+import StatusBadge from '../myCellar/StatusBadge';
+import StarRating from '../myCellar/StarRating';
 
 interface GridWineCardProps {
-  wine: WineRecommendation;
+  wine: MyCellarWine | WineRecommendation;
   cardWidth: number;
-  onRemoveFromFavorites?: (wine: WineRecommendation) => void;
-  onPress?: (wine: WineRecommendation) => void;
+  onRemoveFromFavorites?: (wine: MyCellarWine | WineRecommendation) => void;
+  onPress?: (wine: MyCellarWine | WineRecommendation) => void;
   index?: number;
+  onWineUpdated?: () => void; // Callback when wine data is updated
 }
 
 const GridWineCard: React.FC<GridWineCardProps> = ({
@@ -139,7 +142,27 @@ const GridWineCard: React.FC<GridWineCardProps> = ({
             {wine.producer} {wine.vintage}
           </Text>
           
-          {/* Rating - if available */}
+          {/* Status Badge - My Cellar Feature - ALWAYS SHOW */}
+          <View style={styles.statusBadgeContainer}>
+            <StatusBadge 
+              status={((wine as any).status || 'favorite') as 'wantToTry' | 'haveTried' | 'favorite'} 
+              size="small"
+              showLabel={false}
+            />
+          </View>
+          
+          {/* User Rating - My Cellar Feature */}
+          {(wine as MyCellarWine).wineRating && (wine as MyCellarWine).wineRating! > 0 && (
+            <View style={styles.userRatingContainer}>
+              <StarRating 
+                rating={(wine as MyCellarWine).wineRating!} 
+                size={12} 
+                readonly 
+              />
+            </View>
+          )}
+          
+          {/* Expert Rating - if available */}
           {wine.expertRating && wine.expertRating !== 'unknown' && (
             <View style={styles.ratingRow}>
               <Ionicons name="star" size={12} color="#FFD700" />
@@ -285,6 +308,14 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
+  },
+  statusBadgeContainer: {
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  userRatingContainer: {
+    marginTop: 4,
+    marginBottom: 4,
   },
 });
 

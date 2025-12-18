@@ -33,6 +33,7 @@ interface MasonryGridProps {
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
   ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null;
   contentContainerStyle?: any;
+  onWineUpdated?: () => void; // Callback when wine data is updated
 }
 
 const MasonryGrid: React.FC<MasonryGridProps> = ({
@@ -47,6 +48,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
   ListHeaderComponent,
   ListEmptyComponent,
   contentContainerStyle,
+  onWineUpdated,
 }) => {
   const numColumns = useMemo(() => getNumColumns(), []);
 
@@ -74,11 +76,12 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
         wine={item}
         numColumns={numColumns}
         onRemoveFromFavorites={onRemoveFromFavorites}
-        onPress={onPress}
+        onPress={undefined}
         index={index}
+        onWineUpdated={onWineUpdated}
       />
     ),
-    [numColumns, onRemoveFromFavorites, onPress]
+    [numColumns, onRemoveFromFavorites, onWineUpdated]
   );
 
   const keyExtractor = useCallback(

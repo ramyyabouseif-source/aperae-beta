@@ -84,3 +84,5 @@ Change to: `"claude-3-5-sonnet-20241022"` (or latest available)
 - Wine recommendations should appear (not fallback)
 - No "Claude API error" in logs
 
+
+

@@ -9,10 +9,12 @@ import {
   Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { WineRecommendation } from '../types/wine';
+import { MyCellarWine, WineRecommendation } from '../types/wine';
 import { getWineCardImage } from '../utils/wineCardImages';
 import { getServingGuidance, getConfidenceBreakdown, getConfidenceScore } from '../utils/wineTypeHelpers';
 import ConfidenceBreakdown from './ConfidenceBreakdown';
+import StatusBadge from './myCellar/StatusBadge';
+import StarRating from './myCellar/StarRating';
 
 const { width: screenWidth } = Dimensions.get('window');
 const CARD_WIDTH = screenWidth - 40; // Proper centering like the button
@@ -146,6 +148,32 @@ const SimplePremiumWineCard: React.FC<SimplePremiumWineCardProps> = ({
             <Text style={styles.producerText}>
               {wine.producer} • {wine.vintage}
             </Text>
+            
+            {/* Status Badge - My Cellar Feature - ALWAYS SHOW */}
+            <View style={styles.statusBadgeContainer}>
+              <StatusBadge 
+                status={((wine as any).status || 'favorite') as 'wantToTry' | 'haveTried' | 'favorite'} 
+                size="small"
+                showLabel={false}
+              />
+            </View>
+            
+            {/* User Rating - My Cellar Feature */}
+            {(() => {
+              const cellarWine = wine as MyCellarWine;
+              if (cellarWine.wineRating && cellarWine.wineRating > 0) {
+                return (
+                  <View style={styles.userRatingContainer}>
+                    <StarRating 
+                      rating={cellarWine.wineRating} 
+                      size={14} 
+                      readonly 
+                    />
+                  </View>
+                );
+              }
+              return null;
+            })()}
           </View>
 
           {/* Tasting Notes */}
@@ -403,6 +431,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
     fontWeight: '500',
+    marginBottom: 8,
+  },
+  statusBadgeContainer: {
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  userRatingContainer: {
+    marginTop: 6,
+    marginBottom: 4,
   },
   notesSection: {
     marginBottom: 16,

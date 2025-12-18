@@ -5,14 +5,12 @@
       "producer": "unknown",
       "region": "unknown",
       "vintage": "2016",
-      "vintageAge": "9 years",
       "color": "red",
       "structure": {
         "body": "medium-full",
         "acidity": "medium",
         "acidType": "balanced",
         "tannin": "medium",
-        "tanninCharacter": "polished",
         "sweetness": "dry",
         "abv": "14.5%"
       },
@@ -68,16 +66,7 @@
           "cook": "45 minutes",
           "total": "60 minutes"
         },
-        "servingSuggestion": "Garnish with fresh thyme sprigs and a few whole blackberries for visual appeal.",
-        "confidence": {
-          "score": 92,
-          "breakdown": {
-            "pairingScience": 47,
-            "wineKnowledge": 25,
-            "recipeQuality": 20
-          },
-          "rationale": "Excellent structural compatibility with duck's moderate protein-fat profile matching medium tannins. Strong Tier 2 aromatic bridge with blackberry. Wine knowledge reduced due to unknown producer/region, but typical Malbec structure assumed. Recipe well-developed with clear multi-step technique."
-        }
+        "servingSuggestion": "Garnish with fresh thyme sprigs and a few whole blackberries for visual appeal."
       },
       {
         "complexityLabel": "Moderate Pairing",
@@ -112,16 +101,7 @@
           "cook": "20 minutes",
           "total": "30 minutes"
         },
-        "servingSuggestion": "Serve with roasted green beans or mashed potatoes to complete the meal.",
-        "confidence": {
-          "score": 89,
-          "breakdown": {
-            "pairingScience": 45,
-            "wineKnowledge": 25,
-            "recipeQuality": 19
-          },
-          "rationale": "Strong pairing with proper tannin-protein match and aged wine allowing safe mushroom pairing. Medium acidity balances cream sauce. Wine knowledge reduced due to unknown provenance. Recipe solid with clear pan sauce technique."
-        }
+        "servingSuggestion": "Serve with roasted green beans or mashed potatoes to complete the meal."
       },
       {
         "complexityLabel": "Simple Pairing",
@@ -154,16 +134,7 @@
           "cook": "10 minutes",
           "total": "20 minutes"
         },
-        "servingSuggestion": "Pair with grilled asparagus or a simple arugula salad.",
-        "confidence": {
-          "score": 90,
-          "breakdown": {
-            "pairingScience": 46,
-            "wineKnowledge": 25,
-            "recipeQuality": 19
-          },
-          "rationale": "Classic pairing with lamb's fat-protein profile perfectly matching medium tannins. Simple preparation allows wine's complexity to shine. Wine knowledge reduced due to unknown producer/region. Recipe straightforward and easily executable."
-        }
+        "servingSuggestion": "Pair with grilled asparagus or a simple arugula salad."
       }
     ]
   }

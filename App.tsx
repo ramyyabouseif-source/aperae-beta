@@ -198,7 +198,7 @@ export default function App() {
           name="Favorites"
           component={FavoritesStack}
           options={{
-            tabBarLabel: 'Favorites',
+            tabBarLabel: 'My Cellar',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="heart" size={size} color={color} />
             ),
@@ -296,7 +296,7 @@ export default function App() {
                   resizeMode="contain"
                 />
                 <Text style={styles.menuHeaderTitle} numberOfLines={1} adjustsFontSizeToFit>
-                  My Favorites
+                  My Cellar
                 </Text>
               </View>
             ),

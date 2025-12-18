@@ -58,3 +58,5 @@ After deployment, check logs for:
 **Fix committed and pushed. This provides OpenSSL 3.0 with 1.1 compatibility symlinks for Prisma 5.22.0.**
 
 
+
+

@@ -122,3 +122,5 @@ postgresql://postgres:password@db.xxx.supabase.co:5432/postgres?sslmode=require&
 
 **Next Step:** Update `DATABASE_URL` in Render with the correct Supabase connection string format.
 
+
+

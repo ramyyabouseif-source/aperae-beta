@@ -107,8 +107,9 @@ dependencies : @{database=; redis=; anthropic=; googleVision=}
   - **Meaning:** Wrong URL path
   - **Action:** Verify URL is correct: `https://api.aperae.com/api/health`
 
-**Test Result:** [ ] PASS / [ ] FAIL  
-**Notes:** ___________________________
+**Test Result:** ✅ **PASS**  
+**Test Date:** December 13, 2025  
+**Notes:** Production API returned healthy status with mockMode: False. All dependencies accessible. Response received without errors.
 
 ---
 
@@ -129,8 +130,9 @@ Same format as production API - JSON with status, uptime, etc.
 - [ ] You get JSON response
 - [ ] Status shows "healthy" or "degraded"
 
-**Test Result:** [ ] PASS / [ ] FAIL  
-**Notes:** ___________________________
+**Test Result:** ✅ **PASS**  
+**Test Date:** December 13, 2025  
+**Notes:** Staging API returned healthy status with mockMode: True (expected for staging environment). All checks passed.
 
 ---
 
@@ -163,7 +165,6 @@ You should see JSON output with wine recommendations, including:
 dish           : Grilled Salmon
 recommendations : {@{tierLabel=Premium Selection; wineName=...; producer=...; ...}}
 ```
-
 ### **✅ What to Check:**
 - [ ] Command runs without errors
 - [ ] You get recommendations (array of 3 wines)
@@ -179,8 +180,9 @@ recommendations : {@{tierLabel=Premium Selection; wineName=...; producer=...; ..
   - **Meaning:** API might be slow or overloaded
   - **Action:** Try again, check Render logs
 
-**Test Result:** [ ] PASS / [ ] FAIL  
-**Notes:** ___________________________
+**Test Result:** ✅ **PASS**  
+**Test Date:** December 13, 2025  
+**Notes:** Successfully received full wine recommendations response for "Grilled Salmon" with complete dishAnalysis, 3 recommendations (Premium Selection: Chablis Premier Cru, Moderate Selection: Sancerre, Budget Selection: Albariño). All wine details present including producer, vintage, rationale, tasting notes, serving guidance, and confidence scores. Response indicates Claude API is working correctly (not using fallback data).
 
 ---
 
@@ -242,8 +244,10 @@ refreshToken  : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   - **Meaning:** Server error, check database connection
   - **Action:** Check Render logs
 
-**Test Result:** [ ] PASS / [ ] FAIL  
-**Notes:** ___________________________
+**Test Result:** ✅ **PASS**  
+**Test Date:** December 13, 2025  
+**Test Email Used:** test-20251213112231@example.com  
+**Notes:** User registration successful. Received success: True, user object with ID (744e571a-995f-4aa5-ae43-2dcf55a44877), email, and role. Both accessToken and refreshToken returned successfully. User account created in database.
 
 ---
 
@@ -260,7 +264,6 @@ $body = @{
     email = "test-20251213120000@example.com"
     password = "Test1234!"
 } | ConvertTo-Json
-
 Invoke-RestMethod -Uri "https://api.aperae.com/api/auth/login" `
     -Method Post `
     -ContentType "application/json" `
@@ -281,8 +284,10 @@ Same format as registration - JSON with:
 - [ ] You get `success: True`
 - [ ] You get both tokens
 
-**Test Result:** [ ] PASS / [ ] FAIL  
-**Notes:** ___________________________
+**Test Result:** ✅ **PASS**  
+**Test Date:** December 13, 2025  
+**Test Email Used:** test-20251213112231@example.com  
+**Notes:** User login successful using the registered test account. Received success: True, user object, accessToken, and refreshToken. Authentication working correctly.
 
 ---
 
@@ -384,14 +389,78 @@ Making secure request to: https://api.aperae.com/api/recommendations
 - [ ] Wine recommendations appear
 - [ ] No error messages about connection failures
 
-**Test Result:** [ ] PASS / [ ] FAIL  
-**Notes:** ___________________________
+**Test Result:** ✅ **PASS** (Both Steps 4 & 5)  
+**Test Date:** December 15, 2025  
+**Step 4 Notes:** App correctly connected to production API. Console logs confirmed: `API_BASE_URL: https://api.aperae.com/api` and `Making secure request to: https://api.aperae.com/api/recommendations`. Connection successful (200 OK).  
+**Step 5 Notes:** Successfully received real AI-generated wine recommendations. Response time: 61 seconds (confirms real Claude API processing, not mock data). Requested "Pomegranate glazed salmon with honey, soy sauce, and garlic" and received appropriate white wine recommendations (Spätlese, Vouvray Demi-Sec, Riesling Kabinett) with correct dish name in response. All recommendations include proper tasting notes, producer names, vintages, and confidence scores. Avoid section correctly identifies red wines to avoid. Full functionality verified!
+
+---
+
+## 📊 **Test Results - December 13, 2025**
+
+### Test 1: Production API Health Check
+- ✅ **PASS**
+- Response: Status "healthy", mockMode: False, errorRate: 0, uptime: 21.25 seconds
+- Notes: Production API responding correctly. All dependencies accessible.
+
+### Test 2: Staging API Health Check
+- ✅ **PASS**
+- Response: Status "healthy", mockMode: True, errorRate: 0, uptime: 21.30 seconds
+- Notes: Staging API responding correctly. Mock mode enabled (expected for staging).
+
+### Test 3: Wine Recommendation API
+- ✅ **PASS**
+- Response Time: ~30 seconds (normal for AI API calls)
+- Notes: Successfully received full recommendations for "Grilled Salmon" with 3 wines:
+  - Premium: Chablis Premier Cru Montée de Tonnerre (William Fèvre, 2020)
+  - Moderate: Sancerre (Pascal Jolivet, 2022)
+  - Budget: Albariño (Martín Códax, 2023-2024)
+  Complete dishAnalysis and all wine details present. Claude API working correctly (not fallback).
+
+### Test 4: User Registration
+- ✅ **PASS**
+- Test Email Used: test-20251213112231@example.com
+- Notes: User successfully created with ID: 744e571a-995f-4aa5-ae43-2dcf55a44877. Both accessToken and refreshToken returned.
+
+### Test 5: User Login
+- ✅ **PASS**
+- Test Email Used: test-20251213112231@example.com
+- Notes: Successfully authenticated with registered account. Both tokens returned.
+
+### Test 6: Mobile App Connection
+- ✅ **PASS** - Full functionality test successful with production API
+- API URL Used: https://api.aperae.com/api (Production)
+- Step 4 (API URL Check): ✅ PASS - Correctly using production API URL
+- Step 5 (Wine Recommendation): ✅ PASS - Real AI recommendations received successfully
+- Test Date: December 15, 2025
+- Notes: 
+  - **Step 4 PASSED**: App correctly connected to production API. Console logs confirmed: `API_BASE_URL: https://api.aperae.com/api`
+  - **Step 5 PASSED**: Successfully received real AI-generated wine recommendations:
+    - Requested dish: "Pomegranate glazed salmon with honey, soy sauce, and garlic"
+    - Response time: 61 seconds (normal for Claude API, confirms real AI processing)
+    - Received correct dish name in response (matches request)
+    - Received 3 white wine recommendations (appropriate for salmon):
+      1. Spätlese (Joh. Jos. Prüm, 2018) - Confidence: 92
+      2. Vouvray Demi-Sec (Domaine Huet, 2019) - Confidence: 90
+      3. Riesling Kabinett (Dr. Loosen, 2022) - Confidence: 88
+    - Avoid section correctly identifies "Red wines" to avoid (appropriate for salmon)
+    - Response includes proper tasting notes, producer names, vintages
+    - **NOT** fallback/mock data (response time and wine selection confirm real AI)
+
+### Overall Status
+- ✅ **ALL TESTS PASS (1-6)** - Complete functionality verified
+- ✅ Mobile app successfully connects to production API and receives real AI recommendations
+- ✅ All core API endpoints functioning correctly
+- ✅ End-to-end flow validated: Mobile app → Production API → Claude AI → Wine recommendations
+
+### Issues Found
+- None - All tests passed successfully. Initial Test 6 issue (staging mock mode) was resolved by switching to production API for full functionality testing.
 
 ---
 
 ## 📊 **Complete Test Results Template**
 
-Copy this template and fill it out:
+Copy this template and fill it out for future test runs:
 
 ```
 ## Test Results - [FILL IN DATE/TIME]

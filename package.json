@@ -6,8 +6,10 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start --tunnel",
-    "android": "expo start --android --tunnel",
-    "ios": "expo start --ios --tunnel",
+    "start:lan": "expo start --lan",
+    "start:tunnel": "expo start --tunnel",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
     "web": "expo start --web",
     "backend": "cd backend && npm start",
     "test": "jest",

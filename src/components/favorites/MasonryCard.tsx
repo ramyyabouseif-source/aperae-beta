@@ -19,6 +19,7 @@ interface MasonryCardProps {
   onRemoveFromFavorites?: (wine: WineRecommendation) => void;
   onPress?: (wine: WineRecommendation) => void;
   index?: number;
+  onWineUpdated?: () => void; // Callback when wine data is updated
 }
 
 const MasonryCard: React.FC<MasonryCardProps> = memo(({
@@ -27,6 +28,7 @@ const MasonryCard: React.FC<MasonryCardProps> = memo(({
   onRemoveFromFavorites,
   onPress,
   index = 0,
+  onWineUpdated,
 }) => {
   const cardWidth = getCardWidth(numColumns);
 
@@ -38,6 +40,7 @@ const MasonryCard: React.FC<MasonryCardProps> = memo(({
         onRemoveFromFavorites={onRemoveFromFavorites}
         onPress={onPress}
         index={index}
+        onWineUpdated={onWineUpdated}
       />
     </View>
   );

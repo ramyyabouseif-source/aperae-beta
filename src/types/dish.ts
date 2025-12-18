@@ -1,33 +1,44 @@
 /**
- * Type definitions for dish recommendation system (wine-to-dish pairing)
+ * Dish Recommendation Types
+ * 
+ * Types for the reverse pairing system (Wine-to-Dish)
  */
 
+export interface DishComplexity {
+  level: 'simple' | 'moderate' | 'complex';
+  label: string;
+}
+
+export interface DishRecipe {
+  ingredients: string[];
+  steps: string[];
+  cookTime: string;
+  servings?: number;
+  difficulty?: string;
+}
+
 export interface DishRecommendation {
-  complexityLabel: string;
   dishName: string;
+  complexity: DishComplexity;
+  recipe: DishRecipe;
   pairingRationale: string;
-  pairingPrinciplesApplied: string[];
-  ingredients: {
-    protein: string[];
-    sauce?: string[];
-    sides?: string[];
-  };
-  recipe: string[];
-  cookTime: {
-    prep: string;
-    cook: string;
-    total: string;
-  };
   servingSuggestion?: string;
-  confidence: {
+  confidenceScore?: number;
+  confidence?: {
     score: number;
     breakdown: {
       pairingScience: number;
       wineKnowledge: number;
-      recipeQuality: number;
+      complexityHandling: number;
     };
     rationale: string;
   };
+  image?: string;
+  alternatives?: Array<{
+    dishName: string;
+    complexity: DishComplexity;
+    pairingRationale: string;
+  }>;
 }
 
 export interface WineAnalysis {
@@ -35,14 +46,14 @@ export interface WineAnalysis {
   region: string;
   vintage: string;
   vintageAge: string;
-  color: string;
+  color: 'red' | 'white' | 'rosé' | 'sparkling' | 'dessert' | 'fortified';
   structure: {
-    body: string;
-    acidity: string;
+    body: 'light' | 'medium' | 'full' | 'medium-full' | 'light-medium';
+    acidity: 'low' | 'medium' | 'medium-high' | 'high';
     acidType: string;
-    tannin: string;
+    tannin: 'none' | 'low' | 'low-medium' | 'medium' | 'medium-high' | 'high';
     tanninCharacter: string;
-    sweetness: string;
+    sweetness: 'dry' | 'off-dry' | 'sweet';
     abv: string;
   };
   aromaticProfile: {
@@ -66,9 +77,6 @@ export interface DishRecommendationResponse {
   wineAnalysis: WineAnalysis;
   wineServingGuidance: WineServingGuidance;
   dishRecommendations: DishRecommendation[];
+  closingNarrative?: string;
+  disclaimer?: string;
 }
-
-
-
-
-

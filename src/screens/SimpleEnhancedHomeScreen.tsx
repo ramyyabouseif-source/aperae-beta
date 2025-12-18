@@ -16,11 +16,17 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { WineService } from '../services/wineService';
+import { DishService } from '../services/dishService';
 import { WineRecommendationResponse, WineRecommendation, FavoriteWine } from '../types/wine';
+import { DishRecommendationResponse } from '../types/dish';
 import AdaptiveWineCard from '../components/AdaptiveWineCard';
+import FlipDishCard from '../components/FlipDishCard';
+import WineAnalysisCard from '../components/WineAnalysisCard';
+import PairingModeToggle, { PairingMode } from '../components/PairingModeToggle';
 import SimpleEnhancedButton from '../components/SimpleEnhancedButton';
 import MockModeToggle from '../components/MockModeToggle';
 import ResponsibleDrinkingDisclaimer from '../components/ResponsibleDrinkingDisclaimer';
+import AllergyFoodSafetyWarning from '../components/AllergyFoodSafetyWarning';
 import DishAnalysisCard from '../components/DishAnalysisCard';
 import FinalSommelierNotes from '../components/FinalSommelierNotes';
 import { PreferencesService } from '../services/preferencesService';
@@ -39,9 +45,19 @@ import { wineCardImageService } from '../services/wineCardImageService';
 import { getWineCardImageCount } from '../utils/wineCardImages';
 
 export default function SimpleEnhancedHomeScreen() {
+  // Pairing mode state
+  const [pairingMode, setPairingMode] = useState<PairingMode>('dish-to-wine');
+  
+  // Dish-to-Wine state
   const [dish, setDish] = useState('');
   const [recommendations, setRecommendations] = useState<WineRecommendationResponse | null>(null);
   const [wineImageIndices, setWineImageIndices] = useState<number[]>([]); // Store image indices for current recommendations
+  
+  // Wine-to-Dish state
+  const [wine, setWine] = useState('');
+  const [dishRecommendations, setDishRecommendations] = useState<DishRecommendationResponse | null>(null);
+  
+  // Shared state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Enhanced state for better UX
@@ -53,8 +69,9 @@ export default function SimpleEnhancedHomeScreen() {
   const navigation = useNavigation();
   const scrollViewRef = useRef<ScrollView>(null);
   
-  // Ref for dish input field
+  // Refs for input fields
   const dishInputRef = useRef<TextInput>(null);
+  const wineInputRef = useRef<TextInput>(null);
 
   const handleGetRecommendations = async () => {
     const timingId = performanceMonitor.startTiming('wine_recommendations', {
@@ -361,6 +378,93 @@ export default function SimpleEnhancedHomeScreen() {
     }
   };
 
+  // Handle pairing mode change
+  const handleModeChange = (mode: PairingMode) => {
+    setPairingMode(mode);
+    // Clear previous results when switching modes
+    setRecommendations(null);
+    setDishRecommendations(null);
+    setError(null);
+    setEnhancedError(null);
+    setDish('');
+    setWine('');
+  };
+
+  // Handle dish recommendations (Wine-to-Dish)
+  const handleGetDishRecommendations = async () => {
+    const timingId = performanceMonitor.startTiming('dish_recommendations', {
+      wine,
+      timestamp: new Date().toISOString(),
+    });
+
+    setError(null);
+    setEnhancedError(null);
+    setDishRecommendations(null);
+
+    if (!wine.trim()) {
+      const validationError = EnhancedErrorHandler.createEnhancedError(
+        new Error('Please enter a wine name to get dish recommendations'),
+        {
+          operation: 'validateInput',
+          component: 'SimpleEnhancedHomeScreen',
+          userAction: 'getDishRecommendations',
+        }
+      );
+      setEnhancedError(validationError);
+      return;
+    }
+
+    setLoading(true);
+    setProgress(0);
+    setLoadingMessage('Analyzing wine profile...');
+
+    try {
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
+      setLoadingMessage('Finding perfect dish pairings...');
+      const response = await DishService.getDishRecommendations(wine.trim());
+
+      clearInterval(progressInterval);
+      setProgress(100);
+      setLoadingMessage('Complete!');
+
+      if (response && response.dishRecommendations && Array.isArray(response.dishRecommendations) && response.dishRecommendations.length > 0) {
+        setDishRecommendations(response);
+      } else {
+        throw new Error('No dish recommendations received');
+      }
+    } catch (error: any) {
+      console.error('Error fetching dish recommendations:', error);
+      const enhancedError = EnhancedErrorHandler.createEnhancedError(error, {
+        operation: 'getDishRecommendations',
+        component: 'SimpleEnhancedHomeScreen',
+        userAction: 'getDishRecommendations',
+        context: { wine },
+      });
+
+      setEnhancedError(enhancedError);
+      const safeError = SecureErrorHandler.sanitizeError(error);
+      setError(safeError);
+    } finally {
+      setLoading(false);
+      setProgress(0);
+      setLoadingMessage('');
+      performanceMonitor.endTiming(timingId, {
+        success: !error && !enhancedError,
+        recommendationCount: dishRecommendations?.dishRecommendations?.length || 0,
+      });
+    }
+  };
+
 
   return (
     <View style={styles.pageContainer}>
@@ -412,47 +516,102 @@ export default function SimpleEnhancedHomeScreen() {
         {/* Mock Mode Toggle */}
         <MockModeToggle />
 
-        {/* Input Section */}
-        <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>Describe your dish:</Text>
-          <TextInput
-            ref={dishInputRef}
-            style={[
-              styles.textInput,
-              isInputFocused && styles.textInputFocused
-            ]}
-            value={dish}
-            onChangeText={setDish}
-            placeholder="Enter a dish, food item, or cuisine..."
-            placeholderTextColor="#999"
-            multiline
-            onFocus={() => {
-              setIsInputFocused(true);
-              // Scroll to input when keyboard appears
-              setTimeout(() => {
-                dishInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
-                  scrollViewRef.current?.scrollTo({
-                    y: pageY - 100, // Scroll to show input with padding above
-                    animated: true,
+        {/* Input Section with Integrated Pairing Mode Toggle - Conditionally render based on mode */}
+        {pairingMode === 'dish-to-wine' ? (
+          <View style={styles.inputSection}>
+            {/* Pairing Mode Toggle - Integrated at top */}
+            <PairingModeToggle
+              mode={pairingMode}
+              onModeChange={handleModeChange}
+              style={styles.pairingToggleIntegrated}
+            />
+            <Text style={styles.inputLabel}>Describe your dish:</Text>
+            <TextInput
+              ref={dishInputRef}
+              style={[
+                styles.textInput,
+                isInputFocused && styles.textInputFocused
+              ]}
+              value={dish}
+              onChangeText={setDish}
+              placeholder="Enter a dish, food item, or cuisine..."
+              placeholderTextColor="#999"
+              multiline
+              onFocus={() => {
+                setIsInputFocused(true);
+                // Scroll to input when keyboard appears
+                setTimeout(() => {
+                  dishInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
+                    scrollViewRef.current?.scrollTo({
+                      y: pageY - 100, // Scroll to show input with padding above
+                      animated: true,
+                    });
                   });
-                });
-              }, 300); // Delay to allow keyboard to appear
-            }}
-            onBlur={() => setIsInputFocused(false)}
-            accessibilityLabel="Dish input"
-            accessibilityHint="Enter the dish you want wine recommendations for"
-            accessibilityRole="text"
-          />
-          <SimpleEnhancedButton
-            title={loading ? "Finding Perfect Wines..." : "Get Wine Recommendations"}
-            onPress={handleGetRecommendations}
-            variant="primary"
-            size="large"
-            loading={loading}
-            fullWidth
-            style={styles.recommendButton}
-          />
-        </View>
+                }, 300); // Delay to allow keyboard to appear
+              }}
+              onBlur={() => setIsInputFocused(false)}
+              accessibilityLabel="Dish input"
+              accessibilityHint="Enter the dish you want wine recommendations for"
+              accessibilityRole="text"
+            />
+            <SimpleEnhancedButton
+              title={loading ? "Finding Perfect Wines..." : "Get Wine Recommendations"}
+              onPress={handleGetRecommendations}
+              variant="primary"
+              size="large"
+              loading={loading}
+              fullWidth
+              style={styles.recommendButton}
+            />
+          </View>
+        ) : (
+          <View style={styles.inputSection}>
+            {/* Pairing Mode Toggle - Integrated at top */}
+            <PairingModeToggle
+              mode={pairingMode}
+              onModeChange={handleModeChange}
+              style={styles.pairingToggleIntegrated}
+            />
+            <Text style={styles.inputLabel}>Enter your wine:</Text>
+            <TextInput
+              ref={wineInputRef}
+              style={[
+                styles.textInput,
+                isInputFocused && styles.textInputFocused
+              ]}
+              value={wine}
+              onChangeText={setWine}
+              placeholder="Enter a wine name, producer, or vintage (e.g., '2016 Clos de Oro Malbec Reserva')..."
+              placeholderTextColor="#999"
+              multiline
+              onFocus={() => {
+                setIsInputFocused(true);
+                // Scroll to input when keyboard appears
+                setTimeout(() => {
+                  wineInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
+                    scrollViewRef.current?.scrollTo({
+                      y: pageY - 100, // Scroll to show input with padding above
+                      animated: true,
+                    });
+                  });
+                }, 300); // Delay to allow keyboard to appear
+              }}
+              onBlur={() => setIsInputFocused(false)}
+              accessibilityLabel="Wine input"
+              accessibilityHint="Enter the wine you want dish recommendations for"
+              accessibilityRole="text"
+            />
+            <SimpleEnhancedButton
+              title={loading ? "Finding Perfect Dishes..." : "Get Dish Recommendations"}
+              onPress={handleGetDishRecommendations}
+              variant="primary"
+              size="large"
+              loading={loading}
+              fullWidth
+              style={styles.recommendButton}
+            />
+          </View>
+        )}
 
         {/* Enhanced Progress Indicator */}
         {loading && (
@@ -461,11 +620,13 @@ export default function SimpleEnhancedHomeScreen() {
           </View>
         )}
 
-        {/* Skeleton Wine Cards During Loading */}
+        {/* Skeleton Cards During Loading */}
         {loading && (
           <View style={styles.skeletonContainer}>
             <Text style={[styles.sectionTitle, { paddingHorizontal: 20, marginBottom: 16 }]}>
-              Finding Perfect Wine Pairings...
+              {pairingMode === 'dish-to-wine' 
+                ? 'Finding Perfect Wine Pairings...' 
+                : 'Finding Perfect Dish Pairings...'}
             </Text>
             <SkeletonWineCard delay={0} />
             <SkeletonWineCard delay={200} />
@@ -493,8 +654,8 @@ export default function SimpleEnhancedHomeScreen() {
           </View>
         )}
 
-        {/* Recommendations */}
-        {recommendations && (
+        {/* Wine Recommendations (Dish-to-Wine mode) */}
+        {pairingMode === 'dish-to-wine' && recommendations && (
           <View style={styles.recommendationsSection}>
             {/* Dish Analysis Card */}
             <DishAnalysisCard
@@ -559,6 +720,39 @@ export default function SimpleEnhancedHomeScreen() {
             {/* Responsible Drinking Disclaimer - After wine cards with proper spacing */}
             <View style={{ marginTop: 24, marginBottom: 16 }}>
               <ResponsibleDrinkingDisclaimer />
+            </View>
+          </View>
+        )}
+
+        {/* Dish Recommendations (Wine-to-Dish mode) */}
+        {pairingMode === 'wine-to-dish' && dishRecommendations && (
+          <View style={styles.recommendationsSection}>
+            {/* Wine Analysis Card - Matching DishAnalysisCard style */}
+            {dishRecommendations.wineAnalysis && (
+              <WineAnalysisCard
+                wine={dishRecommendations.wine}
+                wineAnalysis={dishRecommendations.wineAnalysis}
+                wineServingGuidance={dishRecommendations.wineServingGuidance}
+              />
+            )}
+
+            {/* Dish Recommendation Cards - Ordered: Complex > Moderate > Simple */}
+            {[...dishRecommendations.dishRecommendations]
+              .sort((a, b) => {
+                const order = { complex: 0, moderate: 1, simple: 2 };
+                return order[a.complexity.level] - order[b.complexity.level];
+              })
+              .map((dish, index) => (
+                <FlipDishCard
+                  key={`${dish.dishName}-${index}`}
+                  dish={dish}
+                  index={index}
+                />
+              ))}
+
+            {/* Allergy & Food Safety Warning - After dish cards with proper spacing */}
+            <View style={{ marginTop: 24, marginBottom: 16 }}>
+              <AllergyFoodSafetyWarning />
             </View>
           </View>
         )}
@@ -694,6 +888,13 @@ const styles = StyleSheet.create({
     elevation: 12,
     borderWidth: 1,
     borderColor: 'rgba(191, 150, 148, 0.3)', // Metallic accent border
+    overflow: 'hidden', // Ensure toggle respects border radius
+  },
+  pairingToggleIntegrated: {
+    marginHorizontal: 0, // Remove horizontal margin (container handles it)
+    marginTop: 0, // No top margin (sits at top of container)
+    marginBottom: 16, // Space between toggle and input label
+    borderRadius: 12, // Match container border radius (slightly smaller for visual distinction)
   },
   inputLabel: {
     fontSize: 16,
@@ -1046,5 +1247,47 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+  },
+  wineAnalysisSection: {
+    marginBottom: 24,
+    paddingHorizontal: 20,
+  },
+  wineAnalysisCard: {
+    backgroundColor: 'rgba(247, 244, 240, 0.95)',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  wineName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#5B2433',
+    marginBottom: 12,
+  },
+  wineDetail: {
+    fontSize: 14,
+    color: '#5B2433',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  closingNarrativeSection: {
+    marginTop: 24,
+    marginBottom: 16,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(247, 244, 240, 0.95)',
+    padding: 16,
+    borderRadius: 12,
+  },
+  closingNarrativeText: {
+    fontSize: 16,
+    color: '#5B2433',
+    lineHeight: 24,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });

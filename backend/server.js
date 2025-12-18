@@ -2104,13 +2104,15 @@ app.post('/api/recommendations',
             const startIndex = startMatch.index + startMatch[0].length;
             let extracted = responseText.substring(startIndex);
             
-            // Try to find closing backticks
-            const closingBackticks = extracted.match(/\n?```+\s*$/);
-            if (closingBackticks) {
-              // Remove closing backticks
-              extracted = extracted.substring(0, extracted.length - closingBackticks[0].length);
+            // Find closing backticks anywhere in the string (not just at end)
+            // Look for ``` followed by optional whitespace and optional newline
+            const closingBackticksMatch = extracted.match(/\n?```+\s*/);
+            if (closingBackticksMatch) {
+              // Extract only the content before the closing backticks
+              const closingIndex = closingBackticksMatch.index;
+              extracted = extracted.substring(0, closingIndex);
             } else {
-              // No closing backticks - remove any trailing backticks that might be at the end
+              // No closing backticks found - remove any trailing backticks that might be at the end
               extracted = extracted.replace(/```+\s*$/, '');
             }
             
@@ -2131,10 +2133,12 @@ app.post('/api/recommendations',
             const startIndex = startMatch.index + startMatch[0].length;
             let extracted = responseText.substring(startIndex);
             
-            // Try to find closing backticks
-            const closingBackticks = extracted.match(/\n?```+\s*$/);
-            if (closingBackticks) {
-              extracted = extracted.substring(0, extracted.length - closingBackticks[0].length);
+            // Find closing backticks anywhere in the string (not just at end)
+            const closingBackticksMatch = extracted.match(/\n?```+\s*/);
+            if (closingBackticksMatch) {
+              // Extract only the content before the closing backticks
+              const closingIndex = closingBackticksMatch.index;
+              extracted = extracted.substring(0, closingIndex);
             } else {
               extracted = extracted.replace(/```+\s*$/, '');
             }

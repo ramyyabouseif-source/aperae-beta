@@ -521,11 +521,7 @@ Please respond with ONLY a valid JSON object in this exact format. Do NOT wrap i
 
 - Use "unknown" for uncertain data (never null/empty)
 
-- Confidence score must reflect pairing quality AND data certainty
-
-## DISCLAIMER
-
-"Based on established food-wine pairing principles — consult a certified sommelier for formal advice. Prices and ratings are estimates and may vary."`;
+- Confidence score must reflect pairing quality AND data certainty`;
 
 // =============================================================================
 // ENHANCED WINE RECOMMENDATION PROMPT (Enhanced version with structured output)

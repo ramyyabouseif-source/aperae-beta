@@ -69,3 +69,4 @@ The status badges should appear:
 **After `npx expo start --clear`, the badges should be visible!** 🎉
 
 
+

@@ -81,3 +81,4 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "- Merge conflicts that need to be resolved" -ForegroundColor White
 }
 
+

@@ -6,7 +6,6 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, ActivityIndicator, Platform, Image, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TermsService } from './src/services/termsService';
-import { NDAService } from './src/services/ndaService';
 import { AgeVerificationService } from './src/services/ageVerificationService';
 import { PrivacyPolicyService } from './src/services/privacyPolicyService';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
@@ -17,7 +16,6 @@ import AdaptiveMenuScreen from './src/screens/AdaptiveMenuScreen';
 import AdaptiveFavoritesScreen from './src/screens/AdaptiveFavoritesScreen';
 import AdaptivePreferencesScreen from './src/screens/AdaptivePreferencesScreen';
 import TermsScreen from './src/screens/TermsScreen';
-import NDAScreen from './src/screens/NDAScreen';
 import AgeVerificationScreen from './src/screens/AgeVerificationScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
 import PrivacySettingsScreen from './src/screens/PrivacySettingsScreen';
@@ -28,7 +26,6 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   const [isAgeVerified, setIsAgeVerified] = useState<boolean | null>(null);
-  const [hasAcceptedNDA, setHasAcceptedNDA] = useState<boolean | null>(null);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState<boolean | null>(null);
   const [hasAcceptedPrivacyPolicy, setHasAcceptedPrivacyPolicy] = useState<boolean | null>(null);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
@@ -55,18 +52,16 @@ export default function App() {
       const ageVerified = await AgeVerificationService.isAgeVerified();
       setIsAgeVerified(ageVerified);
       
-      // Always show NDA, Terms, and Privacy Policy screens on app launch
+      // Always show Terms and Privacy Policy screens on app launch
       // regardless of previous acceptance
-      setHasAcceptedNDA(false);
       setHasAcceptedTerms(false);
       setHasAcceptedPrivacyPolicy(false);
       
       console.log('Age verified:', ageVerified);
-      console.log('NDA, Terms, and Privacy Policy will be shown on this launch');
+      console.log('Terms and Privacy Policy will be shown on this launch');
     } catch (error) {
       console.error('Error checking acceptance status:', error);
       setIsAgeVerified(false);
-      setHasAcceptedNDA(false);
       setHasAcceptedTerms(false);
     } finally {
       setIsLoading(false);
@@ -75,17 +70,6 @@ export default function App() {
 
   const handleAgeVerified = () => {
     setIsAgeVerified(true);
-  };
-
-  const handleAcceptNDA = async () => {
-    try {
-      console.log('Accepting NDA...');
-      await NDAService.acceptNDA();
-      setHasAcceptedNDA(true);
-      console.log('NDA accepted successfully');
-    } catch (error) {
-      console.error('Error accepting NDA:', error);
-    }
   };
 
   const handleAcceptTerms = async () => {
@@ -129,12 +113,7 @@ export default function App() {
     return <AgeVerificationScreen onVerified={handleAgeVerified} />;
   }
 
-  // Always show NDA screen after age verification
-  if (!hasAcceptedNDA) {
-    return <NDAScreen onAccept={handleAcceptNDA} />;
-  }
-
-  // Show terms screen if NDA accepted but terms not accepted
+  // Show terms screen after age verification
   if (!hasAcceptedTerms) {
     return <TermsScreen onAccept={handleAcceptTerms} onPrivacyPolicyPress={handlePrivacyPolicyPress} />;
   }

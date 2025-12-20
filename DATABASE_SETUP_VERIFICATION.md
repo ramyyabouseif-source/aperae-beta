@@ -167,3 +167,4 @@ psql $DATABASE_URL -f backend/prisma/migrations/manual_add_wine_recommendations.
 **Status:** ✅ **Code is ready - just verify table exists in Render database**
 
 
+

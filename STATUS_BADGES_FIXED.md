@@ -92,3 +92,4 @@ The badges are:
 **Status badges should now be visible on all wine cards!** 🎉
 
 
+

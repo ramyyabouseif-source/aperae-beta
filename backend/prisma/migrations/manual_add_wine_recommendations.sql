@@ -97,3 +97,4 @@ CREATE INDEX IF NOT EXISTS "wine_recommendations_dish_idx" ON "wine_recommendati
 CREATE INDEX IF NOT EXISTS "wine_recommendations_created_at_idx" ON "wine_recommendations"("created_at");
 
 
+

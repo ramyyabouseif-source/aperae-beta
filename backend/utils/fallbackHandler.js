@@ -1,7 +1,5 @@
-const { isFeatureEnabled } = require('./featureFlags');
 const { normalizeResponse } = require('./responseNormalizer');
-const mockDataLegacy = require('../mockData.json');
-const mockDataEnhanced = require('../mockDataEnhanced.json');
+const mockDataEnhanced = require('../mockDataEnhanced.json'); // V7.0 compatible mock data
 const logger = require('../logger');
 
 /**
@@ -11,13 +9,13 @@ const logger = require('../logger');
  * @returns {object} Normalized mock response
  */
 function getFallbackResponse(dish, requestId) {
-  const useEnhancedPrompt = isFeatureEnabled('ENABLE_ENHANCED_PROMPT');
-  const mockData = useEnhancedPrompt ? mockDataEnhanced : mockDataLegacy;
+  // V7.0 is now the standard - use V7.0 compatible mock data
+  const mockData = mockDataEnhanced;
   
-  logger.warn('Using fallback mock data', { 
+  logger.warn('Using fallback mock data (V7.0)', { 
     requestId, 
     dish, 
-    promptVersion: useEnhancedPrompt ? 'enhanced' : 'legacy' 
+    promptVersion: 'v7.0' 
   });
   
   // Try to find matching dish, otherwise use first entry

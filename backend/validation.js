@@ -23,46 +23,6 @@ const validateRecommendationRequest = [
       sanitized = sanitized.replace(/[<>\"'&]/g, '');
       
       return sanitized;
-    }),
-  body('preferences')
-    .optional()
-    .isObject()
-    .withMessage('Preferences must be an object'),
-  body('preferences.budget')
-    .optional()
-    .isIn(['budget', 'moderate', 'premium', 'luxury'])
-    .withMessage('Invalid budget preference'),
-  body('preferences.regions')
-    .optional()
-    .isArray()
-    .withMessage('Regions must be an array')
-    .customSanitizer(value => {
-      // Sanitize each region string in the array
-      if (Array.isArray(value)) {
-        return value.map(region => {
-          if (typeof region === 'string') {
-            return region.replace(/<[^>]*>/g, '').replace(/[<>\"'&]/g, '');
-          }
-          return region;
-        });
-      }
-      return value;
-    }),
-  body('preferences.grapeVarieties')
-    .optional()
-    .isArray()
-    .withMessage('Grape varieties must be an array')
-    .customSanitizer(value => {
-      // Sanitize each grape variety string in the array
-      if (Array.isArray(value)) {
-        return value.map(grape => {
-          if (typeof grape === 'string') {
-            return grape.replace(/<[^>]*>/g, '').replace(/[<>\"'&]/g, '');
-          }
-          return grape;
-        });
-      }
-      return value;
     })
 ];
 

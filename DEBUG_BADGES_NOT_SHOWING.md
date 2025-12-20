@@ -124,3 +124,4 @@ If badges still don't show:
 **After cache clear, badges should be visible!** 🎉
 
 
+

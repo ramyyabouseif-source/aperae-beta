@@ -193,3 +193,4 @@ if ($response.recommendations[0].confidence.score) {
 **Most likely current state:** Based on your test results, you're probably using **Enhanced** or **Legacy** prompt, not V7.0 (unless the response fields were filtered out before display).
 
 
+

@@ -171,59 +171,6 @@ const options = {
             },
           },
         },
-        UserPreferences: {
-          type: 'object',
-          properties: {
-            budgetSensitivity: {
-              type: 'string',
-              enum: ['$15-30', '$30-60', '$60-150', '$150+', 'any'],
-              description: 'Budget range preference',
-            },
-            regionPreferences: {
-              type: 'string',
-              enum: ['Bordeaux', 'Burgundy', 'Napa Valley', 'Tuscany', 'Mendoza', 'Rioja', 'Barossa Valley', 'any'],
-              description: 'Preferred wine region',
-            },
-            exploreNewRegions: {
-              type: 'boolean',
-              description: 'Whether to explore new regions',
-            },
-            grapeVariety: {
-              type: 'array',
-              items: {
-                type: 'string',
-              },
-              description: 'Preferred grape varieties',
-            },
-            wineStyle: {
-              type: 'array',
-              items: {
-                type: 'string',
-              },
-              description: 'Preferred wine styles',
-            },
-            occasion: {
-              type: 'string',
-              enum: ['casual-dinner', 'formal-dining', 'celebration', 'gifting', 'collector', 'any'],
-              description: 'Occasion context',
-            },
-            retailAccessibility: {
-              type: 'string',
-              enum: ['widely-available', 'specialty-stores', 'boutique-wines', 'any'],
-              description: 'Retail accessibility preference',
-            },
-            agingPotential: {
-              type: 'string',
-              enum: ['drink-now', 'short-term', 'long-term', 'any'],
-              description: 'Aging potential preference',
-            },
-            foodPairingRisk: {
-              type: 'string',
-              enum: ['classic-safe', 'adventurous', 'any'],
-              description: 'Food pairing risk tolerance',
-            },
-          },
-        },
         Error: {
           type: 'object',
           required: ['error'],

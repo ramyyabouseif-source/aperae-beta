@@ -218,3 +218,4 @@ EXPO_PUBLIC_API_URL=https://api.aperae.com/api
 **Ready to start? Begin with EAS Build setup, then move to website deployment!** 🚀
 
 
+

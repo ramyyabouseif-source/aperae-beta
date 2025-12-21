@@ -31,6 +31,7 @@ const { versionMiddleware } = require('./apiVersioning');
 const csrfProtection = require('./csrfProtection');
 const wineDatabaseService = require('./services/wineDatabaseService');
 const dishRecommendationDatabaseService = require('./services/dishRecommendationDatabaseService');
+const wineRecommendationDatabaseService = require('./services/wineRecommendationDatabaseService');
 const { getFallbackResponse } = require('./utils/fallbackHandler');
 const { normalizeResponse } = require('./utils/responseNormalizer');
 const { buildV7Prompt } = require('./prompts/v7-master-sommelier-prompt');
@@ -1502,6 +1503,47 @@ app.post('/api/recommendations',
         // Fallback to mock data if parsing fails
         const mockResponse = getFallbackResponse(dish, requestId);
         return res.json(mockResponse);
+      }
+      
+      // Store original response for database (before normalization/enhancement)
+      const originalResponseData = JSON.parse(JSON.stringify(responseData));
+      
+      // Save recommendations to database IMMEDIATELY after parsing (before any validation that might cause early returns)
+      // This ensures we save the data even if subsequent validation fails
+      // Use original response data before normalization/enhancement to preserve all fields
+      if (originalResponseData && originalResponseData.recommendations && Array.isArray(originalResponseData.recommendations) && originalResponseData.recommendations.length > 0) {
+        wineRecommendationDatabaseService.storeRecommendations(
+          originalResponseData,
+          requestId,
+          claudeResponseTime,
+          'v7.0'
+        ).then(result => {
+          if (result.success) {
+            logger.info('Recommendations saved to database', {
+              requestId,
+              insertedCount: result.insertedCount
+            });
+          } else {
+            logger.warn('Failed to save recommendations to database', {
+              requestId,
+              error: result.error
+            });
+          }
+        }).catch(error => {
+          logger.error('Error saving recommendations to database', {
+            requestId,
+            error: error.message,
+            stack: error.stack
+          });
+        });
+      } else {
+        logger.warn('Skipping database save - invalid originalResponseData structure', {
+          requestId,
+          hasOriginalResponseData: !!originalResponseData,
+          hasRecommendations: !!originalResponseData?.recommendations,
+          recommendationsIsArray: Array.isArray(originalResponseData?.recommendations),
+          recommendationsLength: originalResponseData?.recommendations?.length || 0
+        });
       }
       
       // Normalize response structure

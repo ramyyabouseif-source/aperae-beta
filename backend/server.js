@@ -970,13 +970,13 @@ app.post('/api/recommendations',
       }
 
       if (MOCK_MODE) {
-        logger.debug('Using mock mode for recommendations', { requestId, dish });
-        const mockResponse = getFallbackResponse(dish, requestId);
+        logger.debug('Using mock mode for recommendations', { requestId, dish, isMenuContext });
+        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
         
         const responseTime = Date.now() - requestStartTime;
         RequestLogger.logRequestSuccess('recommendations', requestId, responseTime, { 
           mode: 'mock',
-          format: 'v7.0'
+          format: isMenuContext ? 'v2.2' : 'v7.0'
         });
         monitoring.trackRecommendation(dish, true, responseTime);
         
@@ -987,8 +987,8 @@ app.post('/api/recommendations',
       
       // Check if Anthropic API key is configured
       if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'sk-ant-your-claude-api-key-here') {
-        logger.warn('Anthropic API key not configured, falling back to mock data', { requestId });
-        const mockResponse = getFallbackResponse(dish, requestId);
+        logger.warn('Anthropic API key not configured, falling back to mock data', { requestId, isMenuContext });
+        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
         return res.json(mockResponse);
       }
 
@@ -1292,7 +1292,7 @@ app.post('/api/recommendations',
         console.error('===================================');
         
         // Fallback to mock data if parsing fails
-        const mockResponse = getFallbackResponse(dish, requestId);
+        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
         return res.json(mockResponse);
       }
       
@@ -1375,8 +1375,8 @@ app.post('/api/recommendations',
       
       // Validate responseData before sending
       if (!responseData) {
-        logger.error('responseData is null or undefined', { requestId });
-        const mockResponse = getFallbackResponse(dish, requestId);
+        logger.error('responseData is null or undefined', { requestId, isMenuContext });
+        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
         return res.json(mockResponse);
       }
       
@@ -1384,9 +1384,10 @@ app.post('/api/recommendations',
         logger.error('Invalid responseData structure - missing recommendations array', { 
           requestId,
           hasRecommendations: !!responseData.recommendations,
-          responseDataType: typeof responseData
+          responseDataType: typeof responseData,
+          isMenuContext
         });
-        const mockResponse = getFallbackResponse(dish, requestId);
+        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
         return res.json(mockResponse);
       }
       
@@ -1418,9 +1419,10 @@ app.post('/api/recommendations',
       } catch (serializeError) {
         logger.error('Failed to serialize responseData', { 
           requestId, 
-          error: serializeError.message 
+          error: serializeError.message,
+          isMenuContext
         });
-        const mockResponse = getFallbackResponse(dish, requestId);
+        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
         return res.json(mockResponse);
       }
       
@@ -1553,9 +1555,12 @@ app.post('/api/recommendations',
       // Track failed recommendation
       monitoring.trackRecommendation(req.body.dish || 'unknown', false, responseTime);
       
+      // Determine if this was a menu context request (in case error occurred before isMenuContext was set)
+      const errorIsMenuContext = req.body.availableWines && Array.isArray(req.body.availableWines) && req.body.availableWines.length > 0;
+      
       // Fallback to mock data on any error
-      logger.debug('Falling back to mock data due to error', { requestId, error: error.message });
-      const mockResponse = getFallbackResponse(req.body.dish || 'unknown', requestId);
+      logger.debug('Falling back to mock data due to error', { requestId, error: error.message, isMenuContext: errorIsMenuContext });
+      const mockResponse = getFallbackResponse(req.body.dish || 'unknown', requestId, errorIsMenuContext);
       try {
         if (!res.headersSent) {
           res.json(mockResponse);

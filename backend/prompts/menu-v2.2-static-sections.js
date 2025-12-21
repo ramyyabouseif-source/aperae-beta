@@ -497,14 +497,19 @@ For each shortlisted wine:
 C. FINAL SELECTION:
 
 •	Rank wines by total score (highest to lowest)
-•	Select top 3 wines
-•	Verify diversity across 3 selections:
-o	Price diversity: Aim for spread across menu price range when quality permits 
+•	Select top 3 wines with MANDATORY tier diversity:
+o	TIER DIVERSITY REQUIREMENT (CRITICAL) - MUST select exactly ONE wine from each tier label: 
+  - 1 Premium Selection 
+  - 1 Moderate Choice 
+  - 1 Budget-Friendly 
+o	Selection process:  
+  - Identify highest-scoring wine in each tier 
+  - If a tier has no wines available, select next-best from adjacent tier and note limitation 
+  - Final output MUST show 3 different tier labels
+•	Additional diversity:
 o	Producer diversity: Prefer different producers across 3 selections (avoid 3 from same producer unless menu extremely limited)
 o	Category diversity: Prefer mix across wine categories when quality permits 
 o	Exception: Honor structural needs over diversity (e.g., if dish requires 3 high-acid whites, select best 3 whites)
-
-FINAL CONFIDENCE = Total Score
 
 D. HONEST ASSESSMENT:
 
@@ -669,6 +674,7 @@ STRUCTURAL COMPATIBILITY:
 •	No Tier 1 violations (or explicitly noted if unavoidable)
 
 DIVERSITY VERIFICATION:
+•	Exactly ONE wine from each tier label selected
 •	Price diversity across selections when quality permits
 •	Producer diversity (prefer different producers)
 •	Category diversity (when appropriate)

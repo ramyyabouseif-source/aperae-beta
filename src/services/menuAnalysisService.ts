@@ -742,7 +742,13 @@ export class MenuAnalysisService {
           }
 
           // Category/type match - check if both are the same wine type
-          const aiCategory = (aiRec.tastingNotes?.toLowerCase() || aiRec.wineName?.toLowerCase() || '').trim();
+          // In V2.2, use grape field for wine type; fallback to wineName if grape not available
+          const aiCategorySource = typeof aiRec.grape === 'string' 
+            ? aiRec.grape 
+            : (typeof aiRec.tastingNotes === 'string' 
+                ? aiRec.tastingNotes 
+                : aiRec.wineName || '');
+          const aiCategory = aiCategorySource.toLowerCase().trim();
           const menuCategory = menuWine.category.toLowerCase().trim();
           
           // Check for specific wine type matches
@@ -769,25 +775,47 @@ export class MenuAnalysisService {
             // Use AI's rationale if it matches well, otherwise we'll generate one
             bestRationale = aiRec.rationale || '';
             // Use AI's serving guidance - it should be detailed for menu wines
-            bestServingGuidance = aiRec.servingGuidance || 'Serve at recommended temperature';
+            // Handle both string (legacy) and object (V2.2) formats
+            if (typeof aiRec.servingGuidance === 'string') {
+              bestServingGuidance = aiRec.servingGuidance;
+            } else if (aiRec.servingGuidance && typeof aiRec.servingGuidance === 'object') {
+              // V2.2 format: convert object to string format
+              const parts = [];
+              if (aiRec.servingGuidance.temperature) parts.push(`Temperature: ${aiRec.servingGuidance.temperature}`);
+              if (aiRec.servingGuidance.glassware) parts.push(`Glassware: ${aiRec.servingGuidance.glassware}`);
+              if (aiRec.servingGuidance.decanting) parts.push(aiRec.servingGuidance.decanting);
+              bestServingGuidance = parts.length > 0 ? parts.join('. ') : 'Serve at recommended temperature';
+            } else {
+              bestServingGuidance = 'Serve at recommended temperature';
+            }
+            
+            // Extract confidence score - handle both legacy (number) and V2.2 (object) formats
+            let aiConfidenceValue: number | undefined;
+            if (typeof aiRec.confidence === 'object' && aiRec.confidence !== null && 'score' in aiRec.confidence) {
+              // V2.2 format: confidence is an object with score property
+              aiConfidenceValue = aiRec.confidence.score;
+            } else if (typeof aiRec.confidenceScore === 'number') {
+              // Legacy format: confidenceScore is a number
+              aiConfidenceValue = aiRec.confidenceScore;
+            }
             
             // Improved confidence scoring for menu wines
             // Menu wines should have higher base confidence since they're verified to be on the menu
             if (matchScore > 200) {
               // Exact match - very high confidence
-              bestAiConfidence = aiRec.confidenceScore && aiRec.confidenceScore >= 85 ? aiRec.confidenceScore : 95;
+              bestAiConfidence = aiConfidenceValue !== undefined && aiConfidenceValue >= 85 ? aiConfidenceValue : 95;
             } else if (matchScore > 180) {
               // Producer + vintage match - high confidence
-              bestAiConfidence = aiRec.confidenceScore && aiRec.confidenceScore >= 80 ? aiRec.confidenceScore : 90;
+              bestAiConfidence = aiConfidenceValue !== undefined && aiConfidenceValue >= 80 ? aiConfidenceValue : 90;
             } else if (matchScore > 150) {
               // Producer + name match - good confidence
-              bestAiConfidence = aiRec.confidenceScore && aiRec.confidenceScore >= 75 ? aiRec.confidenceScore : 85;
+              bestAiConfidence = aiConfidenceValue !== undefined && aiConfidenceValue >= 75 ? aiConfidenceValue : 85;
             } else if (matchScore > 100) {
               // Strong partial match - moderate-high confidence
-              bestAiConfidence = aiRec.confidenceScore && aiRec.confidenceScore >= 70 ? aiRec.confidenceScore : 80;
+              bestAiConfidence = aiConfidenceValue !== undefined && aiConfidenceValue >= 70 ? aiConfidenceValue : 80;
             } else if (matchScore > 50) {
               // Partial match - moderate confidence
-              bestAiConfidence = Math.max(aiRec.confidenceScore || 75, 75);
+              bestAiConfidence = Math.max(aiConfidenceValue || 75, 75);
             } else {
               // Weak match - but still menu wine, so base confidence
               bestAiConfidence = 70;

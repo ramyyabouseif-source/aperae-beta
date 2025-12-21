@@ -6,7 +6,7 @@ Write-Host "Menu V2.2 Prompt Test Suite" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-$baseUrl = "http://localhost:3001"
+$baseUrl = "https://api.aperae.com"
 $testResults = @{
     PromptReferences = $false
     MenuContextRequest = $false
@@ -364,9 +364,9 @@ try {
             # Check tastingNotes structure
             if ($rec.tastingNotes) {
                 if ($rec.tastingNotes.aromas -is [array]) {
-                    Write-Host "    ✓ Rec $recIndex: tastingNotes.aromas is array" -ForegroundColor Green
+                    Write-Host "    ✓ Rec ${recIndex}: tastingNotes.aromas is array" -ForegroundColor Green
                 } else {
-                    Write-Host "    ✗ Rec $recIndex: tastingNotes.aromas is not an array" -ForegroundColor Red
+                    Write-Host "    ✗ Rec ${recIndex}: tastingNotes.aromas is not an array" -ForegroundColor Red
                     $schemaValid = $false
                 }
             }
@@ -374,14 +374,14 @@ try {
             # Check confidence structure
             if ($rec.confidence) {
                 if ($rec.confidence.score -is [int] -and $rec.confidence.score -ge 0 -and $rec.confidence.score -le 100) {
-                    Write-Host "    ✓ Rec $recIndex: confidence.score is valid (0-100)" -ForegroundColor Green
+                    Write-Host "    ✓ Rec ${recIndex}: confidence.score is valid (0-100)" -ForegroundColor Green
                 } else {
-                    Write-Host "    ✗ Rec $recIndex: confidence.score is invalid" -ForegroundColor Red
+                    Write-Host "    ✗ Rec ${recIndex}: confidence.score is invalid" -ForegroundColor Red
                     $schemaValid = $false
                 }
                 
                 if ($rec.confidence.breakdown) {
-                    Write-Host "    ✓ Rec $recIndex: confidence.breakdown exists" -ForegroundColor Green
+                    Write-Host "    ✓ Rec ${recIndex}: confidence.breakdown exists" -ForegroundColor Green
                     
                     # Check for tierAdjustments in breakdown (V2.2 feature)
                     if ($rec.confidence.breakdown.tierAdjustments) {

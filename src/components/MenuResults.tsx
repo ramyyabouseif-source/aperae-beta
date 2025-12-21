@@ -123,8 +123,45 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
     };
   };
 
-  const wineRecommendations: WineRecommendation[] = 
-    analysisResult.wineRecommendations?.map((rec) => convertToWineRecommendation(rec)) || [];
+  const wineRecommendations: WineRecommendation[] = (() => {
+    try {
+      if (!analysisResult.wineRecommendations || !Array.isArray(analysisResult.wineRecommendations)) {
+        console.warn('MenuResults: No wineRecommendations array in analysisResult');
+        return [];
+      }
+      
+      console.log(`MenuResults: Converting ${analysisResult.wineRecommendations.length} recommendations`);
+      const converted = analysisResult.wineRecommendations.map((rec, index) => {
+        try {
+          return convertToWineRecommendation(rec);
+        } catch (error: any) {
+          console.error(`MenuResults: Error converting recommendation ${index}:`, error);
+          console.error('Problematic recommendation:', rec);
+          // Return a fallback recommendation to prevent breaking the entire list
+          return {
+            wineName: rec.wine?.wineName || 'Unknown Wine',
+            producer: rec.wine?.producer || 'Unknown Producer',
+            vintage: rec.wine?.vintage || 'NV',
+            pricePoint: rec.wine?.pricePoint || 'Price not listed',
+            rationale: rec.pairingRationale || 'No pairing rationale available',
+            tastingNotes: '',
+            servingGuidance: 'Serve at recommended temperature',
+            confidenceScore: rec.confidenceScore || 75,
+            expertRating: rec.expertRating || 'unknown',
+            retailerSuggestion: rec.retailerSuggestion || 'Check local wine retailers',
+            image: 'unknown',
+            storytellingElements: rec.storytellingElements || ''
+          };
+        }
+      }).filter(rec => rec !== null && rec !== undefined);
+      
+      console.log(`MenuResults: Successfully converted ${converted.length} recommendations`);
+      return converted;
+    } catch (error: any) {
+      console.error('MenuResults: Error processing recommendations:', error);
+      return [];
+    }
+  })();
 
   // Check if OCR was used (indicated by ocrConfidence > 0)
   const wasOCRUsed = analysisResult.ocrConfidence && analysisResult.ocrConfidence > 0;

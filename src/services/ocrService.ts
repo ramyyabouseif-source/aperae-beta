@@ -40,9 +40,10 @@ export class OCRService {
       // For React Native, we'll use a different approach
       // We'll make the API call from the backend instead
       throw new Error('OCR processing should be done on the backend');
-    } catch (error) {
+    } catch (error: any) {
       console.error('OAuth2 token error:', error);
-      throw new Error(`Failed to get access token: ${error.message}`);
+      const errorMessage = error?.message || error?.toString() || 'Unknown error';
+      throw new Error(`Failed to get access token: ${errorMessage}`);
     }
   }
 
@@ -224,10 +225,11 @@ export class OCRService {
       
       console.log('Base64 conversion completed, length:', base64.length);
       return base64;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Image conversion error:', error);
-      console.error('Error details:', error);
-      throw new Error(`Failed to convert image to base64: ${error.message}`);
+      const errorMessage = error?.message || error?.toString() || 'Unknown error';
+      console.error('Error details:', errorMessage);
+      throw new Error(`Failed to convert image to base64: ${errorMessage}`);
     }
   }
 

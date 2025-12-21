@@ -61,7 +61,6 @@ export interface WineRecommendation {
   wineName: string;
   producer: string;
   vintage: string;
-  pricePoint: string; // Can be "unknown" or specific price like "$45"
   rationale: string;
   tastingNotes: TastingNotes; // Union type for backward compatibility
   servingGuidance: string | {
@@ -72,12 +71,11 @@ export interface WineRecommendation {
   confidenceScore?: number; // Legacy - deprecated but kept for compatibility
   confidence?: Confidence; // New format
   confidenceRationale?: string; // Legacy - deprecated
-  expertRating: string; // Can be "unknown" or specific rating like "95 (Wine Spectator)"
-  retailerSuggestion: string;
   image: string; // Can be "unknown" or specific URL
   storytellingElements: string;
   // Existing optional fields
   tierLabel?: string; // "Premium Selection" | "Moderate Choice" | "Budget-Friendly"
+  tierRationale?: string; // Menu V2.2: Explanation of why this tier was assigned
   category?: string; // "Sparkling" | "White Wine" | "Red Wine" | "Rosé" | "Dessert"
   grape?: string; // e.g., "Chardonnay (White)", "Cabernet Sauvignon (Red)"
   pairingPrinciplesApplied?: string[]; // e.g., ["Weight Matching", "Acidity-Fat Cleansing"]
@@ -100,6 +98,7 @@ export interface WineRecommendationResponse {
   disclaimer?: string;
   dishAnalysis?: DishAnalysis;
   pairingNotes?: string;
+  menuLimitations?: string; // Menu V2.2: Overall menu limitations/observations
   // New optional field
   avoid?: {
     types: string[];

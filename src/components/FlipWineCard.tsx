@@ -80,12 +80,14 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
   const confidenceBreakdown = getConfidenceBreakdown(wine);
   const confidenceRationale = getConfidenceRationale(wine);
 
-  // Get tier badge color
+  // Get tier badge color (handles both original labels and new mapped labels)
   const getTierBadgeStyle = (tierLabel?: string) => {
     if (!tierLabel) return styles.tierBadgeDefault;
-    if (tierLabel.toLowerCase().includes('premium')) return styles.tierBadgePremium;
-    if (tierLabel.toLowerCase().includes('moderate')) return styles.tierBadgeModerate;
-    if (tierLabel.toLowerCase().includes('budget')) return styles.tierBadgeBudget;
+    const labelLower = tierLabel.toLowerCase();
+    // Handle both original labels and new mapped labels
+    if (labelLower.includes('premium') || labelLower.includes('splurge')) return styles.tierBadgePremium;
+    if (labelLower.includes('moderate') || labelLower.includes('solid')) return styles.tierBadgeModerate;
+    if (labelLower.includes('budget') || labelLower.includes('smart value')) return styles.tierBadgeBudget;
     return styles.tierBadgeDefault;
   };
 
@@ -294,7 +296,7 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
               <View style={styles.titleSection}>
                 {/* Wine Name - Full width to allow wrapping */}
                 <View style={styles.titleContainer}>
-                  <Text style={styles.wineName} numberOfLines={2}>
+                  <Text style={styles.wineName} numberOfLines={3}>
                     {wine.wineName}
                   </Text>
                 </View>
@@ -460,6 +462,19 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                       <Text style={styles.confidenceBreakdownLabel}>Complexity Handling:</Text>
                       <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.complexityHandling}%</Text>
                     </View>
+                    {/* Tier Adjustments (V2.2 format) */}
+                    {(confidenceBreakdown as any).tierAdjustments !== undefined && (
+                      <View style={styles.confidenceBreakdownItem}>
+                        <Text style={styles.confidenceBreakdownLabel}>Tier Adjustments:</Text>
+                        <Text style={[
+                          styles.confidenceBreakdownValue,
+                          (confidenceBreakdown as any).tierAdjustments > 0 ? { color: '#4CAF50' } :
+                          (confidenceBreakdown as any).tierAdjustments < 0 ? { color: '#F44336' } : {}
+                        ]}>
+                          {(confidenceBreakdown as any).tierAdjustments > 0 ? '+' : ''}{(confidenceBreakdown as any).tierAdjustments}%
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 )}
                 

@@ -12,10 +12,12 @@ import {
 } from 'react-native';
 import { MenuAnalysisResult, WineListAnalysisResult } from '../services/menuAnalysisService';
 import { FavoritesService } from '../services/favoritesService';
-import AdaptiveWineCard from './AdaptiveWineCard';
+import FlipWineCard from './FlipWineCard';
 import { SkeletonWineCard } from './LoadingStates';
 import ResponsibleDrinkingDisclaimer from './ResponsibleDrinkingDisclaimer';
 import GoogleVisionAttribution from './GoogleVisionAttribution';
+import DishAnalysisCard from './DishAnalysisCard';
+import FinalSommelierNotes from './FinalSommelierNotes';
 import { WineRecommendation } from '../types/wine';
 
 
@@ -105,22 +107,41 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
    * - Output: "Famiglia Pasqua" (sanitized for display)
    * - Original exact text remains available in rec.wine for data integrity
    */
+  // Map tierLabel display text
+  const mapTierLabel = (tierLabel?: string): string | undefined => {
+    if (!tierLabel) return undefined;
+    if (tierLabel.toLowerCase().includes('premium')) return 'Splurge Selection';
+    if (tierLabel.toLowerCase().includes('moderate')) return 'Solid Choice';
+    if (tierLabel.toLowerCase().includes('budget')) return 'Smart Value';
+    return tierLabel;
+  };
+
   const convertToWineRecommendation = (rec: any): WineRecommendation => {
     return {
       wineName: sanitizeText(rec.wine?.wineName || 'Unknown Wine'), // Sanitize for display
       producer: sanitizeText(rec.wine?.producer || 'Unknown Producer'), // Sanitize for display
       vintage: rec.wine?.vintage || 'NV',
-      pricePoint: rec.wine?.pricePoint || 'Price not listed',
       rationale: rec.pairingRationale || '',
       // Use AI-generated tasting notes if available, otherwise fall back
       tastingNotes: rec.tastingNotes || sanitizeText(rec.wine?.description || ''),
       servingGuidance: rec.servingGuidance || 'Serve at recommended temperature',
       confidenceScore: rec.confidenceScore || 75,
-      expertRating: rec.expertRating || 'unknown',
-      retailerSuggestion: rec.retailerSuggestion || 'Check local wine retailers',
       image: 'unknown',
-      storytellingElements: rec.storytellingElements || rec.pairingRationale || ''
+      storytellingElements: rec.storytellingElements || rec.pairingRationale || '',
+      tierLabel: mapTierLabel(rec.tierLabel),
+      tierRationale: rec.tierRationale,
+      pairingPrinciplesApplied: rec.pairingPrinciplesApplied
     };
+  };
+
+  // Helper function to get tier order for sorting (Splurge > Solid > Smart Value)
+  const getTierOrder = (tierLabel?: string): number => {
+    if (!tierLabel) return 999; // No tier label goes to end
+    const labelLower = tierLabel.toLowerCase();
+    if (labelLower.includes('splurge') || labelLower.includes('premium')) return 1; // Highest priority
+    if (labelLower.includes('solid') || labelLower.includes('moderate')) return 2;
+    if (labelLower.includes('smart value') || labelLower.includes('budget')) return 3;
+    return 999; // Unknown tiers go to end
   };
 
   const wineRecommendations: WineRecommendation[] = (() => {
@@ -142,20 +163,33 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
             wineName: rec.wine?.wineName || 'Unknown Wine',
             producer: rec.wine?.producer || 'Unknown Producer',
             vintage: rec.wine?.vintage || 'NV',
-            pricePoint: rec.wine?.pricePoint || 'Price not listed',
             rationale: rec.pairingRationale || 'No pairing rationale available',
             tastingNotes: '',
             servingGuidance: 'Serve at recommended temperature',
             confidenceScore: rec.confidenceScore || 75,
-            expertRating: rec.expertRating || 'unknown',
-            retailerSuggestion: rec.retailerSuggestion || 'Check local wine retailers',
             image: 'unknown',
-            storytellingElements: rec.storytellingElements || ''
+            storytellingElements: rec.storytellingElements || '',
+            tierLabel: mapTierLabel(rec.tierLabel),
+            tierRationale: rec.tierRationale,
+            pairingPrinciplesApplied: rec.pairingPrinciplesApplied
           };
         }
       }).filter(rec => rec !== null && rec !== undefined);
       
-      console.log(`MenuResults: Successfully converted ${converted.length} recommendations`);
+      // Sort by tier: Splurge Selection > Solid Choice > Smart Value (descending order)
+      converted.sort((a, b) => {
+        const tierOrderA = getTierOrder(a.tierLabel);
+        const tierOrderB = getTierOrder(b.tierLabel);
+        if (tierOrderA !== tierOrderB) {
+          return tierOrderA - tierOrderB; // Lower number = higher priority
+        }
+        // If same tier, sort by confidence score (descending)
+        const confidenceA = a.confidenceScore || 0;
+        const confidenceB = b.confidenceScore || 0;
+        return confidenceB - confidenceA;
+      });
+      
+      console.log(`MenuResults: Successfully converted and sorted ${converted.length} recommendations`);
       return converted;
     } catch (error: any) {
       console.error('MenuResults: Error processing recommendations:', error);
@@ -166,18 +200,25 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
   // Check if OCR was used (indicated by ocrConfidence > 0)
   const wasOCRUsed = analysisResult.ocrConfidence && analysisResult.ocrConfidence > 0;
 
+  // Check if this is a WineListAnalysisResult (has dishAnalysis)
+  const hasDishAnalysis = 'dishAnalysis' in analysisResult && analysisResult.dishAnalysis;
+  const dishAnalysis = hasDishAnalysis ? (analysisResult as WineListAnalysisResult).dishAnalysis : undefined;
+  const pairingPrinciples = wineRecommendations[0]?.pairingPrinciplesApplied;
+
   return (
     <View style={styles.container}>
-      {/* Title Section - Flows naturally with the page */}
-      {!isLoading && wineRecommendations.length > 0 && (
-        <Text style={styles.recommendationsTitle}>
-          Recommended Wines for "{analysisResult.dishAnalyzed || 'Your Dish'}"
-        </Text>
-      )}
-
       {/* Google Vision API Attribution - Show if OCR was used */}
       {wasOCRUsed && (
         <GoogleVisionAttribution compact />
+      )}
+
+      {/* Dish Analysis Card - Identical format to home screen */}
+      {!isLoading && hasDishAnalysis && dishAnalysis && (
+        <DishAnalysisCard
+          dish={analysisResult.dishAnalyzed || 'Your Dish'}
+          dishAnalysis={dishAnalysis}
+          pairingPrinciples={pairingPrinciples}
+        />
       )}
 
       {/* Skeleton Loading State */}
@@ -194,24 +235,49 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
         </View>
       )}
 
-      {/* Wine Recommendations */}
+      {/* Wine Recommendations - Using FlipWineCard for exact format match */}
       {!isLoading && wineRecommendations.length > 0 && (
         <View style={styles.recommendationsSection}>
           {wineRecommendations.map((wine, index) => (
-            <React.Fragment key={`${wine.wineName}-${index}`}>
-              <AdaptiveWineCard
-                wine={wine}
-                index={index}
-                isFavorite={favorites.has(wine.wineName)}
-                onAddToFavorites={handleAddToFavorites}
-                onRemoveFromFavorites={handleRemoveFromFavorites}
-              />
-              {/* Responsible Drinking Disclaimer - After third wine card */}
-              {index === 2 && (
-                <ResponsibleDrinkingDisclaimer />
-              )}
-            </React.Fragment>
+            <FlipWineCard
+              key={`${wine.wineName}-${index}`}
+              wine={wine}
+              index={index}
+              isFavorite={favorites.has(wine.wineName)}
+              onAddToFavorites={handleAddToFavorites}
+              onRemoveFromFavorites={handleRemoveFromFavorites}
+            />
           ))}
+          
+          {/* Final Sommelier Notes - After all wine cards, before disclaimer (matches home screen) */}
+          {((analysisResult as WineListAnalysisResult).closingNarrative || 
+            (analysisResult as WineListAnalysisResult).menuLimitations ||
+            wineRecommendations.some(w => w.tierRationale)) && (
+            <View style={{ marginTop: 24, marginBottom: 16 }}>
+              <FinalSommelierNotes
+                {...((analysisResult as WineListAnalysisResult).closingNarrative ? { 
+                  closingNarrative: (analysisResult as WineListAnalysisResult).closingNarrative 
+                } : {})}
+                {...((analysisResult as WineListAnalysisResult).menuLimitations ? {
+                  menuLimitations: (analysisResult as WineListAnalysisResult).menuLimitations
+                } : {})}
+                {...(wineRecommendations.some(w => w.tierRationale) ? {
+                  tierRationales: wineRecommendations
+                    .filter(w => w.tierRationale)
+                    .map(w => ({
+                      wineName: w.wineName,
+                      tierLabel: w.tierLabel,
+                      rationale: w.tierRationale || ''
+                    }))
+                } : {})}
+              />
+            </View>
+          )}
+          
+          {/* Responsible Drinking Disclaimer - After final notes with proper spacing (matches home screen) */}
+          <View style={{ marginTop: 0, marginBottom: 16 }}>
+            <ResponsibleDrinkingDisclaimer />
+          </View>
         </View>
       )}
 

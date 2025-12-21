@@ -70,7 +70,7 @@ export class WineService {
   private static initializeSecureClient(): void {
     if (!this.secureClient) {
       const baseURL = getApiBaseUrl();
-      this.secureClient = new SecureHttpClient(baseURL, NETWORK_CONFIG.TIMEOUT);
+      this.secureClient = new SecureHttpClient(baseURL, NETWORK_CONFIG.timeout);
       console.log('Secure HTTP client initialized');
     }
   }
@@ -130,7 +130,6 @@ export class WineService {
       wineName: string;
       producer: string;
       vintage: string;
-      pricePoint: string;
       category: string;
       description?: string;
     }>
@@ -145,13 +144,20 @@ export class WineService {
     try {
       if (this.isMockMode) {
         console.log('Using mock mode');
-        const result = this.getMockRecommendations(dish);
+        // Use menu-specific V2.2 mock data if availableWines is provided (menu context)
+        // Use standard V7.0 mock data if availableWines is NOT provided (home screen context)
+        const isMenuContext = availableWines && availableWines.length > 0;
+        const result = isMenuContext
+          ? this.getMenuMockRecommendations(dish)
+          : this.getMockRecommendations(dish);
         const endTime = performance.now();
         const responseTime = endTime - startTime;
         
         console.log('=== MOCK RESPONSE TIME ===');
         console.log('Response Time:', responseTime.toFixed(2), 'ms');
         console.log('End Time:', new Date().toISOString());
+        console.log('Mock Type:', isMenuContext ? 'Menu V2.2' : 'Standard V7.0 (Home Screen)');
+        console.log('Context:', isMenuContext ? 'Menu Screen' : 'Home Screen');
         console.log('========================');
         
         return result;
@@ -236,7 +242,6 @@ export class WineService {
       wineName: string;
       producer: string;
       vintage: string;
-      pricePoint: string;
       category: string;
       description?: string;
     }>
@@ -285,12 +290,6 @@ export class WineService {
         // Response is already parsed by secure client
         const data = response;
         console.log('Response data received successfully');
-        
-        // Debug: Check if pricePoint and expertRating exist
-        if (data.recommendations && data.recommendations.length > 0) {
-          console.log('First wine pricePoint:', data.recommendations[0].pricePoint);
-          console.log('First wine expertRating:', data.recommendations[0].expertRating);
-        }
         
         return data;
         
@@ -405,7 +404,6 @@ export class WineService {
           region: "Chablis, Burgundy, France",
           vintage: "2021",
           grape: "Chardonnay (White)",
-          pricePoint: "$85",
           category: "White Wine",
           rationale: "Weight Matching and Acidity–Fat Cleansing principles are satisfied by high-acid Chardonnay that cuts through egg yolk and bacon fat. Bitterness & Umami Avoidance achieved through unoaked, mineral-driven style that complements rather than clashes with parmesan's savory depth. Flavor Bridging occurs via wine's creamy lees texture echoing carbonara's richness while citrus and mineral notes refresh the palate.",
           pairingPrinciplesApplied: ["Weight Matching", "Acidity–Fat Cleansing", "Bitterness & Umami Avoidance", "Flavor Bridging"],
@@ -443,8 +441,6 @@ export class WineService {
               grape: "Chardonnay (White)"
             }
           ],
-          expertRating: "93 (Wine Advocate)",
-          retailerSuggestion: "Premier Cru specialists, fine wine retailers, or direct from importer",
           image: "unknown",
           storytellingElements: "Premier Cru Montmains sits on Kimmeridgian limestone, the ancient seabed that gives Chablis its signature flinty minerality and razor-sharp acidity, perfectly suited to cut through rich, creamy dishes."
         },
@@ -457,7 +453,6 @@ export class WineService {
           region: "Mâconnais, Burgundy, France",
           vintage: "2022",
           grape: "Chardonnay (White)",
-          pricePoint: "$45",
           category: "White Wine",
           rationale: "Weight Matching achieved through medium-full body that stands up to carbonara's richness. Acidity–Fat Cleansing provided by southern Burgundy's characteristic bright acidity cutting through bacon fat and egg yolk. Flavor Bridging occurs as wine's subtle oak integration and ripe stone fruit notes complement dish's savory depth while maintaining refreshing citrus lift.",
           pairingPrinciplesApplied: ["Weight Matching", "Acidity–Fat Cleansing", "Flavor Bridging"],
@@ -509,7 +504,6 @@ export class WineService {
           region: "Burgundy, France",
           vintage: "2022",
           grape: "Chardonnay (White)",
-          pricePoint: "$22",
           category: "White Wine",
           rationale: "Weight Matching satisfied as medium-bodied wine pairs appropriately with carbonara without overwhelming the dish. Acidity–Fat Cleansing principle met through Burgundian Chardonnay's natural high acidity that refreshes against bacon fat and egg yolk richness. Bitterness & Umami Avoidance achieved via fruit-forward, minimal-oak style that complements parmesan's umami without clashing.",
           pairingPrinciplesApplied: ["Weight Matching", "Acidity–Fat Cleansing", "Bitterness & Umami Avoidance"],
@@ -560,13 +554,171 @@ export class WineService {
       closingNarrative: "Carbonara demands wines with surgical precision—high acidity to slice through layers of pork fat, egg yolk, and aged cheese, while maintaining enough body to not be overwhelmed. Burgundian Chardonnay, particularly from limestone terroirs, provides this balance: mineral-driven acidity acts as a palate cleanser, while the wine's texture harmonizes with the dish's creamy richness, creating a dialogue between Old World restraint and Italian indulgence."
     };
     
-    console.log('Mock data pricePoint values:', mockData.recommendations.map(w => w.pricePoint));
     console.log('Mock data tierLabels:', mockData.recommendations.map(w => w.tierLabel));
     console.log('Mock data has dishAnalysis:', !!mockData.dishAnalysis);
     console.log('Mock data has avoid:', !!mockData.avoid);
     console.log('Mock data has closingNarrative:', !!mockData.closingNarrative);
     console.log('Mock data closingNarrative:', mockData.closingNarrative);
     console.log('Mock data avoid:', mockData.avoid);
+    return mockData;
+  }
+
+  /**
+   * Generates menu-specific V2.2 mock wine recommendations for development and testing
+   * This matches the Menu Sommelier Prompt V2.2 schema exactly (same as backend MENU_V2_2_MOCK_DATA)
+   * 
+   * @param dish - The food item to pair with wine (used for context in mock data)
+   * @returns Wine recommendation response with Menu V2.2 format mock data
+   * 
+   * @private
+   */
+  private static getMenuMockRecommendations(dish: string): WineRecommendationResponse {
+    console.log('=== MENU V2.2 MOCK DATA DEBUG ===');
+    console.log('Using Menu V2.2 mock data format');
+    
+    // Use Menu V2.2 mock data structure (matches backend MENU_V2_2_MOCK_DATA)
+    const mockData: WineRecommendationResponse = {
+      dish: dish.trim() || "Rack of Lamb with truffle sauce and grilled vegetables",
+      dishAnalysis: {
+        dominantWeight: "heavy",
+        fatContent: "high",
+        primaryProtein: "lamb - fatty red meat with high myoglobin",
+        dominantFlavors: ["umami", "salty", "bitter"],
+        spiceLevel: "none",
+        acidityLevel: "low",
+        applicablePrinciples: ["Tannin-Protein Binding", "Fat Management Dual Requirement", "Tannin-Umami Decision Tree", "Flavor Bridging", "Weight Matching", "Preparation & Sauce Priority"],
+        keyChallenge: "High umami from truffle sauce paired with high-protein lamb creates Scenario 1 (high umami + HIGH protein + high fat), permitting high tannins. Grilled preparation adds char complexity. Wine must provide both high acidity to cleanse fat and high tannins to bind protein.",
+        idealProfile: {
+          acidity: "medium-high",
+          tannin: "high",
+          body: "full",
+          sweetness: "dry",
+          notes: "Truffle sauce creates high umami environment, but lamb's high protein and fat content (Scenario 1) supports high tannins. Tertiary earthy/forest floor notes would provide Tier 1 compound bridge to truffle. Grilled vegetables add char bitterness requiring structured wine."
+        }
+      },
+      recommendations: [
+        {
+          tierLabel: "Premium Selection",
+          wineName: "Barolo 'Albe' 2019",
+          tierRationale: "Barolo DOCG classification indicates premium appellation from Piedmont's most prestigious region.",
+          producer: "C.D Vajra",
+          vintage: "2019",
+          grape: "Nebbiolo (Red)",
+          region: "Barolo DOCG, Piedmont",
+          category: "Red Wine",
+          rationale: "This Barolo balances the dish through high tannins binding lamb's protein while cutting through fat, with bright acidity cleansing richness. The wine's earthy forest floor tertiary notes create a Tier 1 compound bridge to truffle sauce (aged wine tertiary development matching mushroom/truffle), while firm Nebbiolo tannins are supported by lamb's high protein content in Scenario 1 (high umami + HIGH protein prevents tannin-umami amplification). Regional pairing tradition of Barolo with truffle refined across Piedmont's culinary history.",
+          pairingPrinciplesApplied: ["Tannin-Protein Binding", "Fat Management Dual Requirement", "Tannin-Umami Decision Tree (Scenario 1)", "Flavor Bridging (Tier 1)", "Regional Pairing Culture", "Weight Matching"],
+          tastingNotes: {
+            aromas: ["red cherry", "rose", "tar", "forest floor", "truffle"],
+            palate: "firm tannins, high acidity, red fruit core, earthy complexity, full body",
+            finish: "long, persistent with mineral and earth notes"
+          },
+          servingGuidance: {
+            temperature: "62-65°F (17-18°C)",
+            glassware: "Burgundy glass",
+            decanting: "60-90 minutes"
+          },
+          confidence: {
+            score: 95,
+            breakdown: {
+              pairingScience: 50,
+              wineKnowledge: 30,
+              complexityHandling: 15,
+              tierAdjustments: 0
+            } as any,
+            rationale: "Perfect structural alignment: high tannins for Scenario 1, high acidity for fat, Tier 1 tertiary compound bridge to truffle, regional pairing culture (+5), weight match. Well-known Piedmont producer. Complex dish with umami and char resolved through tannin-protein binding and acidity-fat balance."
+          },
+          storytellingElements: "Barolo and truffle represent Piedmont's most iconic pairing, refined over centuries in Alba's culinary tradition where Nebbiolo's firm tannins and earthy complexity mirror the region's prized white truffles.",
+          image: "unknown"
+        } as any,
+        {
+          tierLabel: "Moderate Choice",
+          tierRationale: "Chianti Classico Riserva represents elevated DOCG classification with extended aging requirements.",
+          wineName: "'Novecento' - Chianti Classico Riserva",
+          producer: "Dievole",
+          vintage: "unknown",
+          grape: "Sangiovese (Red, 95%), Canaiolo (3%), Colorino (2%)",
+          region: "Chianti Classico DOCG, Tuscany",
+          pricePoint: "Price varies by restaurant",
+          category: "Red Wine",
+          rationale: "This Riserva bridges the dish through medium-high tannins binding lamb's protein and high acidity cleansing fat. While not achieving Tier 1 compound match like Barolo's truffle synergy, Sangiovese's bright tartaric acidity and savory character provide Tier 3 structural bridge. Scenario 1 conditions (high umami + HIGH protein + high fat) support the wine's firm tannins without bitterness amplification. Riserva aging softens tannins while maintaining structure essential for fatty lamb.",
+          pairingPrinciplesApplied: ["Tannin-Protein Binding", "Fat Management Dual Requirement", "Tannin-Umami Decision Tree (Scenario 1)", "Flavor Bridging (Tier 3)", "Weight Matching"],
+          tastingNotes: {
+            aromas: ["red cherry", "dried herbs", "leather", "tobacco"],
+            palate: "medium-high tannins, bright acidity, red fruit with savory notes, medium-full body",
+            finish: "persistent with dried fruit and spice"
+          },
+          servingGuidance: {
+            temperature: "62-65°F (17-18°C)",
+            glassware: "Bordeaux glass",
+            decanting: "45-60 minutes"
+          },
+          confidence: {
+            score: 85,
+            breakdown: {
+              pairingScience: 43,
+              wineKnowledge: 25,
+              complexityHandling: 15,
+              tierAdjustments: 2
+            } as any,
+            rationale: "Strong structural compatibility with appropriate tannins for Scenario 1 and high acidity for fat. Loses points for Tier 3 vs Tier 1 bridge (Barolo's truffle advantage). Dievole is established Chianti producer. All core principles satisfied though without regional pairing culture bonus."
+          },
+          storytellingElements: "Assessment based on Chianti Classico Riserva typicity and established producer reputation.",
+          expertRating: "unknown",
+          retailerSuggestion: "Check local wine retailers",
+          image: "unknown"
+        } as any,
+        {
+          tierLabel: "Budget-Friendly",
+          tierRationale: "Langhe Nebbiolo DOC represents broad regional Piedmont classification below Barolo/Barbaresco DOCG level.",
+          wineName: "Langhe Nebbiolo DOC 2021",
+          producer: "Giovanni Rosso",
+          vintage: "2021",
+          grape: "Nebbiolo (Red)",
+          region: "Langhe DOC, Piedmont",
+          pricePoint: "Price varies by restaurant",
+          category: "Red Wine",
+          rationale: "This younger Langhe Nebbiolo complements the dish with medium-high tannins binding lamb's protein while medium-high acidity cleanses fat. While lacking the tertiary truffle bridge of aged Barolo, the wine's Nebbiolo character provides Tier 2 aromatic bridge through earthy red fruit and herbal notes. Scenario 1 conditions (high umami + HIGH protein + high fat) support the wine's firm tannins. The 2021 vintage offers fresh acidity ideal for cutting through rich truffle sauce, though softer tannins than premier Barolo.",
+          pairingPrinciplesApplied: ["Tannin-Protein Binding", "Fat Management Dual Requirement", "Tannin-Umami Decision Tree (Scenario 1)", "Flavor Bridging (Tier 2)", "Weight Matching"],
+          tastingNotes: {
+            aromas: ["red cherry", "rose", "herbs"],
+            palate: "medium-high tannins, bright acidity, fresh red fruit, medium-full body",
+            finish: "clean with red fruit and subtle spice"
+          },
+          servingGuidance: {
+            temperature: "60-64°F (16-18°C)",
+            glassware: "Burgundy glass",
+            decanting: "30-45 minutes"
+          },
+          confidence: {
+            score: 81,
+            breakdown: {
+              pairingScience: 43,
+              wineKnowledge: 25,
+              complexityHandling: 15,
+              tierAdjustments: -2
+            } as any,
+            rationale: "Solid structural compatibility with appropriate tannins for Scenario 1 and acidity for fat. Loses points for Tier 2 vs Tier 1 bridge (lacks tertiary truffle synergy). Young vintage lacks complexity of aged Barolo. Giovanni Rosso is reputable Piedmont producer. All core principles satisfied."
+          },
+          storytellingElements: "Giovanni Rosso's Langhe Nebbiolo offers an accessible introduction to Piedmont's noble grape with the structure necessary for lamb while maintaining the bright acidity and earthy character that complement the dish's richness.",
+          expertRating: "unknown",
+          retailerSuggestion: "Check local wine retailers",
+          image: "unknown"
+        } as any
+      ] as any,
+      closingNarrative: "These three selections provide tier diversity while maintaining pairing excellence for rack of lamb with truffle sauce. The premium Barolo delivers the iconic truffle bridge, the moderate Chianti Classico offers bright acidity and firm structure, and the budget Langhe Nebbiolo provides accessible Nebbiolo character with appropriate tannins for lamb's high protein content.",
+      menuLimitations: "Menu offers excellent pairing options across all three tiers with Piedmont Nebbiolo representations at premium and budget levels, plus Tuscan Sangiovese at moderate tier."
+    };
+    
+    // Update dish name if provided (for better UX/testing)
+    if (dish && dish.trim()) {
+      mockData.dish = dish.trim();
+    }
+    
+    console.log('Menu V2.2 mock data dish:', mockData.dish);
+    console.log('Menu V2.2 mock data recommendations count:', mockData.recommendations.length);
+    console.log('Menu V2.2 mock data has dishAnalysis:', !!mockData.dishAnalysis);
+    console.log('Menu V2.2 mock data tierLabels:', mockData.recommendations.map(r => (r as any).tierLabel));
     return mockData;
   }
 }

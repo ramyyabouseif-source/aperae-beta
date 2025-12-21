@@ -93,7 +93,7 @@ export class CameraService {
 
       // Launch camera
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: 'Images',
+        mediaTypes: [ImagePicker.MediaType.Images],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.5, // Reduced quality for smaller file size
@@ -130,7 +130,7 @@ export class CameraService {
 
       // Launch image picker
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'Images',
+        mediaTypes: [ImagePicker.MediaType.Images],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.5, // Reduced quality for smaller file size

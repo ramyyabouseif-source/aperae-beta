@@ -8,11 +8,15 @@ interface FinalSommelierNotesProps {
     types: string[];
     reason: string;
   };
+  tierRationales?: Array<{ wineName: string; tierLabel?: string; rationale: string }>; // Menu V2.2: Tier rationales for each wine
+  menuLimitations?: string; // Menu V2.2: Overall menu limitations
 }
 
 const FinalSommelierNotes: React.FC<FinalSommelierNotesProps> = ({
   closingNarrative,
   avoid,
+  tierRationales,
+  menuLimitations,
 }) => {
   const [expanded, setExpanded] = useState(false); // Default to collapsed
 
@@ -48,6 +52,39 @@ const FinalSommelierNotes: React.FC<FinalSommelierNotesProps> = ({
             </View>
           ) : null}
 
+          {/* Menu Limitations (Menu V2.2) */}
+          {menuLimitations ? (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Ionicons name="list" size={18} color="#8B0000" />
+                <Text style={styles.sectionTitle}>Menu Overview</Text>
+              </View>
+              <Text style={styles.sectionText}>{menuLimitations}</Text>
+            </View>
+          ) : null}
+
+          {/* Tier Rationales (Menu V2.2) */}
+          {tierRationales && tierRationales.length > 0 ? (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Ionicons name="information-circle" size={18} color="#8B0000" />
+                <Text style={styles.sectionTitle}>Tier Classifications</Text>
+              </View>
+              {tierRationales.map((item, index) => (
+                <View key={index} style={[
+                  styles.tierRationaleItem,
+                  index === tierRationales.length - 1 && styles.tierRationaleItemLast
+                ]}>
+                  <Text style={styles.tierRationaleWineName}>
+                    {item.wineName}
+                    {item.tierLabel ? ` • ${item.tierLabel}` : ''}
+                  </Text>
+                  <Text style={styles.tierRationaleText}>{item.rationale}</Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
+
           {/* Avoid Section */}
           {avoid ? (
             <View style={styles.avoidSection}>
@@ -72,7 +109,7 @@ const FinalSommelierNotes: React.FC<FinalSommelierNotesProps> = ({
             </View>
           ) : null}
           
-          {!closingNarrative && !avoid && (
+          {!closingNarrative && !menuLimitations && (!tierRationales || tierRationales.length === 0) && !avoid && (
             <Text style={styles.emptyText}>No additional notes available.</Text>
           )}
         </View>
@@ -187,6 +224,39 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 12,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8B0000',
+    marginLeft: 6,
+  },
+  tierRationaleItem: {
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  tierRationaleItemLast: {
+    borderBottomWidth: 0,
+    marginBottom: 0,
+    paddingBottom: 0,
+  },
+  tierRationaleWineName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  tierRationaleText: {
+    fontSize: 13,
+    color: '#666',
+    lineHeight: 18,
   },
 });
 

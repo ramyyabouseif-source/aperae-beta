@@ -73,6 +73,8 @@ const styles = StyleSheet.create({
     padding: 16,
     marginVertical: 16,
     marginHorizontal: 20,
+    alignSelf: 'stretch', // Ensure consistent width - stretch to fill available space
+    flexShrink: 0, // Prevent shrinking when content is smaller
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

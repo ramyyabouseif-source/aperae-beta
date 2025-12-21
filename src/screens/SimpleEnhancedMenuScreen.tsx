@@ -18,6 +18,7 @@ import { PreferencesService } from '../services/preferencesService';
 import { WinePreferences } from '../types/wine';
 import MenuCamera from '../components/MenuCamera';
 import MenuResults from '../components/MenuResults';
+import MockModeToggle from '../components/MockModeToggle';
 
 
 const SimpleEnhancedMenuScreen: React.FC = () => {
@@ -218,75 +219,9 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
         />
       </View>
 
-      {/* Step 2: Serving Style Selection */}
+      {/* Step 2: Wine List Photo */}
       <View style={styles.stepContainer}>
-        <Text style={styles.stepTitle}>2. Wine serving preference?</Text>
-        <View style={styles.servingStyleContainer}>
-          <TouchableOpacity
-            style={[
-              styles.servingStyleButton,
-              servingStyle === 'glass' && styles.servingStyleButtonSelected
-            ]}
-            onPress={() => setServingStyle('glass')}
-          >
-            <Ionicons 
-              name="wine" 
-              size={20} 
-              color={servingStyle === 'glass' ? '#fff' : '#5B2433'} 
-            />
-            <Text style={[
-              styles.servingStyleText,
-              servingStyle === 'glass' && styles.servingStyleTextSelected
-            ]}>
-              By the Glass
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[
-              styles.servingStyleButton,
-              servingStyle === 'bottle' && styles.servingStyleButtonSelected
-            ]}
-            onPress={() => setServingStyle('bottle')}
-          >
-            <Ionicons 
-              name="wine" 
-              size={20} 
-              color={servingStyle === 'bottle' ? '#fff' : '#5B2433'} 
-            />
-            <Text style={[
-              styles.servingStyleText,
-              servingStyle === 'bottle' && styles.servingStyleTextSelected
-            ]}>
-              Full Bottle
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[
-              styles.servingStyleButton,
-              servingStyle === 'both' && styles.servingStyleButtonSelected
-            ]}
-            onPress={() => setServingStyle('both')}
-          >
-            <Ionicons 
-              name="wine" 
-              size={20} 
-              color={servingStyle === 'both' ? '#fff' : '#5B2433'} 
-            />
-            <Text style={[
-              styles.servingStyleText,
-              servingStyle === 'both' && styles.servingStyleTextSelected
-            ]}>
-              Both Options
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Step 3: Wine List Photo */}
-      <View style={styles.stepContainer}>
-        <Text style={styles.stepTitle}>3. Scan the wine list</Text>
+        <Text style={styles.stepTitle}>2. Scan the wine list</Text>
         <View style={styles.photoButtonsContainer}>
           <TouchableOpacity 
             style={[styles.photoButton, styles.takePhotoButton, isAnalyzing && styles.photoButtonDisabled]}
@@ -329,9 +264,9 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
         )}
       </View>
 
-      {/* Step 4: Get Recommendations */}
+      {/* Step 3: Get Recommendations */}
       <View style={styles.stepContainer}>
-        <Text style={styles.stepTitle}>4. Get wine recommendations</Text>
+        <Text style={styles.stepTitle}>3. Get wine recommendations</Text>
         <TouchableOpacity 
           style={[styles.getRecommendationsButton, (isAnalyzing || !dishInput.trim() || !capturedPhoto) && styles.getRecommendationsButtonDisabled]}
           onPress={handleGetRecommendations}
@@ -354,14 +289,8 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
       <View style={styles.statusContainer}>
         <Text style={styles.statusText}>
           OCR: {serviceStatus.ocrAvailable ? '✅' : '❌'} | 
-          Camera: {serviceStatus.cameraAvailable ? '✅' : '❌'} | 
-          Preferences: {winePreferences ? '✅' : '❌'}
+          Camera: {serviceStatus.cameraAvailable ? '✅' : '❌'}
         </Text>
-        {winePreferences && (
-          <Text style={styles.preferencesStatusText}>
-            Wine preferences loaded: {Object.keys(winePreferences).filter(key => winePreferences[key as keyof WinePreferences]).length} preferences set
-          </Text>
-        )}
       </View>
     </View>
   );
@@ -382,6 +311,9 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled={true}
       >
+        {/* Mock Mode Toggle */}
+        <MockModeToggle />
+
         {/* Restaurant Wine Pairing Assistant */}
         {renderWinePairingAssistant()}
 

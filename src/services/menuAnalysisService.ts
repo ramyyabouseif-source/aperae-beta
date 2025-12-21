@@ -7,38 +7,46 @@ import { OCRService, OCRResult, MenuItem } from './ocrService';
 import { CameraService, PhotoResult } from './cameraService';
 import { WineService } from './wineService';
 
+import { DishAnalysis } from '../types/wine';
+
 export interface WineListAnalysisResult {
   availableWines: Array<{
     wineName: string;
     producer: string;
     vintage: string;
-    pricePoint: string;
     servingStyle: 'glass' | 'bottle' | 'both';
     category: string;
     description?: string;
+    grape?: string;
+    region?: string;
   }>;
   wineRecommendations: Array<{
     wine: {
       wineName: string;
       producer: string;
       vintage: string;
-      pricePoint: string;
       servingStyle: 'glass' | 'bottle' | 'both';
       category: string;
       description?: string;
+      grape?: string;
+      region?: string;
     };
     pairingRationale: string;
     confidenceScore: number;
     servingGuidance: string;
     tastingNotes?: string;
-    expertRating?: string;
-    retailerSuggestion?: string;
     storytellingElements?: string;
+    tierLabel?: string;
+    tierRationale?: string;
+    pairingPrinciplesApplied?: string[];
   }>;
   processingTime: number;
   ocrConfidence: number;
   dishAnalyzed: string;
   servingStylePreference: 'glass' | 'bottle' | 'both';
+  dishAnalysis?: DishAnalysis;
+  closingNarrative?: string;
+  menuLimitations?: string;
 }
 
 export interface MenuAnalysisOptions {
@@ -117,7 +125,7 @@ export class MenuAnalysisService {
       console.log('Filtered wines:', filteredWines.length);
 
       // Step 4: Get AI-powered wine recommendations for the dish
-      const wineRecommendations = await this.getWineRecommendationsFromAvailableWines(
+      const { recommendations: wineRecommendations, dishAnalysis } = await this.getWineRecommendationsFromAvailableWines(
         dish,
         filteredWines,
         winePreferences
@@ -132,6 +140,7 @@ export class MenuAnalysisService {
         ocrConfidence: ocrResult.confidence,
         dishAnalyzed: dish,
         servingStylePreference,
+        dishAnalysis,
       };
     } catch (error: any) {
       console.error('Wine list analysis error:', error);
@@ -500,7 +509,7 @@ export class MenuAnalysisService {
             console.log(`⚠ No price block found for wine at line ${wineLine.index}`);
           }
           
-          const wine = this.extractWineFromLine(wineLine.line, wineLine.category, ocrResult.confidence, matchedPrice);
+          const wine = this.extractWineFromLine(wineLine.line, wineLine.category, ocrResult.confidence);
           if (wine) {
             wines.push(wine);
           }
@@ -544,44 +553,16 @@ export class MenuAnalysisService {
           }
           
           if (isPriceOnly) {
-            // Try to attach to previous wine if it doesn't have a price
-            if (wines.length > 0 && wines[wines.length - 1].pricePoint === 'Price not listed') {
-              const priceValue = parseInt(line.replace(/,/g, ''));
-              if (priceValue >= 5 && priceValue <= 500) {
-                wines[wines.length - 1].pricePoint = `$${priceValue}`;
-              }
-            }
-            // Also check next line for wine info
-            if (i + 1 < processedLines.length && !processedLines[i + 1].isCategory && !processedLines[i + 1].isPriceOnly) {
-              const nextLine = processedLines[i + 1].line;
-              const wine = this.extractWineFromLine(nextLine, currentCategoryFallback, ocrResult.confidence, line.trim());
-              if (wine) {
-                wines.push(wine);
-                i++;
-                continue;
-              }
-            }
+            // Skip price-only lines (no longer extracting prices)
             continue;
-          }
-          
-          // Check if line contains a wine item
-          let priceFromNextLine = null;
-          if (i + 1 < processedLines.length && processedLines[i + 1].isPriceOnly && !priceLines.includes(i + 1)) {
-            const priceValue = parseInt(processedLines[i + 1].line.replace(/,/g, ''));
-            if (priceValue >= 5 && priceValue <= 500) {
-              priceFromNextLine = `$${priceValue}`;
-            }
           }
           
           // Only process if it looks like a wine line and we haven't already processed it
           const alreadyProcessed = wineLines.some(wl => wl.index === i);
           if (!alreadyProcessed) {
-            const wine = this.extractWineFromLine(line, currentCategoryFallback, ocrResult.confidence, priceFromNextLine || undefined);
+            const wine = this.extractWineFromLine(line, currentCategoryFallback, ocrResult.confidence);
             if (wine) {
               wines.push(wine);
-              if (priceFromNextLine && i + 1 < processedLines.length && processedLines[i + 1].isPriceOnly) {
-                i++;
-              }
             }
           }
         }
@@ -619,7 +600,7 @@ export class MenuAnalysisService {
     dish: string,
     availableWines: WineListAnalysisResult['availableWines'],
     winePreferences?: any
-  ): Promise<WineListAnalysisResult['wineRecommendations']> {
+  ): Promise<{ recommendations: WineListAnalysisResult['wineRecommendations'], dishAnalysis?: DishAnalysis }> {
     try {
       console.log('Getting AI recommendations for dish:', dish);
       console.log('Available wines:', availableWines.length);
@@ -627,7 +608,7 @@ export class MenuAnalysisService {
 
       // Convert available wines list to a summary for the AI prompt
       const availableWinesSummary = availableWines.map(w => 
-        `${w.wineName}${w.producer !== 'Unknown Producer' ? ` (${w.producer})` : ''}${w.vintage !== 'NV' ? ` ${w.vintage}` : ''}${w.pricePoint !== 'Price not listed' ? ` - ${w.pricePoint}` : ''} - ${w.category}`
+        `${w.wineName}${w.producer !== 'Unknown Producer' ? ` (${w.producer})` : ''}${w.vintage !== 'NV' ? ` ${w.vintage}` : ''} - ${w.category}`
       ).join('\n');
 
       // Use WineService to get AI recommendations with enhanced prompt
@@ -636,7 +617,7 @@ export class MenuAnalysisService {
 
       if (!wineResponse || !wineResponse.recommendations || wineResponse.recommendations.length === 0) {
         console.warn('No recommendations from WineService, returning empty array');
-        return [];
+        return { recommendations: [], dishAnalysis: wineResponse?.dishAnalysis };
       }
 
       // CRITICAL: Only recommend wines that are actually on the menu
@@ -1171,8 +1152,16 @@ export class MenuAnalysisService {
       // Convert to recommendation format with full AI data
       for (const scored of topWines) {
         const aiRec = scored.aiRecommendation;
+        // Merge menu wine data with AI recommendation data (grape, region from AI)
+        const wineWithAiData = {
+          ...scored.wine,
+          // Add grape and region from AI recommendation if available
+          ...(aiRec?.grape && { grape: aiRec.grape }),
+          ...(aiRec?.region && { region: aiRec.region })
+        };
+        
         recommendations.push({
-          wine: scored.wine,
+          wine: wineWithAiData,
           pairingRationale: scored.rationale,
           // Use actual AI confidence score if available, otherwise calculate from match score
           confidenceScore: scored.aiConfidence || 
@@ -1180,11 +1169,11 @@ export class MenuAnalysisService {
              scored.score > 100 ? 88 : 
              scored.score > 50 ? 80 : 75),
           servingGuidance: scored.servingGuidance,
-          // Pass through AI recommendation data for tasting notes, expert rating, etc.
+          // Pass through AI recommendation data for tasting notes, etc.
           tastingNotes: aiRec?.tastingNotes || '',
-          expertRating: aiRec?.expertRating || 'unknown',
-          retailerSuggestion: aiRec?.retailerSuggestion || 'Check local wine retailers',
-          storytellingElements: aiRec?.storytellingElements || scored.rationale
+          storytellingElements: aiRec?.storytellingElements || scored.rationale,
+          tierLabel: aiRec?.tierLabel,
+          pairingPrinciplesApplied: aiRec?.pairingPrinciplesApplied
         });
       }
 
@@ -1192,12 +1181,24 @@ export class MenuAnalysisService {
       recommendations.sort((a, b) => b.confidenceScore - a.confidenceScore);
 
       console.log('Generated recommendations:', recommendations.length);
-      return recommendations;
+      const result: { recommendations: WineListAnalysisResult['wineRecommendations'], dishAnalysis?: DishAnalysis, closingNarrative?: string, menuLimitations?: string } = {
+        recommendations,
+        dishAnalysis: wineResponse.dishAnalysis,
+      };
+      
+      if (wineResponse.closingNarrative) {
+        result.closingNarrative = wineResponse.closingNarrative;
+      }
+      if (wineResponse.menuLimitations) {
+        result.menuLimitations = wineResponse.menuLimitations;
+      }
+      
+      return result;
     } catch (error: any) {
       console.error('AI wine recommendation error:', error);
       console.error('Error details:', error);
       // Return empty array on error - the UI will handle it gracefully
-      return [];
+      return { recommendations: [] };
     }
   }
 
@@ -1210,7 +1211,6 @@ export class MenuAnalysisService {
         wineName: 'Cabernet Sauvignon',
         producer: 'Napa Valley Reserve',
         vintage: '2019',
-        pricePoint: '$45',
         servingStyle: 'bottle',
         category: 'Red Wine',
         description: 'Full-bodied with notes of blackberry and oak'
@@ -1219,7 +1219,6 @@ export class MenuAnalysisService {
         wineName: 'Chardonnay',
         producer: 'Sonoma Coast',
         vintage: '2020',
-        pricePoint: '$12',
         servingStyle: 'glass',
         category: 'White Wine',
         description: 'Crisp and refreshing with citrus notes'
@@ -1228,7 +1227,6 @@ export class MenuAnalysisService {
         wineName: 'Pinot Noir',
         producer: 'Willamette Valley',
         vintage: '2018',
-        pricePoint: '$38',
         servingStyle: 'bottle',
         category: 'Red Wine',
         description: 'Elegant and smooth with cherry flavors'
@@ -1237,7 +1235,6 @@ export class MenuAnalysisService {
         wineName: 'Sauvignon Blanc',
         producer: 'New Zealand',
         vintage: '2021',
-        pricePoint: '$9',
         servingStyle: 'glass',
         category: 'White Wine',
         description: 'Bright and zesty with tropical fruit'
@@ -1246,7 +1243,6 @@ export class MenuAnalysisService {
         wineName: 'Prosecco',
         producer: 'Veneto',
         vintage: 'NV',
-        pricePoint: '$15',
         servingStyle: 'glass',
         category: 'Sparkling Wine',
         description: 'Light and bubbly, perfect for celebrations'
@@ -1328,89 +1324,10 @@ export class MenuAnalysisService {
     line: string, 
     category: string, 
     confidence: number,
-    priceFromContext?: string
+    priceFromContext?: string // Kept for backward compatibility but no longer used
   ): WineListAnalysisResult['availableWines'][0] | null {
     // Skip lines that are too short or don't look like wine entries
     if (line.length < 5) return null;
-    
-    // Extract price - improved patterns to catch various formats
-    // Patterns: $XX, $XX.XX, $XXX, $X,XXX, $XX/glass, $XX/btl, etc.
-    let priceMatch = line.match(/\$\s*[\d,]+(?:\.\d{2})?/);
-    if (!priceMatch) {
-      // Try pattern: number followed by / or space before glass/btl/bottle
-      priceMatch = line.match(/([\d,]+(?:\.\d{2})?)\s*(?:\/|\s)(?:glass|btl|bottle)/i);
-      if (priceMatch && priceMatch[1]) {
-        const numValue = parseFloat(priceMatch[1].replace(/,/g, ''));
-        if (numValue >= 5 && numValue <= 500) {
-          priceMatch[0] = '$' + priceMatch[1].trim();
-        } else {
-          priceMatch = null;
-        }
-      }
-    }
-    if (!priceMatch) {
-      // Try pattern: standalone number at start or end of line (common in wine lists)
-      // Check for numbers at the start
-      let numMatch = line.match(/^(\d{1,3}(?:,\d{3})*)\s+/);
-      if (numMatch) {
-        const numValue = parseFloat(numMatch[1].replace(/,/g, ''));
-        if (numValue >= 5 && numValue <= 500) {
-          priceMatch = [numMatch[0], '$' + numMatch[1].trim()];
-        }
-      }
-      // Check for numbers at the end
-      if (!priceMatch) {
-        numMatch = line.match(/\s+(\d{1,3}(?:,\d{3})*)\s*$/);
-        if (numMatch) {
-          const numValue = parseFloat(numMatch[1].replace(/,/g, ''));
-          if (numValue >= 5 && numValue <= 500) {
-            priceMatch = [numMatch[0], '$' + numMatch[1].trim()];
-          }
-        }
-      }
-      // Check for standalone number (entire line is just a number - this is likely a price)
-      if (!priceMatch) {
-        numMatch = line.match(/^(\d{1,3}(?:,\d{3})*)$/);
-        if (numMatch) {
-          const numValue = parseFloat(numMatch[1].replace(/,/g, ''));
-          if (numValue >= 5 && numValue <= 500) {
-            priceMatch = [numMatch[0], '$' + numMatch[1].trim()];
-          }
-        }
-      }
-    }
-    // Use price from context if provided, otherwise use extracted price
-    let price = priceFromContext || (priceMatch ? priceMatch[0].replace(/\s+/g, '') : 'Price not listed');
-    
-    // Also check description for embedded prices (e.g., "Mercurey, 2016.... 102")
-    if (price === 'Price not listed' || price === priceFromContext) {
-      // Look for prices in the text after removing vintage and wine info
-      const priceInText = line.match(/(?:^|\s)(\d{2,3})\s*$/);
-      if (priceInText && priceInText[1]) {
-        const embeddedPrice = parseInt(priceInText[1]);
-        if (embeddedPrice >= 10 && embeddedPrice <= 500) {
-          // Check if this is likely a price vs a year or other number
-          const isLikelyPrice = embeddedPrice > 50 || 
-            (embeddedPrice >= 10 && embeddedPrice <= 99 && !line.match(/\b(19|20)\d{2}\b/));
-          if (isLikelyPrice) {
-            price = `$${embeddedPrice}`;
-          }
-        }
-      }
-    }
-    
-    // Ensure price format is consistent
-    if (price !== 'Price not listed' && !price.startsWith('$')) {
-      price = `$${price.replace(/[^0-9]/g, '')}`;
-    }
-    
-    // Validate price is in reasonable range
-    if (price !== 'Price not listed') {
-      const priceNum = parseInt(price.replace(/[^0-9]/g, ''));
-      if (priceNum < 5 || priceNum > 500) {
-        price = 'Price not listed';
-      }
-    }
     
     // Determine serving style - check for explicit indicators
     let servingStyle: 'glass' | 'bottle' | 'both' = 'both';
@@ -1444,12 +1361,18 @@ export class MenuAnalysisService {
     // Remove price and serving style indicators from line to get wine name
     let wineText = line;
     
-    // Remove price patterns
-    if (priceMatch) {
-      wineText = wineText.replace(priceMatch[0], '').trim();
-      // Also remove any trailing price-related text
-      wineText = wineText.replace(/\s*\/\s*(?:glass|btl|bottle).*$/i, '').trim();
-    }
+    // Remove price patterns ($XX, standalone numbers that look like prices)
+    wineText = wineText.replace(/\$\s*[\d,]+(?:\.\d{2})?/g, '').trim();
+    // Remove standalone numbers at end that might be prices (but keep vintages)
+    wineText = wineText.replace(/\s+(\d{2,3})\s*$/g, (match, num) => {
+      const numValue = parseInt(num);
+      // If it's a year (1900-2099), keep it; otherwise remove if it looks like a price
+      if (numValue >= 1900 && numValue <= 2099) return match;
+      if (numValue >= 5 && numValue <= 500) return ''; // Likely a price
+      return match;
+    }).trim();
+    // Remove price/serving style patterns like "$XX/glass" or "$XX/btl"
+    wineText = wineText.replace(/\$\d+\s*\/(?:glass|btl|bottle)/gi, '').trim();
     
     // Remove serving style indicators
     wineText = wineText.replace(/\b(glass|bottle|by the glass|by the bottle)\b/gi, '').trim();
@@ -1457,52 +1380,145 @@ export class MenuAnalysisService {
     // Clean up multiple spaces
     wineText = wineText.replace(/\s+/g, ' ').trim();
     
+    // PRESERVE ORIGINAL FULL WINE NAME TEXT (before removing technical details)
+    // This preserves the complete original text including producer, wine name, appellation
+    const fullWineNameOriginal = wineText.replace(/\s+/g, ' ').trim();
+    
     // Extract vintage (4-digit year, usually 19xx or 20xx)
     const vintageMatch = wineText.match(/\b(19|20)\d{2}\b/);
     const vintage = vintageMatch ? vintageMatch[0] : 'NV';
     
-    // Split by common separators (em dash, en dash, hyphen, comma, pipe)
-    const parts = wineText.split(/[–—\-\|,]+/).map(p => p.trim()).filter(p => p.length > 0);
+    // Extract technical details (appellations, grape percentages) to move to description
+    const technicalDetails: string[] = [];
     
-    let wineName = '';
-    let producer = '';
-    let description = '';
-    
-    if (parts.length === 0) {
-      return null;
-    } else if (parts.length === 1) {
-      // Single part - likely just wine name
-      wineName = parts[0].replace(/\b(19|20)\d{2}\b/, '').trim();
-      producer = 'Unknown Producer';
-    } else if (parts.length === 2) {
-      // Two parts - usually producer, wine name or wine name, producer
-      // Check if first part contains common producer indicators
-      const firstPart = parts[0];
-      const secondPart = parts[1];
-      
-      // If second part has a vintage, it's likely: wine name, producer/vintage
-      if (secondPart.match(/\b(19|20)\d{2}\b/)) {
-        wineName = firstPart;
-        producer = secondPart.replace(/\b(19|20)\d{2}\b/, '').trim();
-      } else {
-        // Try to identify which is producer vs wine name
-        // Producers often come first in fine dining menus
-        wineName = firstPart.length > secondPart.length ? firstPart : secondPart;
-        producer = firstPart.length <= secondPart.length ? firstPart : secondPart;
-      }
-    } else {
-      // Multiple parts - first is usually producer, second is wine name, rest might be description
-      producer = parts[0];
-      wineName = parts[1];
-      description = parts.slice(2).join(', ');
+    // Extract appellation patterns (DOCG, DOC, AOC, IGT, AVA, etc.)
+    const appellationPattern = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:\s+DOCG?|AOC|IGT|AVA|DOP|DO|DOQ|VdP|VdT))\b/g;
+    const appellationMatches = wineText.match(appellationPattern);
+    if (appellationMatches) {
+      technicalDetails.push(...appellationMatches);
+      // Remove appellations from wine text for parsing
+      wineText = wineText.replace(appellationPattern, '').trim();
     }
     
-    // Remove vintage from wine name if it was extracted separately
-    wineName = wineName.replace(/\b(19|20)\d{2}\b/, '').trim();
+    // Extract grape percentages (e.g., "Sangiovese 95%, Canaiolo 3%", "Corvina 70%, Rond. 20%")
+    const grapePercentagePattern = /([A-Za-z]+(?:\s+[A-Za-z]+)*(?:\s+[A-Z][a-z]+)*)\s+\d+%/g;
+    const grapeMatches = wineText.match(grapePercentagePattern);
+    if (grapeMatches && grapeMatches.length > 0) {
+      technicalDetails.push(grapeMatches.join(', '));
+      // Remove grape percentages from wine text
+      wineText = wineText.replace(grapePercentagePattern, '').trim();
+    }
     
-    // Clean up wine name and producer
-    wineName = wineName.replace(/\s+/g, ' ').trim();
-    producer = producer.replace(/\b(19|20)\d{2}\b/, '').replace(/\s+/g, ' ').trim();
+    // Extract blend information patterns (e.g., "Chard 75%, P. Noir 15%/Bianco 10%")
+    const blendPattern = /\b([A-Z][a-z]+(?:\s*[A-Z][a-z]+)*)\s+\d+%[,\s]*([A-Z][a-z]+(?:\s*[A-Z][a-z]+)*)\s+\d+%/g;
+    const blendMatches = wineText.match(blendPattern);
+    if (blendMatches) {
+      technicalDetails.push(...blendMatches);
+      wineText = wineText.replace(blendPattern, '').trim();
+    }
+    
+    // Extract "100%" grape indicators and move to description
+    const singleGrapePattern = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+100%\b/g;
+    const singleGrapeMatches = wineText.match(singleGrapePattern);
+    if (singleGrapeMatches && singleGrapeMatches.length === 1) {
+      // Single grape at 100% - this is likely category info, remove from text
+      wineText = wineText.replace(singleGrapePattern, '').trim();
+    } else if (singleGrapeMatches && singleGrapeMatches.length > 1) {
+      // Multiple grapes - this is blend info for description
+      technicalDetails.push(singleGrapeMatches.join(', '));
+      wineText = wineText.replace(singleGrapePattern, '').trim();
+    }
+    
+    // Extract producer from the original full text (before technical details removed)
+    // Pattern: Producer name, Wine Name (common in Italian menus)
+    // Examples: "Ca del Bosco, Cuvee' Prestige Ed 45 NV - Franciacorta DOCG"
+    //           "G.D Vajra, Barolo 'Albe' 2019"
+    let producer = 'Unknown Producer';
+    let description = '';
+    
+    // Extract region/appellation information
+    const regionInfo: string[] = [];
+    if (technicalDetails.length > 0) {
+      regionInfo.push(...technicalDetails);
+    }
+    
+    // Try to extract producer name - look for common producer patterns at the start
+    const producerPatterns = [
+      // Producer followed by comma: "Producer, Wine Name"
+      /^([A-Z][A-Za-z'.\s-]+?),\s+(.+)$/,
+    ];
+    
+    let producerFound = false;
+    for (const pattern of producerPatterns) {
+      const match = fullWineNameOriginal.match(pattern);
+      if (match && match[1]) {
+        producer = match[1].trim();
+        producerFound = true;
+        break;
+      }
+    }
+    
+    // If producer not found with patterns, try splitting by comma
+    if (!producerFound) {
+      const parts = fullWineNameOriginal.split(',').map(p => p.trim()).filter(p => p.length > 0);
+      if (parts.length >= 2) {
+        // First part is likely producer
+        const firstPart = parts[0];
+        // Check if it looks like a producer (has common producer keywords or is reasonably short)
+        const producerKeywords = ['tenuta', 'fattoria', 'cantina', 'domaine', 'chateau', 'estate', 'vineyard', 'del', 'della', 'di', 'da'];
+        const firstPartLower = firstPart.toLowerCase();
+        const looksLikeProducer = producerKeywords.some(keyword => firstPartLower.includes(keyword)) ||
+                                  (firstPart.length < 40 && !firstPart.match(/\b(19|20)\d{2}\b/));
+        
+        if (looksLikeProducer) {
+          producer = firstPart;
+          producerFound = true;
+        }
+      }
+    }
+    
+    // Normalize producer name (handle variations like "Ca del Bosco" vs "Ca' del Bosco")
+    if (producer !== 'Unknown Producer') {
+      producer = producer.replace(/\bCa\s+del\b/gi, "Ca' del");
+      producer = producer.replace(/\s+/g, ' ').trim();
+    }
+    
+    // Extract region/appellation information to description
+    // Look for DOCG, DOC, AOC, IGT, AVA patterns in the full original wine name
+    const regionMatches = fullWineNameOriginal.match(appellationPattern);
+    if (regionMatches) {
+      regionMatches.forEach(match => {
+        if (!regionInfo.includes(match)) {
+          regionInfo.push(match);
+        }
+      });
+    }
+    
+    // Build description with region/grape information
+    if (regionInfo.length > 0) {
+      description = `Region: ${regionInfo.join(', ')}`;
+    }
+    
+    // Extract grape information from blend details (if present in technical details)
+    const grapeInfo = technicalDetails.filter(detail => 
+      detail.toLowerCase().includes('%') && 
+      (detail.toLowerCase().includes('chardonnay') || 
+       detail.toLowerCase().includes('pinot') || 
+       detail.toLowerCase().includes('nebbiolo') ||
+       detail.toLowerCase().includes('sangiovese') ||
+       detail.toLowerCase().includes('cabernet') ||
+       detail.toLowerCase().includes('merlot'))
+    );
+    
+    if (grapeInfo.length > 0 && description) {
+      description = `${description}. Grape Blend: ${grapeInfo.join(', ')}`;
+    } else if (grapeInfo.length > 0) {
+      description = `Grape Blend: ${grapeInfo.join(', ')}`;
+    }
+    
+    // Use full wine name as wineName (preserving original text structure)
+    // Keep technical details in the wine name for full context
+    let wineName = fullWineNameOriginal;
     
     // Skip if wine name is too short or looks invalid
     if (wineName.length < 2) return null;
@@ -1515,12 +1531,17 @@ export class MenuAnalysisService {
       detectedCategory = ''; // Clear price-like categories
     }
     
-    const wineNameLower = wineName.toLowerCase();
+    // Clean text for category detection (remove technical details)
+    const cleanWineName = wineName.replace(/\b\d+%\b/g, '').replace(/\b(DOCG|DOC|AOC|IGT|AVA|DOP|DO)\b/gi, '').trim();
+    const cleanDescription = (description || '').replace(/\b\d+%\b/g, '').replace(/\b(DOCG|DOC|AOC|IGT|AVA|DOP|DO)\b/gi, '').trim();
+    
+    const wineNameLower = cleanWineName.toLowerCase();
     const producerLower = producer.toLowerCase();
-    const descriptionLower = (description || '').toLowerCase();
+    const descriptionLower = cleanDescription.toLowerCase();
     const combinedText = `${wineNameLower} ${producerLower} ${descriptionLower}`;
     
-    // Check for specific wine types in the wine name/producer/description
+    // Check for specific wine types in the cleaned wine name/producer/description
+    // Prioritize actual grape names over appellations
     if ((combinedText.includes('pinot noir') || (combinedText.includes('pinot') && !combinedText.includes('pinot grigio') && !combinedText.includes('pinot gris')))) {
       detectedCategory = 'Pinot Noir';
     } else if (combinedText.includes('chardonnay')) {
@@ -1537,16 +1558,24 @@ export class MenuAnalysisService {
       detectedCategory = 'Riesling';
     } else if (combinedText.includes('rosé') || combinedText.includes('rose')) {
       detectedCategory = 'Rosé';
-    } else if (combinedText.includes('sparkling') || combinedText.includes('champagne') || combinedText.includes('brut')) {
+    } else if (combinedText.includes('sparkling') || combinedText.includes('champagne') || combinedText.includes('brut') || combinedText.includes('prosecco') || combinedText.includes('franciacorta')) {
       detectedCategory = 'Sparkling';
+    } else if (combinedText.includes('nebbiolo')) {
+      detectedCategory = 'Red Wine'; // Nebbiolo is red
+    } else if (combinedText.includes('sangiovese')) {
+      detectedCategory = 'Red Wine'; // Sangiovese is red
     } else if (!detectedCategory || detectedCategory.trim().length < 2) {
       // If category is still not determined, try to infer from context
       if (producerLower.includes('burgundy') || wineNameLower.includes('bourgogne')) {
         detectedCategory = 'Pinot Noir'; // Default Burgundy red
       } else if (producerLower.includes('bordeaux') || wineNameLower.includes('bordeaux')) {
         detectedCategory = 'Cabernet Sauvignon'; // Default Bordeaux red
+      } else if (combinedText.includes('barolo') || combinedText.includes('barbaresco')) {
+        detectedCategory = 'Red Wine'; // Barolo/Barbaresco are Nebbiolo
+      } else if (combinedText.includes('chianti') || combinedText.includes('brunello')) {
+        detectedCategory = 'Red Wine'; // Chianti/Brunello are Sangiovese
       } else {
-        detectedCategory = 'Wine'; // Fallback
+        detectedCategory = category || 'Wine'; // Use original category or fallback
       }
     }
     
@@ -1581,7 +1610,6 @@ export class MenuAnalysisService {
       wineName: sanitizeText(wineName) || 'Unknown Wine',
       producer: sanitizeText(producer) || 'Unknown Producer',
       vintage: vintage,
-      pricePoint: price,
       servingStyle,
       category: sanitizeText(detectedCategory) || 'Wine',
       description: description ? sanitizeText(description) : undefined,

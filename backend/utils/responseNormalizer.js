@@ -38,7 +38,8 @@ function normalizeConfidence(rec) {
       breakdown: {
         pairingScience: breakdown.pairingScience || 0,
         wineKnowledge: breakdown.wineKnowledge || 0,
-        complexityHandling: breakdown.complexityHandling || 0
+        complexityHandling: breakdown.complexityHandling || 0,
+        tierAdjustments: breakdown.tierAdjustments || 0 // New V2.2 field
       },
       rationale: rec.confidence.rationale || ''
     };
@@ -51,7 +52,8 @@ function normalizeConfidence(rec) {
     breakdown: {
       pairingScience: Math.round(score * 0.5), // Estimate
       wineKnowledge: Math.round(score * 0.3),
-      complexityHandling: Math.round(score * 0.2)
+      complexityHandling: Math.round(score * 0.2),
+      tierAdjustments: 0 // Default for legacy format
     },
     rationale: rec.confidenceRationale || ''
   };
@@ -59,6 +61,7 @@ function normalizeConfidence(rec) {
 
 /**
  * Normalizes dish analysis, adding missing new fields with defaults
+ * Note: Excludes cookingMethod, cookingMethodImpact, sauce, sauceCharacteristic, saucePriority
  * @param {object} analysis - Dish analysis object
  * @returns {object|null} Normalized dish analysis
  */
@@ -66,6 +69,9 @@ function normalizeDishAnalysis(analysis) {
   if (!analysis || typeof analysis !== 'object') {
     return null;
   }
+  
+  // Build idealProfile with maxABV support (new V2.2 field)
+  const idealProfile = analysis.idealProfile || {};
   
   return {
     dominantWeight: analysis.dominantWeight || 'medium',
@@ -80,12 +86,14 @@ function normalizeDishAnalysis(analysis) {
       ? analysis.applicablePrinciples
       : [],
     keyChallenge: analysis.keyChallenge || '',
-    idealProfile: analysis.idealProfile || {
-      acidity: 'medium',
-      tannin: 'medium',
-      body: 'medium',
-      sweetness: 'dry',
-      notes: ''
+    idealProfile: {
+      acidity: idealProfile.acidity || 'medium',
+      acidType: idealProfile.acidType || 'balanced',
+      tannin: idealProfile.tannin || 'medium',
+      body: idealProfile.body || 'medium',
+      sweetness: idealProfile.sweetness || 'dry',
+      maxABV: idealProfile.maxABV || null, // New V2.2 field (optional, only if capsaicin present)
+      notes: idealProfile.notes || ''
     }
   };
 }
@@ -105,15 +113,30 @@ function normalizeRecommendation(rec) {
   // Normalize tasting notes
   normalized.tastingNotes = normalizeTastingNotes(rec.tastingNotes);
   
-  // Normalize confidence
+  // Normalize confidence (includes tierAdjustments support)
   const confidence = normalizeConfidence(rec);
   normalized.confidence = confidence;
   
-  // Keep legacy fields for backward compatibility
-  // But prefer new format if both exist
+  // Handle tierLabel and tierRationale (V2.2 fields)
+  // tierLabel is present in both old and new formats
+  normalized.tierLabel = rec.tierLabel || null;
+  normalized.tierRationale = rec.tierRationale || null; // New V2.2 field
   
-  // Ensure new fields have defaults
+  // Ensure core fields have defaults
   normalized.region = normalized.region || '';
+  normalized.grape = normalized.grape || null;
+  
+  // Handle optional/removed fields gracefully
+  // These may be null in V2.2 responses (expertRating, retailerSuggestion, image removed)
+  // But keep them if present for backward compatibility
+  normalized.expertRating = rec.expertRating || null;
+  normalized.retailerSuggestion = rec.retailerSuggestion || null;
+  normalized.image = rec.image || null;
+  
+  // V2.2 fields
+  normalized.storytellingElements = rec.storytellingElements || null;
+  
+  // Legacy fields (may be present in old format)
   normalized.tierFallbackApplied = normalized.tierFallbackApplied || false;
   normalized.story = normalized.story || '';
   normalized.alternatives = Array.isArray(normalized.alternatives) 
@@ -138,7 +161,7 @@ function normalizeResponse(responseData) {
   
   const normalized = { ...responseData };
   
-  // Normalize dish analysis
+  // Normalize dish analysis (excludes cookingMethod, cookingMethodImpact, sauce, sauceCharacteristic, saucePriority)
   if (normalized.dishAnalysis) {
     normalized.dishAnalysis = normalizeDishAnalysis(normalized.dishAnalysis);
   }
@@ -148,13 +171,19 @@ function normalizeResponse(responseData) {
     normalized.recommendations = normalized.recommendations.map(normalizeRecommendation);
   }
   
-  // Ensure avoid object exists
+  // Handle menuLimitations (new V2.2 field at response level)
+  normalized.menuLimitations = responseData.menuLimitations || null;
+  
+  // Ensure avoid object exists (for V7.0 format)
   if (!normalized.avoid) {
     normalized.avoid = {
       types: [],
       reason: ''
     };
   }
+  
+  // Handle legacy fields (may be present in old format)
+  normalized.pairingNotes = responseData.pairingNotes || null;
   
   return normalized;
 }
@@ -190,6 +219,8 @@ module.exports = {
   normalizeConfidence,
   normalizeDishAnalysis
 };
+
+
 
 
 

@@ -15,7 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { MyCellarWine, WineRecommendation } from '../types/wine';
 import { getWineCardImage } from '../utils/wineCardImages';
-import { getTastingNotesDisplay, getServingGuidance } from '../utils/wineTypeHelpers';
+import { getTastingNotesDisplay, getServingGuidance, getConfidenceScore, getConfidenceBreakdown, getConfidenceRationale } from '../utils/wineTypeHelpers';
 import StatusSelector from './myCellar/StatusSelector';
 import NotesInput from './myCellar/NotesInput';
 import TagsBadgeSelector from './myCellar/TagsBadgeSelector';
@@ -76,6 +76,9 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
   // Get tasting notes display (handles both string and object formats)
   const tastingNotes = getTastingNotesDisplay(wine.tastingNotes);
   const servingGuidance = getServingGuidance(wine);
+  const confidenceScore = getConfidenceScore(wine);
+  const confidenceBreakdown = getConfidenceBreakdown(wine);
+  const confidenceRationale = getConfidenceRationale(wine);
 
   // Get tier badge color
   const getTierBadgeStyle = (tierLabel?: string) => {
@@ -84,6 +87,13 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
     if (tierLabel.toLowerCase().includes('moderate')) return styles.tierBadgeModerate;
     if (tierLabel.toLowerCase().includes('budget')) return styles.tierBadgeBudget;
     return styles.tierBadgeDefault;
+  };
+
+  // Get confidence color based on score
+  const getConfidenceColor = (score: number) => {
+    if (score >= 90) return '#4CAF50'; // Green for high confidence
+    if (score >= 80) return '#FF9800'; // Orange for medium-high confidence
+    return '#F44336'; // Red for lower confidence
   };
 
 
@@ -359,7 +369,7 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
             {/* Disclaimer on Front */}
             <View style={styles.disclaimer}>
               <Text style={styles.disclaimerText}>
-                Recommendations based on established food-wine pairing principles - prices and ratings are estimates and may vary by retailer
+                Recommendations based on established food-wine pairing principles.
               </Text>
             </View>
           </View>
@@ -412,6 +422,55 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                 {servingGuidance}
               </Text>
             </View>
+
+            {/* Confidence Score */}
+            {confidenceScore > 0 && (
+              <View style={styles.confidenceContainer}>
+                <View style={styles.confidenceLabel}>
+                  <Ionicons name="checkmark-circle" size={16} color="#8B0000" />
+                  <Text style={styles.confidenceLabelText}>Confidence Score</Text>
+                </View>
+                <View style={styles.confidenceBar}>
+                  <View
+                    style={[
+                      styles.confidenceFill,
+                      {
+                        width: `${confidenceScore}%`,
+                        backgroundColor: getConfidenceColor(confidenceScore),
+                      },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.confidenceScoreText}>
+                  {confidenceScore}% confidence
+                </Text>
+                
+                {/* Confidence Breakdown */}
+                {confidenceBreakdown && (
+                  <View style={styles.confidenceBreakdownContainer}>
+                    <View style={styles.confidenceBreakdownItem}>
+                      <Text style={styles.confidenceBreakdownLabel}>Pairing Science:</Text>
+                      <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.pairingScience}%</Text>
+                    </View>
+                    <View style={styles.confidenceBreakdownItem}>
+                      <Text style={styles.confidenceBreakdownLabel}>Wine Knowledge:</Text>
+                      <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.wineKnowledge}%</Text>
+                    </View>
+                    <View style={styles.confidenceBreakdownItem}>
+                      <Text style={styles.confidenceBreakdownLabel}>Complexity Handling:</Text>
+                      <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.complexityHandling}%</Text>
+                    </View>
+                  </View>
+                )}
+                
+                {/* Confidence Rationale */}
+                {confidenceRationale && (
+                  <Text style={styles.confidenceRationaleText}>
+                    {confidenceRationale}
+                  </Text>
+                )}
+              </View>
+            )}
 
             {/* Region (Enhanced Format) */}
             {wine.region && wine.region !== 'unknown' && (
@@ -947,6 +1006,72 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     lineHeight: 20,
+  },
+  confidenceContainer: {
+    backgroundColor: '#F5F5F5',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#8B0000',
+  },
+  confidenceLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  confidenceLabelText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#333',
+    marginLeft: 6,
+  },
+  confidenceBar: {
+    height: 6,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 3,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  confidenceFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  confidenceScoreText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  confidenceBreakdownContainer: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  confidenceBreakdownItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  confidenceBreakdownLabel: {
+    fontSize: 12,
+    color: '#666',
+    flex: 1,
+  },
+  confidenceBreakdownValue: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+  },
+  confidenceRationaleText: {
+    fontSize: 12,
+    color: '#666',
+    fontStyle: 'italic',
+    marginTop: 8,
+    lineHeight: 16,
   },
   rationaleContainer: {
     marginBottom: 12,

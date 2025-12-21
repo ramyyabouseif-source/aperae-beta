@@ -35,6 +35,7 @@ const wineRecommendationDatabaseService = require('./services/wineRecommendation
 const { getFallbackResponse } = require('./utils/fallbackHandler');
 const { normalizeResponse } = require('./utils/responseNormalizer');
 const { buildV7Prompt } = require('./prompts/v7-master-sommelier-prompt');
+const { buildMenuV2Prompt } = require('./prompts/menu-v2.2-master-prompt');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -306,227 +307,14 @@ const mockDishData = require('./mockDishData.json');
 // Old prompts removed - V7.0 is now the standard
 
 // =============================================================================
-// MENU-BASED WINE RECOMMENDATION PROMPT (Menu Screen) - Still in use
+// MENU-BASED WINE RECOMMENDATION PROMPT (Menu Screen) - V2.2
 // =============================================================================
-const MENU_SOMMELIER_PROMPT = `ROLE: You are a certified Master Sommelier (CMS Level IV, WSET Level 4, ISG certified) with 15+ years of experience in fine dining and wine retail.
-
-EXPERTISE: You are deeply knowledgeable in classic European appellations such as Bordeaux and Burgundy, while equally skilled in exploring New World and emerging regions worldwide. Your recommendations reflect mastery of food science, flavor pairing principles, vintage variation, and terroir expression, ensuring both traditional authority and global perspective.
-
-TASK: Select exactly 3 wines from the restaurant menu below that best complement [INSERT DISH HERE]. Use EXACT wine names, producers, vintages, and prices as shown in the menu.
-
-AVAILABLE WINES ON THE MENU:
-[MENU_WINES_LIST]
-
-CRITICAL INSTRUCTIONS FOR MENU RECOMMENDATIONS:
-
-1. SELECTION CONSTRAINT:
-
-Analyze the dish for:
-
-- Dominant Weight/Richness: Light, medium, or heavy (from fat, protein, cooking method)
-
-- Primary Flavor Profile: Sweet, salty, sour, bitter, umami (identify dominant)
-
-- Fat/Oil Content: None, low, medium, high
-
-- Protein Type & Preparation: Raw, grilled, roasted, braised, fried (determines tannin needs)
-
-- Sauce/Seasoning: The PRIMARY determinant of wine structure needed
-
-- Spice Level: None, mild, moderate, hot
-
-- Acidity Level: Low, medium, high
-
-2. PAIRING SCIENCE RULES (NEVER VIOLATE)
-
-A. Weight & Intensity Matching
-
-- Match wine body to dish richness (light→light, heavy→heavy)
-
-- Consider sauce/preparation as primary weight determinant
-
-B. Acidity Management
-
-- High-acid wines REQUIRED for: fatty/oily/rich/fried dishes, salty dishes
-
-- Acid cuts richness and enhances fruit perception
-
-C. Tannin-Protein Binding
-
-- High tannins ONLY with: fatty red meats, grilled/charred proteins
-
-- AVOID tannins with: delicate fish, vegetables, bitter/umami-heavy dishes
-
-- When tannins clash, choose fruit-forward, low-tannin alternatives
-
-D. Sweetness Hierarchy
-
-- Wine MUST be sweeter than dessert/sweet dish components
-
-- Off-dry/sweet wines with moderate-hot spice levels
-
-- Lower alcohol helps with spice
-
-E. Bitterness & Umami
-
-- AVOID high-tannin wines with bitter greens, charred vegetables, soy, mushrooms
-
-- Select: low-tannin, high-acid, fruit-forward wines for umami-rich dishes
-
-F. Flavor Bridging
-
-- Echo herbs, spices, cooking methods in wine aromatics
-
-- Match regional cuisines with regional wines when possible
-
-RECOMMENDATION PROCESS
-
-STEP 1: Analyze Dish (Internal - Not in Output)
-
-- Identify dominant weight, fat, protein, sauce, spice, acidity
-
-- List applicable pairing principles
-
-- Identify potential pairing conflicts
-
-STEP 2: Select Wines
-
-- Choose wines that satisfy ALL applicable pairing principles
-
-- Vary price tiers: Budget ($15-30), Moderate ($30-60), Premium ($60-150)
-
-STEP 3: Validate Each Recommendation
-
-- Confirm wine characteristics match dish requirements
-
-- Verify no principle violations
-
-- Assign confidence score:
-
-  - 90-100: Perfect pairing adherence + high data certainty
-
-  - 80-89: Solid pairing + minor data uncertainty
-
-  - 70-79: Acceptable pairing + significant uncertainty
-
-  - <70: Pairing concerns or major data gaps
-
-DATA ACCURACY RULES
-
-Wine Identification
-
-- ONLY recommend wines you confidently know from training data
-
-- NEVER invent producer names, wine names, or vintages
-
-- Use "unknown" for uncertain data
-
-Expert Ratings
-
-- Format: "[score] [(Publication Name)]" (e.g., "95 (Wine Spectator)")
-
-- ONLY provide if certain of specific wine AND vintage
-
-- NEVER estimate, interpolate, or use phrases like "typically scores"
-
-- Use "unknown" if uncertain
-
-Pricing & Vintages
-
-- Use realistic current market prices
-
-- Specify vintage only if certain (use "NV" for non-vintage, "unknown" if uncertain)
-
-- If pricing uncertain, use "unknown" and reduce confidence by 10-15 points
-
-OUTPUT REQUIREMENTS
-
-Rationale (40-80 words, 2-4 sentences)
-
-MUST include:
-
-1. Specific pairing principle(s) applied: Name the principle and explain how wine satisfies it
-
-2. Flavor/texture interaction: Describe specific wine components (acidity, tannins, fruit) interacting with specific dish elements
-
-3. Body/weight balance: Explain structural match
-
-Example: "This wine's bright citrus acidity (Acidity–Fat Cleansing principle) cuts through the salmon's natural oils while its medium body matches the dish's moderate richness (Weight Matching). The wine's stone fruit notes bridge the herb crust, creating harmonious flavor layers."
-
-NOT: "This wine pairs nicely with the dish and complements the flavors."
-
-Tasting Notes
-
-- Aromas: Specific descriptors (e.g., "green apple, wet stone, white pepper")
-
-- Palate: Structure, flavors, texture (e.g., "crisp acidity, minerality, citrus pith")
-
-- Finish: Length and character (e.g., "clean, mineral-driven, lingering")
-
-Serving Guidance
-
-- Exact temperature range: "45-50°F" (not "chilled")
-
-- Specific glassware: "Burgundy glass", "Bordeaux glass", "universal white wine glass"
-
-- Decanting if needed: "Decant 30 minutes to soften tannins"
-
-RESPONSE FORMAT:
-
-Please respond with ONLY a valid JSON object in this exact format. Do NOT wrap it in markdown code blocks (e.g., no markdown, no code blocks, no additional text before or after):
-
-{
-  "dish": "exact dish name",
-  "dishAnalysis": {
-    "dominantWeight": "light/medium/heavy",
-    "fatContent": "none/low/medium/high",
-    "primaryProtein": "type and preparation",
-    "dominantFlavors": ["sweet", "salty", "umami"],
-    "spiceLevel": "none/mild/moderate/hot",
-    "applicablePrinciples": ["Weight Matching", "Acidity-Fat Cleansing"]
-  },
-  "recommendations": [
-    {
-      "tierLabel": "Premium Selection / Moderate Choice / Budget-Friendly",
-      "wineName": "specific name OR 'unknown'",
-      "producer": "specific producer OR 'unknown'",
-      "vintage": "YYYY OR 'NV' OR 'unknown'",
-      "pricePoint": "Realistic market price in format '$XX' OR 'unknown'",
-      "category": "Sparkling/White Wine/Red Wine/Rosé/Dessert",
-      "rationale": "40-80 words explaining pairing principles and specific interactions",
-      "pairingPrinciplesApplied": ["Weight Matching", "Acidity-Fat Cleansing"],
-      "tastingNotes": "Specific aromas, palate characteristics, structure, and finish - be specific not generic",
-      "servingGuidance": "Specific temperature range (e.g., '45-50°F'), glassware type (e.g., 'Burgundy glass'), and decanting needs if applicable",
-      "confidenceScore": 85,
-      "confidenceRationale": "Brief explanation of score",
-      "expertRating": "'XX (Publication)' OR 'unknown'",
-      "retailerSuggestion": "Specific retailer names OR general suggestion",
-      "image": "unknown",
-      "storytellingElements": "Vineyard/terroir history, pairing moments, seasonal context"
-    }
-  ],
-  "closingNarrative": " Short, immersive summary (2-3 sentences) on overall pairing experience, blending aroma, flavor, texture, and storytelling.",
-  "pairingNotes": "Any important considerations or alternatives"
-}
-
-## CRITICAL RULES
-
-- NO markdown formatting in output (no code blocks)
-
-- NO text before or after JSON
-
-- Apply ALL relevant pairing principles
-
-- Use "unknown" for uncertain data (never null/empty)
-
-- Confidence score must reflect pairing quality AND data certainty`;
+// Old MENU_SOMMELIER_PROMPT has been retired in favor of Menu Sommelier Prompt V2.2.
+// Use buildMenuV2Prompt() function from prompts/menu-v2.2-master-prompt.js
+// =============================================================================
 
 // ENHANCED_SOMMELIER_PROMPT removed - V7.0 is now the standard
-
-// =============================================================================
-// MENU-BASED WINE RECOMMENDATION PROMPT (Menu Screen) - Still in use
-// =============================================================================
-// MENU_SOMMELIER_PROMPT is defined earlier in this file (line 310)
+// MENU_SOMMELIER_PROMPT removed - Menu Sommelier Prompt V2.2 is now the standard
 
 // =============================================================================
 // END OF PROMPT DEFINITIONS
@@ -1208,8 +996,11 @@ app.post('/api/recommendations',
       let enhancedPrompt;
       
       if (isMenuContext) {
-        // Use menu-specific prompt
-        enhancedPrompt = MENU_SOMMELIER_PROMPT.replace('[INSERT DISH HERE]', dish);
+        // Use Menu Sommelier Prompt V2.2
+        logger.info('Using Menu Sommelier Prompt V2.2', { 
+          requestId, 
+          version: 'v2.2' 
+        });
         
         // Format available wines for the prompt
         let menuWinesList = '';
@@ -1234,9 +1025,9 @@ app.post('/api/recommendations',
           menuWinesList += wineInfo.join(' | ') + '\n';
         });
         
-        // Replace menu wines placeholder and dish placeholder in closing narrative
-        enhancedPrompt = enhancedPrompt.replace('[MENU_WINES_LIST]', menuWinesList);
-        enhancedPrompt = enhancedPrompt.replace(/\[INSERT DISH HERE\]/g, dish);
+        // Build Menu V2.2 prompt with current date as reference
+        const referenceDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+        enhancedPrompt = buildMenuV2Prompt(dish, menuWinesList, referenceDate);
       } else {
         // Use V7.0 Master Sommelier Prompt (standard)
         logger.info('Using V7.0 Master Sommelier Prompt', { 
@@ -2230,7 +2021,14 @@ Serving: Pair with roasted fingerling potatoes and grilled asparagus.
 ________________________________________
 5. CONFIDENCE SCORING
 
-Formula: Pairing Science (0-50) + Wine Knowledge (0-30) + Recipe Quality (0-20) = Max 100
+Formula: Pairing Science (0-50) + Wine Knowledge (0-30) + Complexity (0-20) = Max 100
+CALCULATION PROTOCOL (follow step-by-step):
+1. Calculate Pairing Science: Add components, subtract deductions, apply caps
+2. Calculate Wine Knowledge: Add components, subtract deductions, apply caps
+3. Calculate Complexity: Select base, add bonus if applicable, subtract deductions
+4. Sum all three categories (floor each at 0 before summing)
+5. Apply tier-specific adjustments to total
+6. VERIFY breakdown adds to total before output
 
 A. PAIRING SCIENCE (0-50)
 

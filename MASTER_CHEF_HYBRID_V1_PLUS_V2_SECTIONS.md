@@ -296,3 +296,5 @@ IF Tier 1 violation detected: Reject dish, select alternative
 CRITICAL: You MUST return COMPLETE, VALID JSON. The response must start with { and end with } with all brackets, braces, and arrays properly closed. Do NOT truncate or cut off the response mid-JSON. Ensure all 3 dishRecommendations are fully included with complete recipe steps, ingredients, and confidence scoring.
 
 
+
+

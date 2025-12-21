@@ -41,8 +41,8 @@ export class OCRService {
       // We'll make the API call from the backend instead
       throw new Error('OCR processing should be done on the backend');
     } catch (error: any) {
-      console.error('OAuth2 token error:', error);
-      const errorMessage = error?.message || error?.toString() || 'Unknown error';
+      const errorMessage = error?.message || (typeof error === 'string' ? error : error?.toString() || 'Unknown error');
+      console.error('OAuth2 token error:', errorMessage);
       throw new Error(`Failed to get access token: ${errorMessage}`);
     }
   }
@@ -226,9 +226,8 @@ export class OCRService {
       console.log('Base64 conversion completed, length:', base64.length);
       return base64;
     } catch (error: any) {
-      console.error('Image conversion error:', error);
-      const errorMessage = error?.message || error?.toString() || 'Unknown error';
-      console.error('Error details:', errorMessage);
+      const errorMessage = error?.message || (typeof error === 'string' ? error : error?.toString() || 'Unknown error');
+      console.error('Image conversion error:', errorMessage);
       throw new Error(`Failed to convert image to base64: ${errorMessage}`);
     }
   }

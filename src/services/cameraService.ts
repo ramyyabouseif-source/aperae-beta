@@ -93,7 +93,7 @@ export class CameraService {
 
       // Launch camera
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: [ImagePicker.MediaType.Images],
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.5, // Reduced quality for smaller file size
@@ -111,9 +111,10 @@ export class CameraService {
         height: asset.height || 0,
         type: 'image',
       };
-    } catch (error) {
-      console.error('Camera photo capture error:', error);
-      throw new Error(`Failed to take photo: ${error.message}`);
+    } catch (error: any) {
+      const errorMessage = error?.message || (typeof error === 'string' ? error : error?.toString() || 'Unknown error');
+      console.error('Camera photo capture error:', errorMessage);
+      throw new Error(`Failed to take photo: ${errorMessage}`);
     }
   }
 
@@ -130,7 +131,7 @@ export class CameraService {
 
       // Launch image picker
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: [ImagePicker.MediaType.Images],
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.5, // Reduced quality for smaller file size
@@ -148,9 +149,10 @@ export class CameraService {
         height: asset.height || 0,
         type: 'image',
       };
-    } catch (error) {
-      console.error('Photo picker error:', error);
-      throw new Error(`Failed to pick photo: ${error.message}`);
+    } catch (error: any) {
+      const errorMessage = error?.message || (typeof error === 'string' ? error : error?.toString() || 'Unknown error');
+      console.error('Photo picker error:', errorMessage);
+      throw new Error(`Failed to pick photo: ${errorMessage}`);
     }
   }
 

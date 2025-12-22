@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(191, 150, 148, 0.3)', // Metallic accent
   },
   tipsContainer: {
-    backgroundColor: 'rgba(247, 244, 240, 0.95)', // Light tone
+    backgroundColor: 'rgba(247, 244, 240, 0.665)', // Light tone (decreased opacity by 30%)
     marginHorizontal: 16,
     borderRadius: 16,
     padding: 24,

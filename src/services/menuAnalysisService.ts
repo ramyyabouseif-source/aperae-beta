@@ -1415,32 +1415,59 @@ export class MenuAnalysisService {
       'nebbiolo': { name: 'Nebbiolo', color: 'Red', sweetness: 'Dry' },
       'sangiovese': { name: 'Sangiovese', color: 'Red', sweetness: 'Dry' },
       'canaiolo': { name: 'Canaiolo', color: 'Red', sweetness: 'Dry' },
+      'cannalolo': { name: 'Canaiolo', color: 'Red', sweetness: 'Dry' },
       'colorino': { name: 'Colorino', color: 'Red', sweetness: 'Dry' },
       'glera': { name: 'Glera', color: 'White', sweetness: 'Dry' },
       'cabernet sauvignon': { name: 'Cabernet Sauvignon', color: 'Red', sweetness: 'Dry' },
       'cabernet': { name: 'Cabernet Sauvignon', color: 'Red', sweetness: 'Dry' },
+      'cab. sauv': { name: 'Cabernet Sauvignon', color: 'Red', sweetness: 'Dry' },
       'merlot': { name: 'Merlot', color: 'Red', sweetness: 'Dry' },
+      'corvina': { name: 'Corvina', color: 'Red', sweetness: 'Dry' },
+      'rondinella': { name: 'Rondinella', color: 'Red', sweetness: 'Dry' },
+      'rond.': { name: 'Rondinella', color: 'Red', sweetness: 'Dry' },
+      'rond': { name: 'Rondinella', color: 'Red', sweetness: 'Dry' },
+      'molinara': { name: 'Molinara', color: 'Red', sweetness: 'Dry' },
+      'oseleta': { name: 'Oseleta', color: 'Red', sweetness: 'Dry' },
+      'syrah': { name: 'Syrah', color: 'Red', sweetness: 'Dry' },
     };
 
     const grapes: Array<{ name: string; color: string; sweetness: string }> = [];
     const textLower = text.toLowerCase();
 
-    // Extract grape percentages (e.g., "Chard 75%, P. Noir 15%, Bianco 10%")
-    const grapePercentagePattern = /([A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+)%/g;
+    // Extract grape percentages (e.g., "Chard 75%, P. Noir 15%, Bianco 10%", "Corvina 70%, Rond. 20%")
+    // Improved pattern to handle abbreviations and punctuation
+    const grapePercentagePattern = /([A-Za-z]+(?:\.[A-Za-z]*)?(?:\s+[A-Za-z]+)*)\s+(\d+)%/g;
     let match;
     const foundGrapes = new Set<string>();
 
     while ((match = grapePercentagePattern.exec(text)) !== null) {
       const grapeText = match[1].toLowerCase().trim();
-      // Map abbreviations to full names
+      // Map abbreviations to full names - check for exact matches first (including abbreviations)
+      let matched = false;
       for (const [key, grapeInfo] of Object.entries(grapeMap)) {
-        if (grapeText.includes(key) || key.includes(grapeText)) {
+        // Check for exact match or if the key is contained in the grapeText (handles abbreviations)
+        if (grapeText === key || grapeText.includes(key) || key.includes(grapeText)) {
           const grapeKey = grapeInfo.name;
           if (!foundGrapes.has(grapeKey)) {
             grapes.push(grapeInfo);
             foundGrapes.add(grapeKey);
           }
+          matched = true;
           break;
+        }
+      }
+      // If no match found, try to match without punctuation (e.g., "Rond." -> "rond")
+      if (!matched && grapeText.includes('.')) {
+        const grapeTextNoPunct = grapeText.replace(/\./g, '');
+        for (const [key, grapeInfo] of Object.entries(grapeMap)) {
+          if (grapeTextNoPunct === key || grapeTextNoPunct.includes(key) || key.includes(grapeTextNoPunct)) {
+            const grapeKey = grapeInfo.name;
+            if (!foundGrapes.has(grapeKey)) {
+              grapes.push(grapeInfo);
+              foundGrapes.add(grapeKey);
+            }
+            break;
+          }
         }
       }
     }
@@ -1464,9 +1491,16 @@ export class MenuAnalysisService {
       }
     }
 
-    // Special handling for known appellations
+    // Special handling for known appellations (only if no grapes found from percentages)
     if (grapes.length === 0) {
-      if (textLower.includes('barolo') || textLower.includes('barbaresco')) {
+      if (textLower.includes('amarone') || textLower.includes('valpolicella')) {
+        // Amarone/Valpolicella wines are typically blends of Corvina, Rondinella, Molinara
+        grapes.push(
+          { name: 'Corvina', color: 'Red', sweetness: 'Dry' },
+          { name: 'Rondinella', color: 'Red', sweetness: 'Dry' },
+          { name: 'Molinara', color: 'Red', sweetness: 'Dry' }
+        );
+      } else if (textLower.includes('barolo') || textLower.includes('barbaresco')) {
         grapes.push({ name: 'Nebbiolo', color: 'Red', sweetness: 'Dry' });
       } else if (textLower.includes('chianti') || textLower.includes('brunello')) {
         grapes.push({ name: 'Sangiovese', color: 'Red', sweetness: 'Dry' });
@@ -1479,11 +1513,11 @@ export class MenuAnalysisService {
           { name: 'Pinot Noir', color: 'Red', sweetness: 'Dry' },
           { name: 'Pinot Bianco', color: 'White', sweetness: 'Dry' }
         );
-      } else if (textLower.includes('puligny-montrachet') || (textLower.includes('montrachet') && category.toLowerCase().includes('white'))) {
+      } else if (textLower.includes('puligny-montrachet') || (textLower.includes('montrachet') && category && category.toLowerCase().includes('white'))) {
         grapes.push({ name: 'Chardonnay', color: 'White', sweetness: 'Dry' });
-      } else if (category.toLowerCase().includes('pinot noir')) {
+      } else if (category && category.toLowerCase().includes('pinot noir')) {
         grapes.push({ name: 'Pinot Noir', color: 'Red', sweetness: 'Dry' });
-      } else if (category.toLowerCase().includes('chardonnay')) {
+      } else if (category && category.toLowerCase().includes('chardonnay')) {
         grapes.push({ name: 'Chardonnay', color: 'White', sweetness: 'Dry' });
       }
     }
@@ -1823,8 +1857,20 @@ export class MenuAnalysisService {
         detectedCategory = 'Red Wine'; // Barolo/Barbaresco are Nebbiolo
       } else if (combinedText.includes('chianti') || combinedText.includes('brunello')) {
         detectedCategory = 'Red Wine'; // Chianti/Brunello are Sangiovese
+      } else if (combinedText.includes('amarone')) {
+        detectedCategory = 'Red Wine'; // Amarone is red
       } else {
-        detectedCategory = category || 'Wine'; // Use original category or fallback
+        // Validate category before using it - reject if it looks like a wine name
+        const categoryIsValid = category && 
+          category.length < 50 && // Categories should be short
+          !category.includes(',') && // Categories shouldn't have commas
+          !category.match(/\b(19|20)\d{2}\b/) && // Categories shouldn't have vintages
+          !category.match(/\b(DOCG?|DOC|AOC|IGT|AVA)\b/i) && // Categories shouldn't be appellations alone
+          !category.toLowerCase().includes('chardonnay') && // Categories shouldn't be grape names alone
+          !category.toLowerCase().includes('pinot noir') &&
+          !category.toLowerCase().includes('tenuta') && // Categories shouldn't be producer names
+          !category.toLowerCase().includes('fattoria');
+        detectedCategory = categoryIsValid ? category : 'Wine'; // Use validated category or fallback
       }
     }
     

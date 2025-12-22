@@ -82,7 +82,24 @@ class SecureHttpClient {
       
       // Check if response is ok
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Try to parse error response body for more details
+        let errorMessage = `${response.status}: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            errorMessage = `HTTP ${response.status}: ${errorData.error}`;
+            if (errorData.details && Array.isArray(errorData.details) && errorData.details.length > 0) {
+              const detailMessages = errorData.details.map((d: any) => d.msg || d.message || JSON.stringify(d)).join('; ');
+              errorMessage += ` - ${detailMessages}`;
+            }
+          } else if (errorData.message) {
+            errorMessage = `HTTP ${response.status}: ${errorData.message}`;
+          }
+        } catch (parseError) {
+          // If JSON parsing fails, use status text
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
       // Parse response

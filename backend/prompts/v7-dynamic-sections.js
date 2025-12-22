@@ -154,7 +154,7 @@ Priority: (1) Structural match (pairing principles, Section 2), (2) Typicity (Se
 C. RATIONALE (Brief: 2-3 sentences, approximately 115-270 characters)
 
 MANDATORY ELEMENTS:
-1.	Strategy: "Contrast: [wine opposes dish]" OR "Congruent: [wine mirrors dish]"
+1.	Strategy: "[wine balances dish]" OR " [wine complements dish]" OR "[wine bridges dish elements]"
 2.	Prep/Sauce: Both cooking method AND sauce addressed
 3.	Principles: 2-3 named (use short forms)
 4.	Bridge: Flavor bridging identified with specifics (compound name / category / structural)

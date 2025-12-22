@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
   },
   // Wine Pairing Assistant Styles
   winePairingContainer: {
-    backgroundColor: 'rgba(247, 244, 240, 0.95)', // Light tone
+    backgroundColor: 'rgba(247, 244, 240, 0.665)', // Light tone - decreased opacity by 30% (0.95 * 0.7 = 0.665)
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 16,

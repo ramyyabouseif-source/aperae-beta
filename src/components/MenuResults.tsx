@@ -126,6 +126,8 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
       tastingNotes: rec.tastingNotes || sanitizeText(rec.wine?.description || ''),
       servingGuidance: rec.servingGuidance || 'Serve at recommended temperature',
       confidenceScore: rec.confidenceScore || 75,
+      // Pass through confidence object (V2.2 format with breakdown) if available
+      confidence: rec.confidence || undefined,
       image: 'unknown',
       storytellingElements: rec.storytellingElements || rec.pairingRationale || '',
       tierLabel: mapTierLabel(rec.tierLabel),
@@ -275,9 +277,7 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
           )}
           
           {/* Responsible Drinking Disclaimer - After final notes with proper spacing (matches home screen) */}
-          <View style={{ marginTop: 0, marginBottom: 16 }}>
-            <ResponsibleDrinkingDisclaimer />
-          </View>
+          <ResponsibleDrinkingDisclaimer />
         </View>
       )}
 

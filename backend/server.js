@@ -2148,7 +2148,7 @@ DISH DIVERSITY RULE:
 C. PAIRING RATIONALE (Brief: 2-3 sentences per dish)
 
 MANDATORY ELEMENTS:
-1. Strategy: "Contrast: [wine structure opposes dish]" OR "Congruent: [wine mirrors dish]"
+1. Strategy: "[wine balances dish]" OR " [wine complements dish]" OR "[wine bridges dish elements]"
 2. Principle application: 2-3 named principles (short forms)
 3. Bridge: Tier identified with specifics
 4. Wine characteristic: Which structural element drives pairing

@@ -33,6 +33,39 @@ const validateRecommendationRequest = [
     .withMessage('Dish contains invalid characters')
 ];
 
+// Validation rules for dish recommendations (wine -> dish pairing)
+const validateDishRecommendationRequest = [
+  body('wine')
+    .customSanitizer(value => {
+      // Sanitize FIRST to normalize quotes before validation
+      if (typeof value !== 'string') return value;
+      
+      // Normalize curly quotes to straight quotes
+      let sanitized = value
+        .replace(/[""]/g, '"')  // Left double quotation mark (U+201C) -> "
+        .replace(/[""]/g, '"')  // Right double quotation mark (U+201D) -> "
+        .replace(/['']/g, "'")  // Left single quotation mark (U+2018) -> '
+        .replace(/['']/g, "'"); // Right single quotation mark (U+2019) -> '
+      
+      // Remove HTML tags
+      sanitized = sanitized.replace(/<[^>]*>/g, '');
+      
+      // Remove script content and javascript: protocols
+      sanitized = sanitized.replace(/javascript:/gi, '');
+      sanitized = sanitized.replace(/on\w+\s*=/gi, '');
+      
+      // Remove any remaining potentially dangerous characters (but keep normalized quotes)
+      sanitized = sanitized.replace(/[<>"&]/g, '');
+      
+      return sanitized;
+    })
+    .trim()
+    .isLength({ min: 1, max: 500 })
+    .withMessage('Wine must be between 1 and 500 characters')
+    .matches(/^[a-zA-Z0-9\s\-.,!?()'"]+$/)
+    .withMessage('Wine contains invalid characters')
+];
+
 // Middleware to handle validation results
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
@@ -153,6 +186,7 @@ const sanitizeHtml = (value) => {
 
 module.exports = {
   validateRecommendationRequest,
+  validateDishRecommendationRequest,
   validateRegistrationRequest,
   validateLoginRequest,
   validateRefreshRequest,

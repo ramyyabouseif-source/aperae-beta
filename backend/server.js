@@ -8,7 +8,8 @@ const { ipKeyGenerator } = require('express-rate-limit');
 const helmet = require('helmet');
 const Anthropic = require('@anthropic-ai/sdk');
 const { 
-  validateRecommendationRequest, 
+  validateRecommendationRequest,
+  validateDishRecommendationRequest,
   validateRegistrationRequest,
   validateLoginRequest,
   validateRefreshRequest,
@@ -2313,6 +2314,8 @@ Wine: "${wine}"`;
  *         description: Internal server error
  */
 app.post('/api/dish-recommendations',
+  validateDishRecommendationRequest,
+  handleValidationErrors,
   async (req, res) => {
     const requestStartTime = Date.now();
     const requestId = generateRequestId();

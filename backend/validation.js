@@ -21,8 +21,8 @@ const validateRecommendationRequest = [
       sanitized = sanitized.replace(/javascript:/gi, '');
       sanitized = sanitized.replace(/on\w+\s*=/gi, '');
       
-      // Remove any remaining potentially dangerous characters (but keep normalized quotes)
-      sanitized = sanitized.replace(/[<>"&]/g, '');
+      // Remove potentially dangerous characters (but keep normalized quotes - do NOT remove " or ')
+      sanitized = sanitized.replace(/[<>&]/g, '');
       
       return sanitized;
     })
@@ -54,8 +54,8 @@ const validateDishRecommendationRequest = [
       sanitized = sanitized.replace(/javascript:/gi, '');
       sanitized = sanitized.replace(/on\w+\s*=/gi, '');
       
-      // Remove any remaining potentially dangerous characters (but keep normalized quotes)
-      sanitized = sanitized.replace(/[<>"&]/g, '');
+      // Remove potentially dangerous characters (but keep normalized quotes - do NOT remove " or ')
+      sanitized = sanitized.replace(/[<>&]/g, '');
       
       return sanitized;
     })

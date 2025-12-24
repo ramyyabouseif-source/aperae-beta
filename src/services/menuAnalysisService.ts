@@ -3,6 +3,7 @@
  * Combines OCR processing with wine recommendation engine
  */
 
+import * as Crypto from 'expo-crypto';
 import { OCRService, OCRResult, MenuItem } from './ocrService';
 import { CameraService, PhotoResult } from './cameraService';
 import { WineService } from './wineService';
@@ -19,6 +20,8 @@ export interface WineListAnalysisResult {
     description?: string;
     grape?: string;
     region?: string;
+    price?: string; // Price as extracted from OCR
+    rawOcrLine?: string; // Original OCR line for debugging
   }>;
   wineRecommendations: Array<{
     wine: {
@@ -86,10 +89,79 @@ export class MenuAnalysisService {
   };
 
   /**
+   * Generate a unique request ID for tracking
+   */
+  private static async generateRequestId(): Promise<string> {
+    // Generate a base64url-encoded random ID (similar to backend)
+    // Use expo-crypto for React Native compatibility
+    const randomBytes = new Uint8Array(12);
+    const randomValues = await Crypto.getRandomBytesAsync(12);
+    randomBytes.set(randomValues);
+    return btoa(String.fromCharCode(...randomBytes))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  }
+
+  /**
+   * Store parsed menu wines to database via API
+   */
+  private static async storeParsedMenuWines(
+    parsedWines: WineListAnalysisResult['availableWines'],
+    requestId: string,
+    dish: string,
+    ocrConfidence: number
+  ): Promise<void> {
+    try {
+      const { getApiBaseUrl } = require('../utils/api');
+      const apiBaseUrl = getApiBaseUrl();
+      const url = `${apiBaseUrl}/menu-wines`;
+
+      // Prepare wines for API (include all fields)
+      const winesForApi = parsedWines.map(wine => ({
+        wineName: wine.wineName,
+        producer: wine.producer,
+        vintage: wine.vintage,
+        grape: wine.grape,
+        region: wine.region,
+        price: wine.price,
+        category: wine.category,
+        servingStyle: wine.servingStyle,
+        description: wine.description,
+        rawOcrLine: wine.rawOcrLine
+      }));
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          parsedWines: winesForApi,
+          requestId,
+          dish,
+          ocrConfidence
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Parsed menu wines stored successfully:', result);
+    } catch (error: any) {
+      console.error('Error storing parsed menu wines:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Analyze wine list from photo with dish context
    */
   static async analyzeWineListFromPhoto(
-    photo: PhotoResult,
+    photo: PhotoResult | null,
     dish: string,
     servingStylePreference: 'glass' | 'bottle' | 'both' = 'both',
     winePreferences?: any
@@ -102,32 +174,65 @@ export class MenuAnalysisService {
       console.log('Serving style preference:', servingStylePreference);
       console.log('Wine preferences:', winePreferences);
 
-      // Step 1: Extract text using OCR (with fallback)
+      // Check if mock mode is enabled
+      const isMockMode = WineService.isMockModeEnabled();
+      console.log('Mock mode enabled:', isMockMode);
+
       let ocrResult: OCRResult;
-      try {
-        ocrResult = await OCRService.extractTextFromImage(photo.uri);
-        console.log('OCR completed, confidence:', ocrResult.confidence);
-        console.log('=== RAW OCR TEXT OUTPUT ===');
-        console.log(ocrResult.text);
-        console.log('=== END OCR TEXT ===');
-      } catch (error: any) {
-        console.log('OCR failed, using fallback mock wine list:', error.message);
-        // Use empty OCR result to trigger mock wine list fallback
+      let availableWines: WineListAnalysisResult['availableWines'];
+
+      if (isMockMode) {
+        // In mock mode, skip OCR and use mock wine list directly
+        console.log('Mock mode enabled - skipping OCR and using mock wine list');
         ocrResult = {
           text: '',
-          confidence: 0,
+          confidence: 100, // High confidence for mock mode
           boundingBoxes: []
         };
+        availableWines = this.getMockWineList();
+        console.log('Using mock wine list with', availableWines.length, 'wines');
+      } else {
+        // Step 1: Extract text using OCR (with fallback)
+        if (!photo) {
+          throw new Error('Photo is required when mock mode is disabled');
+        }
+
+        try {
+          ocrResult = await OCRService.extractTextFromImage(photo.uri);
+          console.log('OCR completed, confidence:', ocrResult.confidence);
+          console.log('=== RAW OCR TEXT OUTPUT ===');
+          console.log(ocrResult.text);
+          console.log('=== END OCR TEXT ===');
+        } catch (error: any) {
+          console.log('OCR failed, using fallback mock wine list:', error.message);
+          // Use empty OCR result to trigger mock wine list fallback
+          ocrResult = {
+            text: '',
+            confidence: 0,
+            boundingBoxes: []
+          };
+        }
+
+        // Step 2: Parse wine list items
+        availableWines = this.parseWineListText(ocrResult);
+        console.log('Parsed wine list items:', availableWines.length);
+        
+        // If no wines were parsed, use a mock wine list for testing
+        if (availableWines.length === 0) {
+          console.log('No wines parsed from OCR, using mock wine list for testing');
+          availableWines = this.getMockWineList();
+        }
       }
 
-      // Step 2: Parse wine list items
-      let availableWines = this.parseWineListText(ocrResult);
-      console.log('Parsed wine list items:', availableWines.length);
-      
-      // If no wines were parsed, use a mock wine list for testing
-      if (availableWines.length === 0) {
-        console.log('No wines parsed from OCR, using mock wine list for testing');
-        availableWines = this.getMockWineList();
+      // Step 2.5: Generate request ID and store parsed wines to database
+      // This happens BEFORE getting recommendations, as requested
+      const requestId = await this.generateRequestId();
+      try {
+        await this.storeParsedMenuWines(availableWines, requestId, dish, ocrResult.confidence);
+        console.log('Parsed menu wines stored to database with request ID:', requestId);
+      } catch (storeError: any) {
+        console.error('Failed to store parsed menu wines (non-blocking):', storeError.message);
+        // Continue even if storage fails - this is non-blocking
       }
 
       // Step 3: Filter wines by serving style preference
@@ -135,10 +240,12 @@ export class MenuAnalysisService {
       console.log('Filtered wines:', filteredWines.length);
 
       // Step 4: Get AI-powered wine recommendations for the dish
+      // Pass requestId to link recommendations with parsed wines
       const { recommendations: wineRecommendations, dishAnalysis } = await this.getWineRecommendationsFromAvailableWines(
         dish,
         filteredWines,
-        winePreferences
+        winePreferences,
+        requestId
       );
 
       const processingTime = Date.now() - startTime;
@@ -519,8 +626,13 @@ export class MenuAnalysisService {
             console.log(`⚠ No price block found for wine at line ${wineLine.index}`);
           }
           
-          const wine = this.extractWineFromLine(wineLine.line, wineLine.category, ocrResult.confidence);
+          const wine = this.extractWineFromLine(wineLine.line, wineLine.category, ocrResult.confidence, matchedPrice);
           if (wine) {
+            // Add price and raw OCR line to wine object
+            if (matchedPrice && matchedPrice !== 'Price not listed') {
+              wine.price = matchedPrice;
+            }
+            wine.rawOcrLine = wineLine.line;
             wines.push(wine);
           }
         }
@@ -530,6 +642,7 @@ export class MenuAnalysisService {
         for (const wineLine of wineLines) {
           const wine = this.extractWineFromLine(wineLine.line, wineLine.category, ocrResult.confidence);
           if (wine) {
+            wine.rawOcrLine = wineLine.line;
             wines.push(wine);
           }
         }
@@ -609,12 +722,14 @@ export class MenuAnalysisService {
   private static async getWineRecommendationsFromAvailableWines(
     dish: string,
     availableWines: WineListAnalysisResult['availableWines'],
-    winePreferences?: any
+    winePreferences?: any,
+    requestId?: string
   ): Promise<{ recommendations: WineListAnalysisResult['wineRecommendations'], dishAnalysis?: DishAnalysis }> {
     try {
       console.log('Getting AI recommendations for dish:', dish);
       console.log('Available wines:', availableWines.length);
       console.log('Wine preferences:', winePreferences);
+      console.log('Request ID:', requestId);
 
       // Convert available wines list to a summary for the AI prompt
       const availableWinesSummary = availableWines.map(w => 
@@ -623,7 +738,8 @@ export class MenuAnalysisService {
 
       // Use WineService to get AI recommendations with enhanced prompt
       // Pass available wines to constrain recommendations to menu wines only
-      const wineResponse = await WineService.getWineRecommendations(dish, winePreferences, availableWines);
+      // Pass requestId to link recommendations with parsed wines
+      const wineResponse = await WineService.getWineRecommendations(dish, winePreferences, availableWines, requestId);
 
       if (!wineResponse || !wineResponse.recommendations || wineResponse.recommendations.length === 0) {
         console.warn('No recommendations from WineService, returning empty array');

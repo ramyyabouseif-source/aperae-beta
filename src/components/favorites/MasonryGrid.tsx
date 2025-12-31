@@ -81,7 +81,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
         onWineUpdated={onWineUpdated}
       />
     ),
-    [numColumns, onRemoveFromFavorites, onPress, onWineUpdated]
+    [numColumns, onRemoveFromFavorites, onWineUpdated]
   );
 
   const keyExtractor = useCallback(

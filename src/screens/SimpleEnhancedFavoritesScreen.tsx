@@ -12,11 +12,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { FavoritesService, PaginationOptions } from '../services/favoritesService';
-import { LayoutPreferencesService, LayoutType } from '../services/layoutPreferencesService';
 import { MyCellarWine } from '../types/wine';
-import MasonryGrid from '../components/favorites/MasonryGrid';
 import FavoritesListView from '../components/favorites/FavoritesListView';
-import LayoutToggleButton from '../components/favorites/LayoutToggleButton';
 import WineDetailModal from '../components/favorites/WineDetailModal';
 import StatusBadge from '../components/myCellar/StatusBadge';
 import StarRating from '../components/myCellar/StarRating';
@@ -30,10 +27,9 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [selectedWine, setSelectedWine] = useState<MyCellarWine | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [layout, setLayout] = useState<LayoutType>('grid');
   const [fadeAnim] = useState(new Animated.Value(1));
   const [stats, setStats] = useState({ total: 0, wantToTry: 0, haveTried: 0, favorites: 0, averageRating: 0 });
-  const [statusFilter, setStatusFilter] = useState<'all' | 'wantToTry' | 'haveTried' | 'favorite'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'wantToTry' | 'haveTried'>('all');
   const navigation = useNavigation();
 
   const PAGE_SIZE = 20; // Items per page
@@ -58,37 +54,6 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
     }
   };
 
-  const loadLayoutPreference = async () => {
-    try {
-      const savedLayout = await LayoutPreferencesService.getLayoutPreference();
-      setLayout(savedLayout);
-    } catch (error) {
-      console.error('Error loading layout preference:', error);
-    }
-  };
-
-  const handleLayoutToggle = useCallback(async (newLayout: LayoutType) => {
-    // Animate transition
-    Animated.sequence([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    setLayout(newLayout);
-    try {
-      await LayoutPreferencesService.saveLayoutPreference(newLayout);
-    } catch (error) {
-      console.error('Error saving layout preference:', error);
-    }
-  }, [fadeAnim]);
 
   const loadFavorites = async (page: number = 1, append: boolean = false) => {
     try {
@@ -171,7 +136,7 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
     // setModalVisible(true);
   }, []);
 
-  const handleStatusChange = async (wine: MyCellarWine, newStatus: 'wantToTry' | 'haveTried' | 'favorite') => {
+  const handleStatusChange = async (wine: MyCellarWine, newStatus: 'wantToTry' | 'haveTried') => {
     try {
       await FavoritesService.updateWineStatus(wine.id, newStatus);
       // Update local state
@@ -246,10 +211,6 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
               <Text style={styles.statNumber}>{stats.haveTried}</Text>
               <Text style={styles.statLabel}>Have Tried</Text>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{stats.favorites}</Text>
-              <Text style={styles.statLabel}>Favorites</Text>
-            </View>
           </View>
           {stats.averageRating > 0 && (
             <View style={styles.ratingRow}>
@@ -263,7 +224,7 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
         {favorites.length > 0 && (
           <View style={styles.filterContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-              {(['all', 'favorite', 'wantToTry', 'haveTried'] as const).map((filter) => (
+              {(['all', 'wantToTry', 'haveTried'] as const).map((filter) => (
                 <TouchableOpacity
                   key={filter}
                   style={[
@@ -278,7 +239,7 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
                       statusFilter === filter && styles.filterButtonTextActive,
                     ]}
                   >
-                    {filter === 'all' ? 'All' : filter === 'wantToTry' ? 'Want to Try' : filter === 'haveTried' ? 'Have Tried' : 'Favorites'}
+                    {filter === 'all' ? 'All' : filter === 'wantToTry' ? 'Want to Try' : 'Have Tried'}
                   </Text>
                   {statusFilter === filter && favorites.filter(w => w.status === filter).length > 0 && (
                     <View style={styles.filterBadge}>
@@ -293,15 +254,6 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
           </View>
         )}
         
-        {/* Layout Toggle Button */}
-        {filteredWines.length > 0 && (
-          <View style={styles.layoutToggleContainer}>
-            <LayoutToggleButton
-              layout={layout}
-              onToggle={handleLayoutToggle}
-            />
-          </View>
-        )}
       </View>
     );
   };
@@ -332,43 +284,25 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
           },
         ]}
       >
-        {layout === 'grid' ? (
-          <MasonryGrid
-            data={getFilteredWines()}
-            loading={loading}
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            onRemoveFromFavorites={confirmRemoveFavorite}
-            onPress={handleWinePress}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
-            ListHeaderComponent={renderListHeader}
-            ListEmptyComponent={renderEmptyState}
-            contentContainerStyle={[
-              getFilteredWines().length === 0 && styles.emptyListContainer
-            ]}
-          />
-        ) : (
-          <FavoritesListView
-            data={getFilteredWines()}
-            loading={loading}
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            onRemoveFromFavorites={confirmRemoveFavorite}
-            onPress={handleWinePress}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
-            ListHeaderComponent={renderListHeader}
-            ListEmptyComponent={renderEmptyState}
-            contentContainerStyle={[
-              getFilteredWines().length === 0 && styles.emptyListContainer
-            ]}
-            onWineUpdated={async () => {
-              await loadFavorites(currentPage, false);
-              await loadStats();
-            }}
-          />
-        )}
+        <FavoritesListView
+          data={getFilteredWines()}
+          loading={loading}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          onRemoveFromFavorites={confirmRemoveFavorite}
+          onPress={undefined}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListHeaderComponent={renderListHeader}
+          ListEmptyComponent={renderEmptyState}
+          contentContainerStyle={[
+            getFilteredWines().length === 0 && styles.emptyListContainer
+          ]}
+          onWineUpdated={async () => {
+            await loadFavorites(currentPage, false);
+            await loadStats();
+          }}
+        />
       </Animated.View>
 
       {/* Wine Detail Modal - Disabled: Cards now flip instead */}
@@ -423,10 +357,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#5B2433', // Dark tone
     textAlign: 'center',
-  },
-  layoutToggleContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
   },
   wineCellarBackground: {
     position: 'absolute',

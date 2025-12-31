@@ -278,7 +278,7 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
           
           {/* Responsible Drinking Disclaimer - After final notes with proper spacing (matches home screen) */}
           <View style={{ marginTop: 24, marginBottom: 16 }}>
-            <ResponsibleDrinkingDisclaimer style={{ marginVertical: 0 }} />
+            <ResponsibleDrinkingDisclaimer />
           </View>
         </View>
       )}

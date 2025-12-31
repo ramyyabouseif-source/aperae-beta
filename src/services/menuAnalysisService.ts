@@ -228,7 +228,7 @@ export class MenuAnalysisService {
               : (typeof rec.servingGuidance === 'object' && rec.servingGuidance?.temperature
                   ? `${rec.servingGuidance.temperature}${rec.servingGuidance.glassware ? ` | ${rec.servingGuidance.glassware}` : ''}${rec.servingGuidance.decanting ? ` | ${rec.servingGuidance.decanting}` : ''}`
                   : 'Serve at recommended temperature'),
-            tastingNotes: typeof rec.tastingNotes === 'string' ? rec.tastingNotes : undefined,
+            tastingNotes: rec.tastingNotes, // Preserve object format (V2.2) or string format (legacy)
             storytellingElements: rec.storytellingElements,
             tierLabel: rec.tierLabel,
             tierRationale: rec.tierRationale,

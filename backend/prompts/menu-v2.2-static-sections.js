@@ -533,7 +533,7 @@ If menu lacks critical wine types:
 A. RATIONALE SPECIFICITY (2-4 sentences, 40-80 words)
 
 MANDATORY ELEMENTS:
-1. Strategy: "[wine balances dish]" OR " [wine complements dish]" OR "[wine bridges dish elements]"
+1. Strategy: "Contrast: [wine opposes dish]" OR "Congruent: [wine mirrors dish]" OR Balanced: [wine bridges dish elements]"
 2. Specific wine characteristics: "citrus notes", "minerality", "herbal character", "bright acidity", "firm tannins"
 3. Dish interaction: Connect wine to specific dish elements (e.g., "wine's citrus acidity cuts through fish's natural oils")
 4. Pairing principle: Name principle (Acidity-Fat, Tannin-Protein, Weight Match, high umami + moderate protein (Scenario 2))
@@ -715,4 +715,6 @@ Avoid:
 };
 
 module.exports = STATIC_SECTIONS;
+
+
 

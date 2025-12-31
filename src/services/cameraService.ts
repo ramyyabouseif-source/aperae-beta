@@ -19,11 +19,80 @@ export interface PhotoResult {
   type: 'image';
 }
 
+/**
+ * Web-specific file input handler
+ * Creates a hidden file input and triggers it programmatically
+ */
+const createWebFileInput = (accept: string = 'image/*'): Promise<PhotoResult | null> => {
+  // Type guard for web environment
+  if (typeof document === 'undefined' || typeof window === 'undefined') {
+    return Promise.resolve(null);
+  }
+  
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = accept;
+    input.style.display = 'none';
+    
+    input.onchange = (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      
+      if (!file) {
+        resolve(null);
+        return;
+      }
+      
+      // Create object URL for the file
+      const uri = URL.createObjectURL(file);
+      
+      // Get image dimensions
+      const img = new Image();
+      img.onload = () => {
+        resolve({
+          uri,
+          width: img.width,
+          height: img.height,
+          type: 'image',
+        });
+      };
+      img.onerror = () => {
+        // If we can't get dimensions, return with 0 dimensions
+        resolve({
+          uri,
+          width: 0,
+          height: 0,
+          type: 'image',
+        });
+      };
+      img.src = uri;
+    };
+    
+    input.oncancel = () => {
+      resolve(null);
+    };
+    
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+  });
+};
+
 export class CameraService {
   /**
    * Request camera permissions
    */
   static async requestCameraPermission(): Promise<CameraPermission> {
+    // On web, camera access is handled via file input, so we always return granted
+    if (Platform.OS === 'web') {
+      return {
+        granted: true,
+        canAskAgain: true,
+        status: 'granted',
+      };
+    }
+    
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       
@@ -46,6 +115,15 @@ export class CameraService {
    * Check current camera permissions
    */
   static async getCameraPermission(): Promise<CameraPermission> {
+    // On web, camera access is handled via file input, so we always return granted
+    if (Platform.OS === 'web') {
+      return {
+        granted: true,
+        canAskAgain: true,
+        status: 'granted',
+      };
+    }
+    
     try {
       const { status } = await ImagePicker.getCameraPermissionsAsync();
       
@@ -68,6 +146,11 @@ export class CameraService {
    * Request media library permissions for saving photos
    */
   static async requestMediaLibraryPermission(): Promise<boolean> {
+    // On web, file access is handled via file input, so we always return true
+    if (Platform.OS === 'web') {
+      return true;
+    }
+    
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       return status === 'granted';
@@ -81,6 +164,11 @@ export class CameraService {
    * Take a photo using the camera
    */
   static async takePhoto(): Promise<PhotoResult | null> {
+    // On web, use file input (user can select from camera or files)
+    if (Platform.OS === 'web') {
+      return createWebFileInput('image/*');
+    }
+    
     try {
       // Check permissions first
       const permission = await this.getCameraPermission();
@@ -122,6 +210,11 @@ export class CameraService {
    * Pick a photo from the gallery
    */
   static async pickPhoto(): Promise<PhotoResult | null> {
+    // On web, use file input
+    if (Platform.OS === 'web') {
+      return createWebFileInput('image/*');
+    }
+    
     try {
       // Request media library permission
       const hasPermission = await this.requestMediaLibraryPermission();
@@ -160,6 +253,11 @@ export class CameraService {
    * Check if camera is available on the device
    */
   static async isCameraAvailable(): Promise<boolean> {
+    // On web, file input is always available
+    if (Platform.OS === 'web') {
+      return true;
+    }
+    
     try {
       // Check permissions - if we can get permissions, camera is likely available
       // The permission check will fail if camera hardware is not available

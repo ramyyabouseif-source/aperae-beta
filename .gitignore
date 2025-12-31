@@ -95,3 +95,4 @@ backend/.env
 
 # Google Cloud Vision API key
 google-vision-key.json
+.vercel

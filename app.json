@@ -46,7 +46,17 @@
         "babel": {
           "include": ["@babel/plugin-proposal-export-namespace-from"]
         }
-      }
+      },
+      "name": "PocketSomm - AI Wine Sommelier",
+      "shortName": "PocketSomm",
+      "lang": "en",
+      "scope": "/",
+      "themeColor": "#8B0000",
+      "backgroundColor": "#FFFFFF",
+      "display": "standalone",
+      "orientation": "portrait",
+      "startUrl": "/",
+      "description": "AI-powered wine recommendations based on food pairings and user preferences"
     },
     "plugins": [
       "expo-camera",

@@ -248,3 +248,38 @@ model WineRecommendation {
   @@map("wine_recommendations")
 }
 
+// =============================================================================
+// PARSED MENU WINE STORAGE (OCR Results - Before AI Recommendations)
+// =============================================================================
+
+model MenuWine {
+  id                String    @id @default(uuid())
+  request_id        String    // Links to the same request_id as WineRecommendation
+  dish              String?   // Dish name from menu context (optional)
+  created_at        DateTime  @default(now())
+  
+  // Parsed Wine Data (from OCR)
+  wine_name         String
+  producer          String?
+  vintage           String?   // Can be year or "NV"
+  grape             String?
+  region            String?
+  price             String?  // Price as extracted from OCR (preserve original format)
+  
+  // Additional Metadata
+  category          String?  // Wine category (Red, White, etc.)
+  serving_style     String?  // "glass", "bottle", or "both"
+  description       String?  @db.Text
+  ocr_confidence    Float?   // OCR confidence score for this wine
+  
+  // Full OCR line for debugging/analysis
+  raw_ocr_line      String?  @db.Text
+  
+  @@index([request_id])
+  @@index([dish])
+  @@index([created_at])
+  @@index([wine_name])
+  @@index([producer])
+  @@map("menu_wines")
+}
+

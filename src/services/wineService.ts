@@ -132,7 +132,8 @@ export class WineService {
       vintage: string;
       category: string;
       description?: string;
-    }>
+    }>,
+    requestId?: string
   ): Promise<WineRecommendationResponse> {
     const startTime = performance.now();
     console.log('=== WINE RECOMMENDATION REQUEST START ===');
@@ -172,7 +173,7 @@ export class WineService {
       // }
 
       // Make API call with retry logic
-      const result = await this.makeApiCallWithRetry(dish, preferences, availableWines);
+      const result = await this.makeApiCallWithRetry(dish, preferences, availableWines, requestId);
       
       const endTime = performance.now();
       const responseTime = endTime - startTime;
@@ -244,7 +245,8 @@ export class WineService {
       vintage: string;
       category: string;
       description?: string;
-    }>
+    }>,
+    requestId?: string
   ): Promise<WineRecommendationResponse> {
     let lastError: Error | null = null;
     
@@ -266,6 +268,12 @@ export class WineService {
         if (availableWines && availableWines.length > 0) {
           requestBody.availableWines = availableWines;
           console.log('Request includes available wines (menu context):', availableWines.length);
+        }
+        
+        // Include request ID if provided (for linking with parsed menu wines)
+        if (requestId) {
+          requestBody.requestId = requestId;
+          console.log('Request includes request ID for linking:', requestId);
         }
         
         console.log('Request body:', JSON.stringify(requestBody));

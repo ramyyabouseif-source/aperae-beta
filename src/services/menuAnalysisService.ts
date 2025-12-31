@@ -135,6 +135,7 @@ export class MenuAnalysisService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest', // CSRF protection header
         },
         body: JSON.stringify({
           parsedWines: winesForApi,
@@ -152,7 +153,9 @@ export class MenuAnalysisService {
       const result = await response.json();
       console.log('Parsed menu wines stored successfully:', result);
     } catch (error: any) {
-      console.error('Error storing parsed menu wines:', error);
+      const errorMessage = error?.message || (typeof error === 'string' ? error : error?.toString() || 'Unknown error');
+      console.error('Error storing parsed menu wines:', errorMessage);
+      // Don't throw - this is non-blocking
       throw error;
     }
   }
@@ -182,15 +185,69 @@ export class MenuAnalysisService {
       let availableWines: WineListAnalysisResult['availableWines'];
 
       if (isMockMode) {
-        // In mock mode, skip OCR and use mock wine list directly
-        console.log('Mock mode enabled - skipping OCR and using mock wine list');
-        ocrResult = {
-          text: '',
-          confidence: 100, // High confidence for mock mode
-          boundingBoxes: []
+        // In mock mode, skip all processing and return mock data directly
+        console.log('Mock mode enabled - skipping all processing and using mock recommendations directly');
+        
+        // Get mock recommendations from WineService (which returns instantly in mock mode)
+        // Pass a dummy wine to trigger Menu V2.2 mock data (Menu V2.2 is used when availableWines.length > 0)
+        const dummyWine = [{ wineName: 'Mock', producer: 'Mock', vintage: 'NV', category: 'Red Wine' }];
+        const wineResponse = await WineService.getWineRecommendations(dish, winePreferences, dummyWine);
+        
+        // Extract available wines from the mock recommendations (Menu V2.2 format)
+        const mockAvailableWines: WineListAnalysisResult['availableWines'] = (wineResponse.recommendations || []).map((rec: any) => ({
+          wineName: rec.wineName || 'Unknown Wine',
+          producer: rec.producer || 'Unknown Producer',
+          vintage: rec.vintage || 'NV',
+          servingStyle: 'both' as const,
+          category: rec.category || 'Unknown',
+          description: typeof rec.tastingNotes === 'string' ? rec.tastingNotes : '',
+          grape: rec.grape,
+          region: rec.region,
+        }));
+        
+        const filteredWines = this.filterWinesByServingStyle(mockAvailableWines, servingStylePreference);
+        
+        // Convert WineRecommendationResponse to WineListAnalysisResult format directly
+        const wineRecommendations: WineListAnalysisResult['wineRecommendations'] = (wineResponse.recommendations || []).map((rec: any) => {
+          return {
+            wine: {
+              wineName: rec.wineName || 'Unknown Wine',
+              producer: rec.producer || 'Unknown Producer',
+              vintage: rec.vintage || 'NV',
+              servingStyle: 'both' as const,
+              category: rec.category || 'Unknown',
+              description: typeof rec.tastingNotes === 'string' ? rec.tastingNotes : '',
+              grape: rec.grape,
+              region: rec.region,
+            },
+            pairingRationale: rec.rationale || rec.pairingRationale || '',
+            confidenceScore: rec.confidenceScore || (rec.confidence?.score || 75),
+            confidence: rec.confidence,
+            servingGuidance: typeof rec.servingGuidance === 'string' 
+              ? rec.servingGuidance 
+              : (typeof rec.servingGuidance === 'object' && rec.servingGuidance?.temperature
+                  ? `${rec.servingGuidance.temperature}${rec.servingGuidance.glassware ? ` | ${rec.servingGuidance.glassware}` : ''}${rec.servingGuidance.decanting ? ` | ${rec.servingGuidance.decanting}` : ''}`
+                  : 'Serve at recommended temperature'),
+            tastingNotes: typeof rec.tastingNotes === 'string' ? rec.tastingNotes : undefined,
+            storytellingElements: rec.storytellingElements,
+            tierLabel: rec.tierLabel,
+            tierRationale: rec.tierRationale,
+            pairingPrinciplesApplied: rec.pairingPrinciplesApplied,
+          };
+        });
+        
+        const processingTime = Date.now() - startTime;
+        return {
+          availableWines: filteredWines,
+          wineRecommendations,
+          processingTime,
+          ocrConfidence: 100,
+          dishAnalyzed: dish,
+          servingStylePreference,
+          dishAnalysis: wineResponse.dishAnalysis,
+          closingNarrative: wineResponse.closingNarrative,
+          menuLimitations: (wineResponse as any).menuLimitations,
         };
-        availableWines = this.getMockWineList();
-        console.log('Using mock wine list with', availableWines.length, 'wines');
       } else {
         // Step 1: Extract text using OCR (with fallback)
         if (!photo) {
@@ -224,15 +281,18 @@ export class MenuAnalysisService {
         }
       }
 
-      // Step 2.5: Generate request ID and store parsed wines to database
+      // Step 2.5: Generate request ID and store parsed wines to database (skip in mock mode)
       // This happens BEFORE getting recommendations, as requested
       const requestId = await this.generateRequestId();
-      try {
-        await this.storeParsedMenuWines(availableWines, requestId, dish, ocrResult.confidence);
-        console.log('Parsed menu wines stored to database with request ID:', requestId);
-      } catch (storeError: any) {
-        console.error('Failed to store parsed menu wines (non-blocking):', storeError.message);
-        // Continue even if storage fails - this is non-blocking
+      if (!isMockMode) {
+        try {
+          await this.storeParsedMenuWines(availableWines, requestId, dish, ocrResult.confidence);
+          console.log('Parsed menu wines stored to database with request ID:', requestId);
+        } catch (storeError: any) {
+          const errorMessage = storeError?.message || (typeof storeError === 'string' ? storeError : storeError?.toString() || 'Unknown error');
+          console.error('Failed to store parsed menu wines (non-blocking):', errorMessage);
+          // Continue even if storage fails - this is non-blocking
+        }
       }
 
       // Step 3: Filter wines by serving style preference

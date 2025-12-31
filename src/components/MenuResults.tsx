@@ -255,7 +255,7 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
           {((analysisResult as WineListAnalysisResult).closingNarrative || 
             (analysisResult as WineListAnalysisResult).menuLimitations ||
             wineRecommendations.some(w => w.tierRationale)) && (
-            <View style={{ marginTop: 24, marginBottom: 16 }}>
+            <View style={styles.finalNotesSection}>
               <FinalSommelierNotes
                 {...((analysisResult as WineListAnalysisResult).closingNarrative ? { 
                   closingNarrative: (analysisResult as WineListAnalysisResult).closingNarrative 
@@ -277,7 +277,9 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
           )}
           
           {/* Responsible Drinking Disclaimer - After final notes with proper spacing (matches home screen) */}
-          <ResponsibleDrinkingDisclaimer />
+          <View style={{ marginTop: 24, marginBottom: 16 }}>
+            <ResponsibleDrinkingDisclaimer style={{ marginVertical: 0 }} />
+          </View>
         </View>
       )}
 
@@ -517,5 +519,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  finalNotesSection: {
+    marginHorizontal: 20,
+    marginTop: 24,
+    marginBottom: 16,
   },
 });

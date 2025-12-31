@@ -33,6 +33,7 @@ const csrfProtection = require('./csrfProtection');
 const wineDatabaseService = require('./services/wineDatabaseService');
 const dishRecommendationDatabaseService = require('./services/dishRecommendationDatabaseService');
 const wineRecommendationDatabaseService = require('./services/wineRecommendationDatabaseService');
+const menuWineDatabaseService = require('./services/menuWineDatabaseService');
 const { getFallbackResponse } = require('./utils/fallbackHandler');
 const { normalizeResponse } = require('./utils/responseNormalizer');
 const { buildV7Prompt } = require('./prompts/v7-master-sommelier-prompt');
@@ -116,13 +117,16 @@ app.use(securityLogger);
 const allowedOrigins = (() => {
   const env = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
   const defaults = [
-  'http://localhost:3000',
-  'http://localhost:19006',
-  'https://localhost:3000',
-  'https://localhost:19006',
-  'exp://127.0.0.1:8081',
-    'exp://localhost:8081'
-];
+    'http://localhost:3000',
+    'http://localhost:19006',
+    'https://localhost:3000',
+    'https://localhost:19006',
+    'exp://127.0.0.1:8081',
+    'exp://localhost:8081',
+    // Production domains
+    'https://www.aperae.com',
+    'https://aperae.com',
+  ];
   return env.length ? env : defaults;
 })();
 
@@ -168,7 +172,10 @@ const corsOptions = {
         'exp://127.0.0.1:8081',
         'exp://192.168.1.152:8081',
         'exp://localhost:8081',
-        'exp://192.168.1.152:8081'
+        'exp://192.168.1.152:8081',
+        // Allow production domains in development for testing
+        'https://www.aperae.com',
+        'https://aperae.com',
       ];
       
       if (devOrigins.includes(origin)) {
@@ -179,6 +186,17 @@ const corsOptions = {
       // Log rejected origins for debugging
       logger.warn('CORS: Rejected origin in development', { origin });
       return callback(new Error('Origin not allowed in development mode'));
+    }
+    
+    // In production, allow production domains
+    const productionOrigins = [
+      'https://www.aperae.com',
+      'https://aperae.com',
+    ];
+    
+    if (productionOrigins.includes(origin)) {
+      logger.debug('CORS: Allowing production origin', { origin });
+      return callback(null, true);
     }
     
     callback(new Error('Not allowed by CORS'));
@@ -946,10 +964,12 @@ app.post('/api/recommendations',
   handleValidationErrors,
   async (req, res) => {
     const requestStartTime = Date.now();
-    const requestId = generateRequestId();
+    // Use client-provided request ID if available (for linking with parsed menu wines), otherwise generate one
+    const requestId = req.body.requestId || generateRequestId();
     
     RequestLogger.logRequestStart('recommendations', requestId, { 
-      dish: req.body.dish
+      dish: req.body.dish,
+      requestIdSource: req.body.requestId ? 'client' : 'server'
     });
     
     try {
@@ -1304,11 +1324,13 @@ app.post('/api/recommendations',
       // This ensures we save the data even if subsequent validation fails
       // Use original response data before normalization/enhancement to preserve all fields
       if (originalResponseData && originalResponseData.recommendations && Array.isArray(originalResponseData.recommendations) && originalResponseData.recommendations.length > 0) {
+        // Use correct prompt version based on context
+        const promptVersion = isMenuContext ? 'v2.2' : 'v7.0';
         wineRecommendationDatabaseService.storeRecommendations(
           originalResponseData,
           requestId,
           claudeResponseTime,
-          'v7.0'
+          promptVersion
         ).then(result => {
           if (result.success) {
             logger.info('Recommendations saved to database', {
@@ -2313,6 +2335,134 @@ Wine: "${wine}"`;
  *       500:
  *         description: Internal server error
  */
+/**
+ * @swagger
+ * /api/menu-wines:
+ *   post:
+ *     summary: Store parsed menu wines from OCR
+ *     description: Stores parsed wine list data before AI recommendations are generated
+ *     tags: [Menu]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - parsedWines
+ *               - requestId
+ *             properties:
+ *               parsedWines:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     wineName:
+ *                       type: string
+ *                     producer:
+ *                       type: string
+ *                     vintage:
+ *                       type: string
+ *                     grape:
+ *                       type: string
+ *                     region:
+ *                       type: string
+ *                     price:
+ *                       type: string
+ *               requestId:
+ *                 type: string
+ *               dish:
+ *                 type: string
+ *               ocrConfidence:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Menu wines stored successfully
+ *       400:
+ *         description: Invalid request
+ *       500:
+ *         description: Internal server error
+ */
+app.post('/api/menu-wines', async (req, res) => {
+  const requestStartTime = Date.now();
+  
+  try {
+    const { parsedWines, requestId, dish, ocrConfidence } = req.body;
+    
+    if (!parsedWines || !Array.isArray(parsedWines)) {
+      return res.status(400).json({ 
+        error: 'parsedWines must be an array',
+        requestId: requestId || 'unknown'
+      });
+    }
+    
+    if (!requestId) {
+      return res.status(400).json({ 
+        error: 'requestId is required',
+        requestId: 'unknown'
+      });
+    }
+    
+    logger.debug('Storing parsed menu wines', {
+      requestId,
+      dish,
+      wineCount: parsedWines.length,
+      ocrConfidence
+    });
+    
+    // Store parsed wines to database
+    const result = await menuWineDatabaseService.storeParsedMenuWines(
+      parsedWines,
+      requestId,
+      dish || null,
+      ocrConfidence || null
+    );
+    
+    const responseTime = Date.now() - requestStartTime;
+    
+    if (result.success) {
+      logger.info('Parsed menu wines stored successfully', {
+        requestId,
+        insertedCount: result.insertedCount,
+        responseTime
+      });
+      
+      return res.json({
+        success: true,
+        requestId,
+        insertedCount: result.insertedCount,
+        message: `Stored ${result.insertedCount} parsed menu wines`
+      });
+    } else {
+      logger.error('Failed to store parsed menu wines', {
+        requestId,
+        error: result.error,
+        responseTime
+      });
+      
+      return res.status(500).json({
+        success: false,
+        requestId,
+        error: result.error || 'Failed to store parsed menu wines'
+      });
+    }
+  } catch (error) {
+    const responseTime = Date.now() - requestStartTime;
+    logger.error('Error storing parsed menu wines', {
+      requestId: req.body?.requestId || 'unknown',
+      error: error.message,
+      stack: error.stack,
+      responseTime
+    });
+    
+    return res.status(500).json({
+      success: false,
+      requestId: req.body?.requestId || 'unknown',
+      error: error.message || 'Internal server error'
+    });
+  }
+});
+
 app.post('/api/dish-recommendations',
   validateDishRecommendationRequest,
   handleValidationErrors,

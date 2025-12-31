@@ -10,6 +10,7 @@ import {
   Modal,
   TextInput,
   ImageBackground,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MenuAnalysisService, WineListAnalysisResult } from '../services/menuAnalysisService';
@@ -80,26 +81,36 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
     }
     
     try {
-      // Request camera permission first
-      const cameraPermission = await CameraService.requestCameraPermission();
-      
-      if (!cameraPermission.granted) {
-        Alert.alert(
-          'Camera Permission Required',
-          'PocketSomm needs access to your camera to take photos of wine lists. Please enable camera access in your device settings.',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Settings', onPress: () => {
-              // In a real app, you'd open device settings here
-              console.log('User should go to device settings to enable camera');
-            }}
-          ]
-        );
-        return;
+      // On web, use CameraService.takePhoto() directly (uses file input)
+      // On mobile, open the camera modal
+      if (Platform.OS === 'web') {
+        const photo = await CameraService.takePhoto();
+        if (photo) {
+          console.log('Photo captured:', photo);
+          setCapturedPhoto(photo);
+        }
+      } else {
+        // Request camera permission first
+        const cameraPermission = await CameraService.requestCameraPermission();
+        
+        if (!cameraPermission.granted) {
+          Alert.alert(
+            'Camera Permission Required',
+            'PocketSomm needs access to your camera to take photos of wine lists. Please enable camera access in your device settings.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Settings', onPress: () => {
+                // In a real app, you'd open device settings here
+                console.log('User should go to device settings to enable camera');
+              }}
+            ]
+          );
+          return;
+        }
+        
+        console.log('Camera permission granted, opening camera...');
+        setShowCamera(true);
       }
-      
-      console.log('Camera permission granted, opening camera...');
-      setShowCamera(true);
     } catch (error) {
       console.error('Camera permission error:', error);
       Alert.alert('Error', 'Failed to request camera permission. Please try again.');
@@ -213,7 +224,7 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
   const renderWinePairingAssistant = () => (
     <View style={styles.winePairingContainer}>
       <Text style={styles.sectionTitle}>Restaurant Wine Pairing Assistant</Text>
-      <Text style={styles.sectionSubtitle}>Get the perfect wine pairing from the restaurant's wine list</Text>
+      <Text style={styles.sectionSubtitle}>Reveal your perfect wine pairing from the restaurant's wine list</Text>
       {/* Step 1: Dish Input */}
       <View style={styles.stepContainer}>
         <Text style={styles.stepTitle}>1. Describe your dish</Text>

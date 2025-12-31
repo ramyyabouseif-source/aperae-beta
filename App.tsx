@@ -415,15 +415,6 @@ export default function App() {
         >
           <TouchableOpacity
             style={styles.settingsOption}
-            onPress={() => navigation.navigate('Preferences')}
-          >
-            <Ionicons name="wine" size={24} color="#5B2433" />
-            <Text style={styles.settingsOptionText}>Wine Preferences</Text>
-            <Ionicons name="chevron-forward" size={20} color="#CCCCCC" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.settingsOption}
             onPress={() => navigation.navigate('PrivacySettings')}
           >
             <Ionicons name="shield-outline" size={24} color="#5B2433" />

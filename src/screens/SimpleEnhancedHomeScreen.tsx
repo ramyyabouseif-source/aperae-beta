@@ -359,12 +359,12 @@ export default function SimpleEnhancedHomeScreen() {
         addedAt: new Date().toISOString(),
       };
       await FavoritesService.addToFavorites(favoriteWine);
-      Alert.alert('Success', 'Wine added to favorites!');
+      Alert.alert('Success', 'Wine added to your cellar!');
     } catch (error: any) {
       if (error.message && error.message.includes('already in favorites')) {
-        Alert.alert('Already Added', 'This wine is already in your favorites!');
+        Alert.alert('Already Added', 'This wine is already in your cellar!');
       } else {
-        Alert.alert('Error', 'Failed to add wine to favorites');
+        Alert.alert('Error', 'Failed to add wine to your cellar');
       }
     }
   };

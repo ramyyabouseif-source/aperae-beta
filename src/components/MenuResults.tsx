@@ -72,10 +72,10 @@ export default function MenuResults({ analysisResult, onClose, isLoading = false
       };
       await FavoritesService.addToFavorites(favoriteWine as any);
       setFavorites(new Set([...favorites, wine.wineName]));
-      Alert.alert('Success', 'Wine added to favorites!');
+      Alert.alert('Success', 'Wine added to your cellar!');
     } catch (error) {
       console.error('Error adding to favorites:', error);
-      Alert.alert('Error', 'Failed to add wine to favorites');
+      Alert.alert('Error', 'Failed to add wine to your cellar');
     }
   };
 

@@ -220,6 +220,349 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
     transform: [{ scaleX: backScaleX }],
   };
 
+  // Render back card content (extracted for reuse in conditional rendering)
+  const renderBackContent = () => (
+    <View style={styles.backContent}>
+      {/* Back Header */}
+      <View style={styles.backHeader}>
+        <Text style={styles.backTitle}>Wine Details</Text>
+        <TouchableOpacity 
+          onPress={() => {
+            flipToFront();
+          }} 
+          style={styles.flipButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="return-up-back-outline" size={20} color="#8B0000" />
+          <Text style={styles.flipButtonText}>Flip Back</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Serving Guidance */}
+      <View style={styles.servingGuidanceContainer}>
+        <Text style={styles.servingGuidanceLabel}>Serving Suggestion:</Text>
+        <Text style={styles.servingGuidanceText}>
+          {servingGuidance}
+        </Text>
+      </View>
+
+      {/* Confidence Score */}
+      {confidenceScore > 0 && (
+        <View style={styles.confidenceContainer}>
+          <View style={styles.confidenceLabel}>
+            <Ionicons name="checkmark-circle" size={16} color="#8B0000" />
+            <Text style={styles.confidenceLabelText}>Confidence Score</Text>
+          </View>
+          <View style={styles.confidenceBar}>
+            <View
+              style={[
+                styles.confidenceFill,
+                {
+                  width: `${confidenceScore}%`,
+                  backgroundColor: getConfidenceColor(confidenceScore),
+                },
+              ]}
+            />
+          </View>
+          <Text style={styles.confidenceScoreText}>
+            {confidenceScore}% confidence
+          </Text>
+          
+          {/* Confidence Breakdown */}
+          {confidenceBreakdown && (
+            <View style={styles.confidenceBreakdownContainer}>
+              <View style={styles.confidenceBreakdownItem}>
+                <Text style={styles.confidenceBreakdownLabel}>Pairing Science:</Text>
+                <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.pairingScience}%</Text>
+              </View>
+              <View style={styles.confidenceBreakdownItem}>
+                <Text style={styles.confidenceBreakdownLabel}>Wine Knowledge:</Text>
+                <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.wineKnowledge}%</Text>
+              </View>
+              <View style={styles.confidenceBreakdownItem}>
+                <Text style={styles.confidenceBreakdownLabel}>Complexity Handling:</Text>
+                <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.complexityHandling}%</Text>
+              </View>
+            </View>
+          )}
+          
+          {/* Confidence Rationale */}
+          {confidenceRationale && (
+            <Text style={styles.confidenceRationaleText}>
+              {confidenceRationale}
+            </Text>
+          )}
+        </View>
+      )}
+
+      {/* Region (Enhanced Format) */}
+      {wine.region && wine.region !== 'unknown' && (
+        <View style={styles.detailSection}>
+          <Text style={styles.detailTitle}>
+            <Ionicons name="location" size={16} color="#8B0000" /> Region
+          </Text>
+          <Text style={styles.detailText}>{wine.region}</Text>
+        </View>
+      )}
+
+      {/* Story (Enhanced Format - prefer story over storytellingElements) */}
+      {(wine.story || wine.storytellingElements) && (
+        <View style={styles.detailSection}>
+          <Text style={styles.detailTitle}>
+            <Ionicons name="book" size={16} color="#8B0000" /> Story
+          </Text>
+          <Text style={styles.detailText}>
+            {wine.story || wine.storytellingElements}
+          </Text>
+        </View>
+      )}
+
+      {/* My Cellar Section - Only show if wine is in My Cellar */}
+      {isMyCellarWine && (
+        <View style={styles.myCellarSection}>
+          <Text style={styles.myCellarSectionTitle}>
+            <Ionicons name="wine" size={16} color="#8B0000" /> My Cellar
+          </Text>
+          
+          {/* Status Selector */}
+          <StatusSelector
+            currentStatus={localStatus === 'wantToTry' ? 'wantToTry' : localStatus === 'haveTried' ? 'haveTried' : 'wantToTry'}
+            onStatusChange={async (newStatus) => {
+              setLocalStatus(newStatus);
+              if (cellarWine.id) {
+                try {
+                  await FavoritesService.updateWineStatus(cellarWine.id, newStatus);
+                  onWineUpdated?.();
+                } catch (error) {
+                  console.error('Error updating status:', error);
+                }
+              }
+            }}
+          />
+
+          {/* Ratings */}
+          <View style={styles.ratingsContainer}>
+            <View style={styles.ratingItem}>
+              <Text style={styles.ratingLabel}>Wine Rating</Text>
+              <StarRating
+                rating={localWineRating || 0}
+                size={20}
+                readonly={false}
+                onRatingChange={async (rating) => {
+                  setLocalWineRating(rating);
+                  if (cellarWine.id) {
+                    try {
+                      await FavoritesService.updateWineRating(cellarWine.id, rating);
+                      onWineUpdated?.();
+                    } catch (error) {
+                      console.error('Error updating wine rating:', error);
+                    }
+                  }
+                }}
+              />
+            </View>
+            <View style={styles.ratingItem}>
+              <Text style={styles.ratingLabel}>Pairing Rating</Text>
+              <StarRating
+                rating={localPairingRating || 0}
+                size={20}
+                readonly={false}
+                onRatingChange={async (rating) => {
+                  setLocalPairingRating(rating);
+                  if (cellarWine.id) {
+                    try {
+                      await FavoritesService.updatePairingRating(cellarWine.id, rating);
+                      onWineUpdated?.();
+                    } catch (error) {
+                      console.error('Error updating pairing rating:', error);
+                    }
+                  }
+                }}
+              />
+            </View>
+          </View>
+
+          {/* Notes */}
+          <View ref={wineNotesContainerRef}>
+            <NotesInput
+              label="Wine Notes"
+              placeholder="Add your tasting notes..."
+              value={localWineNotes}
+              onChangeText={setLocalWineNotes}
+              inputRef={wineNotesInputRef}
+              onFocus={() => {
+                if (Platform.OS !== 'web') {
+                  setTimeout(() => {
+                    if (wineNotesInputRef.current && scrollViewRef.current) {
+                      wineNotesInputRef.current.measureLayout(
+                        scrollViewRef.current as any,
+                        (_x, y, _width, _height) => {
+                          scrollViewRef.current?.scrollTo({
+                            y: Math.max(0, y - 150),
+                            animated: true,
+                          });
+                        },
+                        () => {
+                          wineNotesInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
+                            scrollViewRef.current?.scrollTo({
+                              y: Math.max(0, pageY - 150),
+                              animated: true,
+                            });
+                          });
+                        }
+                      );
+                    }
+                  }, 300);
+                }
+              }}
+              onBlur={async () => {
+                if (cellarWine.id) {
+                  try {
+                    await FavoritesService.updateWineNotes(cellarWine.id, localWineNotes);
+                    onWineUpdated?.();
+                  } catch (error) {
+                    console.error('Error updating wine notes:', error);
+                  }
+                }
+              }}
+            />
+          </View>
+          
+          <View ref={pairingNotesContainerRef}>
+            <NotesInput
+              label="Pairing Notes"
+              placeholder="How did this pair with your dish?"
+              value={localPairingNotes}
+              onChangeText={setLocalPairingNotes}
+              inputRef={pairingNotesInputRef}
+              onFocus={() => {
+                if (Platform.OS !== 'web') {
+                  setTimeout(() => {
+                    if (pairingNotesInputRef.current && scrollViewRef.current) {
+                      pairingNotesInputRef.current.measureLayout(
+                        scrollViewRef.current as any,
+                        (_x, y, _width, _height) => {
+                          scrollViewRef.current?.scrollTo({
+                            y: Math.max(0, y - 150),
+                            animated: true,
+                          });
+                        },
+                        () => {
+                          pairingNotesInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
+                            scrollViewRef.current?.scrollTo({
+                              y: Math.max(0, pageY - 150),
+                              animated: true,
+                            });
+                          });
+                        }
+                      );
+                    }
+                  }, 300);
+                }
+              }}
+              onBlur={async () => {
+                if (cellarWine.id) {
+                  try {
+                    await FavoritesService.updatePairingNotes(cellarWine.id, localPairingNotes);
+                    onWineUpdated?.();
+                  } catch (error) {
+                    console.error('Error updating pairing notes:', error);
+                  }
+                }
+              }}
+            />
+          </View>
+
+          {/* Tags */}
+          <TagsBadgeSelector
+            label="Tags"
+            selectedTags={localTags}
+            onTagsChange={async (tags) => {
+              setLocalTags(tags);
+              if (cellarWine.id) {
+                try {
+                  await FavoritesService.updateWineTags(cellarWine.id, tags);
+                  onWineUpdated?.();
+                } catch (error) {
+                  console.error('Error updating tags:', error);
+                }
+              }
+            }}
+            availableTags={[
+              'Special Occasions',
+              'Dinner Parties',
+              'Date Night',
+              'Weekend',
+              'Holiday',
+              'Gift',
+              'Celebration',
+              'Everyday',
+              'Fine Dining',
+              'Casual',
+            ]}
+          />
+        </View>
+      )}
+
+      {/* Alternatives (Enhanced Format) */}
+      {wine.alternatives && wine.alternatives.length > 0 && (
+        <View style={[styles.detailSection, styles.alternativesSection]}>
+          <Text style={styles.detailTitle}>
+            <Ionicons name="wine" size={16} color="#8B0000" /> Alternative Wines
+          </Text>
+          {wine.alternatives.map((alt, index) => (
+            <View 
+              key={index} 
+              style={[
+                styles.alternativeItem,
+                index === wine.alternatives.length - 1 && styles.alternativeItemLast
+              ]}
+            >
+              <Text style={styles.alternativeName}>{alt.wineName}</Text>
+              <Text style={styles.alternativeDetails}>
+                {alt.producer} • {alt.vintage} • {alt.grape}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Action Buttons */}
+      <View style={styles.backActions}>
+        <TouchableOpacity
+          style={[styles.favoriteButton, isFavorite && styles.favoriteButtonActive]}
+          onPress={handleFavoritePress}
+        >
+          <Ionicons
+            name={isFavorite ? 'heart' : 'heart-outline'}
+            size={20}
+            color={isFavorite ? '#fff' : '#8B0000'}
+          />
+          <Text style={[styles.favoriteText, isFavorite && styles.favoriteTextActive]}>
+            {isFavorite ? 'In Cellar' : 'Add to Cellar'}
+          </Text>
+        </TouchableOpacity>
+
+        {showRemoveButton && onRemoveFromFavorites && (
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={() => onRemoveFromFavorites(wine)}
+          >
+            <Ionicons name="trash-outline" size={20} color="#f44336" />
+            <Text style={styles.removeText}>Remove</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Disclaimer */}
+      <View style={styles.disclaimer}>
+        <Text style={styles.disclaimerText}>
+          Recommendations based on established food-wine pairing principles - prices and ratings are estimates and may vary by retailer
+        </Text>
+      </View>
+    </View>
+  );
+
   return (
     <View 
       style={styles.container} 
@@ -395,362 +738,34 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
             backAnimatedStyle,
           ]}
         >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardAvoidingView}
-          keyboardVerticalOffset={100}
-        >
+        {Platform.OS === 'web' ? (
           <ScrollView
             ref={scrollViewRef}
             style={styles.backScrollView}
             contentContainerStyle={styles.backScrollContent}
             keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="interactive"
             showsVerticalScrollIndicator={true}
           >
-            <View style={styles.backContent}>
-            {/* Back Header */}
-            <View style={styles.backHeader}>
-              <Text style={styles.backTitle}>Wine Details</Text>
-              <TouchableOpacity 
-                onPress={() => {
-                  flipToFront();
-                }} 
-                style={styles.flipButton}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="return-up-back-outline" size={20} color="#8B0000" />
-                <Text style={styles.flipButtonText}>Flip Back</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Serving Guidance */}
-            <View style={styles.servingGuidanceContainer}>
-              <Text style={styles.servingGuidanceLabel}>Serving Suggestion:</Text>
-              <Text style={styles.servingGuidanceText}>
-                {servingGuidance}
-              </Text>
-            </View>
-
-            {/* Confidence Score */}
-            {confidenceScore > 0 && (
-              <View style={styles.confidenceContainer}>
-                <View style={styles.confidenceLabel}>
-                  <Ionicons name="checkmark-circle" size={16} color="#8B0000" />
-                  <Text style={styles.confidenceLabelText}>Confidence Score</Text>
-                </View>
-                <View style={styles.confidenceBar}>
-                  <View
-                    style={[
-                      styles.confidenceFill,
-                      {
-                        width: `${confidenceScore}%`,
-                        backgroundColor: getConfidenceColor(confidenceScore),
-                      },
-                    ]}
-                  />
-                </View>
-                <Text style={styles.confidenceScoreText}>
-                  {confidenceScore}% confidence
-                </Text>
-                
-                {/* Confidence Breakdown */}
-                {confidenceBreakdown && (
-                  <View style={styles.confidenceBreakdownContainer}>
-                    <View style={styles.confidenceBreakdownItem}>
-                      <Text style={styles.confidenceBreakdownLabel}>Pairing Science:</Text>
-                      <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.pairingScience}%</Text>
-                    </View>
-                    <View style={styles.confidenceBreakdownItem}>
-                      <Text style={styles.confidenceBreakdownLabel}>Wine Knowledge:</Text>
-                      <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.wineKnowledge}%</Text>
-                    </View>
-                    <View style={styles.confidenceBreakdownItem}>
-                      <Text style={styles.confidenceBreakdownLabel}>Complexity Handling:</Text>
-                      <Text style={styles.confidenceBreakdownValue}>{confidenceBreakdown.complexityHandling}%</Text>
-                    </View>
-                  </View>
-                )}
-                
-                {/* Confidence Rationale */}
-                {confidenceRationale && (
-                  <Text style={styles.confidenceRationaleText}>
-                    {confidenceRationale}
-                  </Text>
-                )}
-              </View>
-            )}
-
-            {/* Region (Enhanced Format) */}
-            {wine.region && wine.region !== 'unknown' && (
-              <View style={styles.detailSection}>
-                <Text style={styles.detailTitle}>
-                  <Ionicons name="location" size={16} color="#8B0000" /> Region
-                </Text>
-                <Text style={styles.detailText}>{wine.region}</Text>
-              </View>
-            )}
-
-            {/* Story (Enhanced Format - prefer story over storytellingElements) */}
-            {(wine.story || wine.storytellingElements) && (
-              <View style={styles.detailSection}>
-                <Text style={styles.detailTitle}>
-                  <Ionicons name="book" size={16} color="#8B0000" /> Story
-                </Text>
-                <Text style={styles.detailText}>
-                  {wine.story || wine.storytellingElements}
-                </Text>
-              </View>
-            )}
-
-            {/* My Cellar Section - Only show if wine is in My Cellar */}
-            {isMyCellarWine && (
-              <View style={styles.myCellarSection}>
-                <Text style={styles.myCellarSectionTitle}>
-                  <Ionicons name="wine" size={16} color="#8B0000" /> My Cellar
-                </Text>
-                
-                {/* Status Selector - Only Want to Try / Have Tried (favorite removed since all wines in My Cellar are favorites) */}
-                <StatusSelector
-                  currentStatus={localStatus === 'wantToTry' ? 'wantToTry' : localStatus === 'haveTried' ? 'haveTried' : 'wantToTry'}
-                  onStatusChange={async (newStatus) => {
-                    setLocalStatus(newStatus);
-                    if (cellarWine.id) {
-                      try {
-                        await FavoritesService.updateWineStatus(cellarWine.id, newStatus);
-                        onWineUpdated?.();
-                      } catch (error) {
-                        console.error('Error updating status:', error);
-                      }
-                    }
-                  }}
-                />
-
-                {/* Ratings */}
-                <View style={styles.ratingsContainer}>
-                  <View style={styles.ratingItem}>
-                    <Text style={styles.ratingLabel}>Wine Rating</Text>
-                    <StarRating
-                      rating={localWineRating || 0}
-                      size={20}
-                      readonly={false}
-                      onRatingChange={async (rating) => {
-                        setLocalWineRating(rating);
-                        if (cellarWine.id) {
-                          try {
-                            await FavoritesService.updateWineRating(cellarWine.id, rating);
-                            onWineUpdated?.();
-                          } catch (error) {
-                            console.error('Error updating wine rating:', error);
-                          }
-                        }
-                      }}
-                    />
-                  </View>
-                  <View style={styles.ratingItem}>
-                    <Text style={styles.ratingLabel}>Pairing Rating</Text>
-                    <StarRating
-                      rating={localPairingRating || 0}
-                      size={20}
-                      readonly={false}
-                      onRatingChange={async (rating) => {
-                        setLocalPairingRating(rating);
-                        if (cellarWine.id) {
-                          try {
-                            await FavoritesService.updatePairingRating(cellarWine.id, rating);
-                            onWineUpdated?.();
-                          } catch (error) {
-                            console.error('Error updating pairing rating:', error);
-                          }
-                        }
-                      }}
-                    />
-                  </View>
-                </View>
-
-                {/* Notes */}
-                <View ref={wineNotesContainerRef}>
-                  <NotesInput
-                    label="Wine Notes"
-                    placeholder="Add your tasting notes..."
-                    value={localWineNotes}
-                    onChangeText={setLocalWineNotes}
-                    inputRef={wineNotesInputRef}
-                    onFocus={() => {
-                      // Scroll to input when keyboard appears (same pattern as home screen)
-                      setTimeout(() => {
-                        if (wineNotesInputRef.current && scrollViewRef.current) {
-                          // Use measureLayout to get position relative to ScrollView
-                          wineNotesInputRef.current.measureLayout(
-                            scrollViewRef.current as any,
-                            (_x, y, _width, _height) => {
-                              scrollViewRef.current?.scrollTo({
-                                y: Math.max(0, y - 150), // Scroll to show input with padding above
-                                animated: true,
-                              });
-                            },
-                            () => {
-                              // Fallback to measure if measureLayout fails
-                              wineNotesInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
-                                scrollViewRef.current?.scrollTo({
-                                  y: Math.max(0, pageY - 150),
-                                  animated: true,
-                                });
-                              });
-                            }
-                          );
-                        }
-                      }, 300); // Delay to allow keyboard to appear
-                    }}
-                    onBlur={async () => {
-                      if (cellarWine.id) {
-                        try {
-                          await FavoritesService.updateWineNotes(cellarWine.id, localWineNotes);
-                          onWineUpdated?.();
-                        } catch (error) {
-                          console.error('Error updating wine notes:', error);
-                        }
-                      }
-                    }}
-                  />
-                </View>
-                
-                <View ref={pairingNotesContainerRef}>
-                  <NotesInput
-                    label="Pairing Notes"
-                    placeholder="How did this pair with your dish?"
-                    value={localPairingNotes}
-                    onChangeText={setLocalPairingNotes}
-                    inputRef={pairingNotesInputRef}
-                    onFocus={() => {
-                      // Scroll to input when keyboard appears (same pattern as home screen)
-                      setTimeout(() => {
-                        if (pairingNotesInputRef.current && scrollViewRef.current) {
-                          // Use measureLayout to get position relative to ScrollView
-                          pairingNotesInputRef.current.measureLayout(
-                            scrollViewRef.current as any,
-                            (_x, y, _width, _height) => {
-                              scrollViewRef.current?.scrollTo({
-                                y: Math.max(0, y - 150), // Scroll to show input with padding above
-                                animated: true,
-                              });
-                            },
-                            () => {
-                              // Fallback to measure if measureLayout fails
-                              pairingNotesInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
-                                scrollViewRef.current?.scrollTo({
-                                  y: Math.max(0, pageY - 150),
-                                  animated: true,
-                                });
-                              });
-                            }
-                          );
-                        }
-                      }, 300); // Delay to allow keyboard to appear
-                    }}
-                    onBlur={async () => {
-                      if (cellarWine.id) {
-                        try {
-                          await FavoritesService.updatePairingNotes(cellarWine.id, localPairingNotes);
-                          onWineUpdated?.();
-                        } catch (error) {
-                          console.error('Error updating pairing notes:', error);
-                        }
-                      }
-                    }}
-                  />
-                </View>
-
-                {/* Tags */}
-                <TagsBadgeSelector
-                  label="Tags"
-                  selectedTags={localTags}
-                  onTagsChange={async (tags) => {
-                    setLocalTags(tags);
-                    if (cellarWine.id) {
-                      try {
-                        await FavoritesService.updateWineTags(cellarWine.id, tags);
-                        onWineUpdated?.();
-                      } catch (error) {
-                        console.error('Error updating tags:', error);
-                      }
-                    }
-                  }}
-                  availableTags={[
-                    'Special Occasions',
-                    'Dinner Parties',
-                    'Date Night',
-                    'Weekend',
-                    'Holiday',
-                    'Gift',
-                    'Celebration',
-                    'Everyday',
-                    'Fine Dining',
-                    'Casual',
-                  ]}
-                />
-              </View>
-            )}
-
-            {/* Alternatives (Enhanced Format) */}
-            {wine.alternatives && wine.alternatives.length > 0 && (
-              <View style={[styles.detailSection, styles.alternativesSection]}>
-                <Text style={styles.detailTitle}>
-                  <Ionicons name="wine" size={16} color="#8B0000" /> Alternative Wines
-                </Text>
-                {wine.alternatives.map((alt, index) => (
-                  <View 
-                    key={index} 
-                    style={[
-                      styles.alternativeItem,
-                      index === wine.alternatives.length - 1 && styles.alternativeItemLast
-                    ]}
-                  >
-                    <Text style={styles.alternativeName}>{alt.wineName}</Text>
-                    <Text style={styles.alternativeDetails}>
-                      {alt.producer} • {alt.vintage} • {alt.grape}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {/* Action Buttons */}
-            <View style={styles.backActions}>
-              <TouchableOpacity
-                style={[styles.favoriteButton, isFavorite && styles.favoriteButtonActive]}
-                onPress={handleFavoritePress}
-              >
-                <Ionicons
-                  name={isFavorite ? 'heart' : 'heart-outline'}
-                  size={20}
-                  color={isFavorite ? '#fff' : '#8B0000'}
-                />
-                <Text style={[styles.favoriteText, isFavorite && styles.favoriteTextActive]}>
-                  {isFavorite ? 'Favorited' : 'Add to Favorites'}
-                </Text>
-              </TouchableOpacity>
-
-              {showRemoveButton && onRemoveFromFavorites && (
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => onRemoveFromFavorites(wine)}
-                >
-                  <Ionicons name="trash-outline" size={20} color="#f44336" />
-                  <Text style={styles.removeText}>Remove</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {/* Disclaimer */}
-            <View style={styles.disclaimer}>
-              <Text style={styles.disclaimerText}>
-                Recommendations based on established food-wine pairing principles - prices and ratings are estimates and may vary by retailer
-              </Text>
-            </View>
-          </View>
+            {renderBackContent()}
           </ScrollView>
-        </KeyboardAvoidingView>
+        ) : (
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.keyboardAvoidingView}
+            keyboardVerticalOffset={100}
+          >
+            <ScrollView
+              ref={scrollViewRef}
+              style={styles.backScrollView}
+              contentContainerStyle={styles.backScrollContent}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="interactive"
+              showsVerticalScrollIndicator={true}
+            >
+              {renderBackContent()}
+            </ScrollView>
+          </KeyboardAvoidingView>
+        )}
         </Animated.View>
       )}
     </View>
@@ -774,12 +789,13 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 12,
     minHeight: 320, // Minimum height to prevent collapse
+    overflow: Platform.OS === 'web' ? 'visible' : 'hidden', // Allow overflow on web to prevent text clipping
   },
   card: {
     width: '100%',
     minHeight: 320, // Match V1 card height
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: Platform.OS === 'web' ? 'visible' : 'hidden', // Allow overflow on web to prevent text clipping
     backgroundColor: '#fff',
   },
   cardFront: {
@@ -925,12 +941,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: Platform.OS === 'web' ? 12 : 20,
     paddingBottom: 20,
     paddingLeft: 20,
     paddingRight: 20, // Match imageOverlay right: 12 + 8 = 20 to align with price badge
     justifyContent: 'space-between',
-    marginTop: 60, // Space for badges
+    marginTop: Platform.OS === 'web' ? 50 : 60, // Space for badges (less on web for better spacing)
   },
   titleSection: {
     marginBottom: 12,
@@ -1167,6 +1183,16 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  backScrollView: {
+    flex: 1,
+  },
+  backScrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   backContent: {
     padding: 16,

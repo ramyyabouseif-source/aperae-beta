@@ -174,3 +174,4 @@ Then I can give you exact step-by-step instructions for that provider!
 
 **What nameservers do you see in GoDaddy?** That will tell us exactly where to add the DNS record! 😊
 
+

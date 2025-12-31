@@ -2948,13 +2948,24 @@ app.post('/api/consent', optionalAuth, csrfProtection, async (req, res) => {
     logger.error('Error storing consent', {
       requestId,
       error: error.message,
+      stack: error.stack,
       responseTime
     });
     
+    // Include more detail in error response for debugging (but sanitize in production)
+    const errorMessage = process.env.NODE_ENV === 'development' 
+      ? error.message 
+      : 'Failed to store consent';
+    
     res.status(500).json({
       success: false,
-      error: 'Failed to store consent',
-      requestId
+      error: errorMessage,
+      requestId,
+      // Include detailed error in development only
+      ...(process.env.NODE_ENV === 'development' && { 
+        details: error.message,
+        stack: error.stack 
+      })
     });
   }
 });

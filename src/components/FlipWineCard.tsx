@@ -855,8 +855,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#5B2433', // Dark tone accent like V1
   },
   contentWrapper: {
-    position: 'relative',
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     zIndex: 1,
   },
   imageOverlay: {
@@ -929,7 +931,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20, // Match imageOverlay right: 12 + 8 = 20 to align with price badge
     justifyContent: 'space-between',
-    marginTop: 38, // Badge ends ~37px, WineName starts immediately after with minimal gap (~1 row)
+    marginTop: 45, // Badge at top:12, height ~23px, ends ~35px + ~10px gap = WineName starts ~45px
   },
   titleSection: {
     marginBottom: 12,

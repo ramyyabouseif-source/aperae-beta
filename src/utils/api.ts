@@ -49,7 +49,11 @@ const getApiBaseUrl = (): string => {
   
   if (isDevelopment) {
     if (Platform.OS === 'web') {
-      // Web can use localhost
+      // Web can use localhost for local development
+      // But if we're on production domain (www.aperae.com), use production API
+      if (typeof window !== 'undefined' && window.location.hostname === 'www.aperae.com') {
+        return 'https://api.aperae.com/api';
+      }
       return 'http://localhost:3001/api';
     }
     // For physical devices, use production API (localhost doesn't work)
@@ -57,8 +61,13 @@ const getApiBaseUrl = (): string => {
     return 'https://api.aperae.com/api';
   }
 
-  // Fallback: default to production API
+  // Fallback: default to production API for production web builds
   if (Platform.OS === 'web') {
+    // Check if we're on production domain
+    if (typeof window !== 'undefined' && window.location.hostname === 'www.aperae.com') {
+      return 'https://api.aperae.com/api';
+    }
+    // Otherwise assume localhost for local web development
     return 'http://localhost:3001/api';
   }
   return 'https://api.aperae.com/api';

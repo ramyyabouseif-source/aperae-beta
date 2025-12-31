@@ -33,6 +33,14 @@ class ConsentApiService {
       const apiBaseUrl = getApiBaseUrl();
       const deviceId = await getDeviceId(); // Get device ID (will be hashed on backend)
 
+      console.log('[ConsentApiService] Storing consent:', {
+        consentType: params.consentType,
+        accepted: params.accepted,
+        version: params.version,
+        apiBaseUrl,
+        hasDeviceId: !!deviceId,
+      });
+
       const response = await fetch(`${apiBaseUrl}/consent`, {
         method: 'POST',
         headers: {
@@ -47,17 +55,32 @@ class ConsentApiService {
         }),
       });
 
+      console.log('[ConsentApiService] Response status:', response.status, response.statusText);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(errorData.error || `HTTP ${response.status}: Failed to store consent`);
+        const errorMessage = errorData.error || `HTTP ${response.status}: Failed to store consent`;
+        console.error('[ConsentApiService] API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorMessage,
+          errorData,
+        });
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
+      console.log('[ConsentApiService] Consent stored successfully:', data.consent);
       return data.consent;
-    } catch (error) {
-      console.error('Error storing consent to backend:', error);
+    } catch (error: any) {
+      console.error('[ConsentApiService] Error storing consent to backend:', {
+        error: error.message,
+        stack: error.stack,
+        consentType: params.consentType,
+      });
       // Don't throw - consent storage failures shouldn't block user flow
       // Frontend still stores consent locally as fallback
+      // But we log the error for debugging
       throw error;
     }
   }

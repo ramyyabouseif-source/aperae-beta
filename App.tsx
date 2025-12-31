@@ -52,17 +52,20 @@ export default function App() {
       const ageVerified = await AgeVerificationService.isAgeVerified();
       setIsAgeVerified(ageVerified);
       
-      // Always show Terms and Privacy Policy screens on app launch
-      // regardless of previous acceptance
-      setHasAcceptedTerms(false);
-      setHasAcceptedPrivacyPolicy(false);
+      // Check if Terms and Privacy Policy have been accepted previously
+      const termsAccepted = await TermsService.hasAcceptedTerms();
+      const privacyAccepted = await PrivacyPolicyService.hasAcceptedPrivacyPolicy();
+      setHasAcceptedTerms(termsAccepted);
+      setHasAcceptedPrivacyPolicy(privacyAccepted);
       
       console.log('Age verified:', ageVerified);
-      console.log('Terms and Privacy Policy will be shown on this launch');
+      console.log('Terms accepted:', termsAccepted);
+      console.log('Privacy Policy accepted:', privacyAccepted);
     } catch (error) {
       console.error('Error checking acceptance status:', error);
       setIsAgeVerified(false);
       setHasAcceptedTerms(false);
+      setHasAcceptedPrivacyPolicy(false);
     } finally {
       setIsLoading(false);
     }

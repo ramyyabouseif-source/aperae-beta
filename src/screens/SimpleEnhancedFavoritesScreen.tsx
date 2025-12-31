@@ -339,7 +339,7 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
             refreshing={refreshing}
             onRefresh={handleRefresh}
             onRemoveFromFavorites={confirmRemoveFavorite}
-            onPress={undefined}
+            onPress={handleWinePress}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             ListHeaderComponent={renderListHeader}
@@ -355,7 +355,7 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
             refreshing={refreshing}
             onRefresh={handleRefresh}
             onRemoveFromFavorites={confirmRemoveFavorite}
-            onPress={undefined}
+            onPress={handleWinePress}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             ListHeaderComponent={renderListHeader}

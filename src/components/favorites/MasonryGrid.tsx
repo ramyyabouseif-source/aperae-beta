@@ -76,12 +76,12 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
         wine={item}
         numColumns={numColumns}
         onRemoveFromFavorites={onRemoveFromFavorites}
-        onPress={undefined}
+        onPress={onPress}
         index={index}
         onWineUpdated={onWineUpdated}
       />
     ),
-    [numColumns, onRemoveFromFavorites, onWineUpdated]
+    [numColumns, onRemoveFromFavorites, onPress, onWineUpdated]
   );
 
   const keyExtractor = useCallback(

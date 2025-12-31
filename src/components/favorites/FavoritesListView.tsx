@@ -46,7 +46,7 @@ const FavoritesListView: React.FC<FavoritesListViewProps> = ({
           onRemoveFromFavorites={onRemoveFromFavorites}
           isFavorite={true}
           showRemoveButton={true}
-          onPress={undefined}
+          onPress={onPress}
           index={index}
           onWineUpdated={onWineUpdated}
         />

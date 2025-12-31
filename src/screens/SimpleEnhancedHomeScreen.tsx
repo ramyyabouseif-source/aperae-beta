@@ -466,36 +466,9 @@ export default function SimpleEnhancedHomeScreen() {
   };
 
 
-  return (
-    <View style={styles.pageContainer}>
-      {/* Transparent Status Bar */}
-      <StatusBar 
-        barStyle="light-content" 
-        backgroundColor="transparent" 
-        translucent={true} 
-      />
-      
-      {/* Vineyard Hero Background - Using local vineyard image */}
-      <Animated.Image
-        source={require('../../assets/images/vineyard-hero-background.jpg')}
-        style={styles.wineCellarBackground}
-        resizeMode="cover"
-      />
-      <View style={styles.wineCellarOverlay} />
-      
-      <KeyboardAvoidingView 
-        style={styles.container} 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-      >
-        <ScrollView 
-          ref={scrollViewRef}
-          style={styles.scrollView} 
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          showsVerticalScrollIndicator={true}
-        >
+  // Render ScrollView content
+  const renderScrollContent = () => (
+    <>
         {/* Logo Header */}
         <View style={styles.logoHeaderContainer}>
           <Image
@@ -539,15 +512,17 @@ export default function SimpleEnhancedHomeScreen() {
               multiline
               onFocus={() => {
                 setIsInputFocused(true);
-                // Scroll to input when keyboard appears
-                setTimeout(() => {
-                  dishInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
-                    scrollViewRef.current?.scrollTo({
-                      y: pageY - 100, // Scroll to show input with padding above
-                      animated: true,
+                // Scroll to input when keyboard appears (skip measure on web as it doesn't work well)
+                if (Platform.OS !== 'web') {
+                  setTimeout(() => {
+                    dishInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
+                      scrollViewRef.current?.scrollTo({
+                        y: pageY - 100, // Scroll to show input with padding above
+                        animated: true,
+                      });
                     });
-                  });
-                }, 300); // Delay to allow keyboard to appear
+                  }, 300); // Delay to allow keyboard to appear
+                }
               }}
               onBlur={() => setIsInputFocused(false)}
               accessibilityLabel="Dish input"
@@ -586,15 +561,17 @@ export default function SimpleEnhancedHomeScreen() {
               multiline
               onFocus={() => {
                 setIsInputFocused(true);
-                // Scroll to input when keyboard appears
-                setTimeout(() => {
-                  wineInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
-                    scrollViewRef.current?.scrollTo({
-                      y: pageY - 100, // Scroll to show input with padding above
-                      animated: true,
+                // Scroll to input when keyboard appears (skip measure on web as it doesn't work well)
+                if (Platform.OS !== 'web') {
+                  setTimeout(() => {
+                    wineInputRef.current?.measure((_x, _y, _width, _height, _pageX, pageY) => {
+                      scrollViewRef.current?.scrollTo({
+                        y: pageY - 100, // Scroll to show input with padding above
+                        animated: true,
+                      });
                     });
-                  });
-                }, 300); // Delay to allow keyboard to appear
+                  }, 300); // Delay to allow keyboard to appear
+                }
               }}
               onBlur={() => setIsInputFocused(false)}
               accessibilityLabel="Wine input"
@@ -756,8 +733,54 @@ export default function SimpleEnhancedHomeScreen() {
             </View>
           </View>
         )}
+      </>
+  );
+
+  return (
+    <View style={styles.pageContainer}>
+      {/* Transparent Status Bar */}
+      <StatusBar 
+        barStyle="light-content" 
+        backgroundColor="transparent" 
+        translucent={true} 
+      />
+      
+      {/* Vineyard Hero Background - Using local vineyard image */}
+      <Animated.Image
+        source={require('../../assets/images/vineyard-hero-background.jpg')}
+        style={styles.wineCellarBackground}
+        resizeMode="cover"
+      />
+      <View style={styles.wineCellarOverlay} />
+      
+      {Platform.OS === 'web' ? (
+        <ScrollView 
+          ref={scrollViewRef}
+          style={styles.container}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={true}
+        >
+          {renderScrollContent()}
         </ScrollView>
-      </KeyboardAvoidingView>
+      ) : (
+        <KeyboardAvoidingView 
+          style={styles.container} 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        >
+          <ScrollView 
+            ref={scrollViewRef}
+            style={styles.scrollView} 
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            showsVerticalScrollIndicator={true}
+          >
+            {renderScrollContent()}
+          </ScrollView>
+        </KeyboardAvoidingView>
+      )}
     </View>
   );
 }

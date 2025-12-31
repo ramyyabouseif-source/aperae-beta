@@ -924,12 +924,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 4, // Minimal top padding - spacing controlled by marginTop
     paddingBottom: 20,
     paddingLeft: 20,
     paddingRight: 20, // Match imageOverlay right: 12 + 8 = 20 to align with price badge
     justifyContent: 'space-between',
-    marginTop: 25, // Minimal space for tierLabel badge - WineName appears ~2 rows below badge
+    marginTop: 38, // Badge ends ~37px, WineName starts immediately after with minimal gap (~1 row)
   },
   titleSection: {
     marginBottom: 12,

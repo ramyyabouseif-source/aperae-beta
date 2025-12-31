@@ -38,7 +38,7 @@ const MasonryCard: React.FC<MasonryCardProps> = memo(({
         wine={wine}
         cardWidth={cardWidth}
         onRemoveFromFavorites={onRemoveFromFavorites}
-        onPress={onPress}
+        onPress={undefined}
         index={index}
         onWineUpdated={onWineUpdated}
       />

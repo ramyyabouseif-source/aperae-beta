@@ -76,7 +76,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
         wine={item}
         numColumns={numColumns}
         onRemoveFromFavorites={onRemoveFromFavorites}
-        onPress={onPress}
+        onPress={undefined}
         index={index}
         onWineUpdated={onWineUpdated}
       />

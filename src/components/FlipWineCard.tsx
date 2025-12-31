@@ -931,7 +931,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20, // Match imageOverlay right: 12 + 8 = 20 to align with price badge
     justifyContent: 'space-between',
-    marginTop: 45, // Badge at top:12, height ~23px, ends ~35px + ~10px gap = WineName starts ~45px
+    marginTop: 55, // Badge at top:12, height ~23px, ends ~35px + ~20px gap = WineName starts ~55px
   },
   titleSection: {
     marginBottom: 12,
@@ -955,6 +955,7 @@ const styles = StyleSheet.create({
   },
   grapeText: {
     fontStyle: 'italic',
+    fontSize: 13, // Reduced by 1pt from producerText (14px -> 13px)
   },
   category: {
     fontSize: 12,

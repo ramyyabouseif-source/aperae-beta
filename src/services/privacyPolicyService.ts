@@ -35,13 +35,28 @@ export class PrivacyPolicyService {
 
   /**
    * Accept the privacy policy
+   * Stores both locally (for app functionality) and in backend (for compliance/traceability)
    */
   static async acceptPrivacyPolicy(): Promise<void> {
     try {
       const timestamp = new Date().toISOString();
+      // Store locally for app functionality
       await SecureStorageService.setItem(PRIVACY_POLICY_ACCEPTED_KEY, 'true');
       await SecureStorageService.setItem(PRIVACY_POLICY_TIMESTAMP_KEY, timestamp);
       await SecureStorageService.setItem(PRIVACY_POLICY_VERSION_KEY, this.CURRENT_VERSION);
+
+      // Store in backend for compliance/traceability (privacy-compliant)
+      try {
+        const ConsentApiService = (await import('./consentApiService')).default;
+        await ConsentApiService.storeConsent({
+          consentType: 'privacy_policy',
+          accepted: true,
+          version: this.CURRENT_VERSION,
+        });
+      } catch (backendError) {
+        // Log but don't fail - local storage is primary, backend is for compliance
+        console.warn('Failed to store privacy policy acceptance to backend (non-blocking):', backendError);
+      }
     } catch (error) {
       console.error('Error accepting privacy policy:', error);
       throw error;

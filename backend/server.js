@@ -34,6 +34,7 @@ const wineDatabaseService = require('./services/wineDatabaseService');
 const dishRecommendationDatabaseService = require('./services/dishRecommendationDatabaseService');
 const wineRecommendationDatabaseService = require('./services/wineRecommendationDatabaseService');
 const menuWineDatabaseService = require('./services/menuWineDatabaseService');
+const consentService = require('./services/consentService');
 const { getFallbackResponse } = require('./utils/fallbackHandler');
 const { normalizeResponse } = require('./utils/responseNormalizer');
 const { buildV7Prompt } = require('./prompts/v7-master-sommelier-prompt');
@@ -2861,6 +2862,155 @@ app.post('/api/dish-recommendations',
     }
   }
 );
+
+// =============================================================================
+// CONSENT STORAGE API ENDPOINTS (Privacy-Compliant)
+// =============================================================================
+
+/**
+ * @swagger
+ * /api/consent:
+ *   post:
+ *     summary: Store user consent record
+ *     description: Store consent for age verification, terms, or privacy policy (privacy-compliant)
+ *     tags: [Consent]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - consentType
+ *               - accepted
+ *             properties:
+ *               consentType:
+ *                 type: string
+ *                 enum: [age_verification, terms, privacy_policy]
+ *               accepted:
+ *                 type: boolean
+ *               version:
+ *                 type: string
+ *               deviceId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Consent stored successfully
+ */
+app.post('/api/consent', optionalAuth, csrfProtection, async (req, res) => {
+  const requestStartTime = Date.now();
+  const requestId = generateRequestId();
+  
+  try {
+    const { consentType, accepted, version, deviceId } = req.body;
+    const userId = req.user?.id || null;
+    
+    if (!consentType || typeof accepted !== 'boolean') {
+      return res.status(400).json({
+        success: false,
+        error: 'consentType and accepted (boolean) are required',
+        requestId
+      });
+    }
+    
+    const consent = await consentService.storeConsent({
+      consentType,
+      accepted,
+      version: version || null,
+      userId,
+      deviceId: deviceId || null,
+      req
+    });
+    
+    const responseTime = Date.now() - requestStartTime;
+    logger.info('Consent stored', {
+      requestId,
+      consentType,
+      accepted,
+      hasUserId: !!userId,
+      responseTime
+    });
+    
+    res.json({
+      success: true,
+      consent: {
+        id: consent.id,
+        consentType: consent.consentType,
+        accepted: consent.accepted,
+        version: consent.version,
+        acceptedAt: consent.acceptedAt
+      },
+      requestId
+    });
+    
+  } catch (error) {
+    const responseTime = Date.now() - requestStartTime;
+    logger.error('Error storing consent', {
+      requestId,
+      error: error.message,
+      responseTime
+    });
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to store consent',
+      requestId
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/consent/user:
+ *   get:
+ *     summary: Get user consent records (for data export)
+ *     tags: [Consent]
+ *     security:
+ *       - bearerAuth: []
+ */
+app.get('/api/consent/user', authenticateToken, async (req, res) => {
+  const requestStartTime = Date.now();
+  const requestId = generateRequestId();
+  
+  try {
+    const userId = req.user.id;
+    const consents = await consentService.getUserConsents(userId);
+    
+    const responseTime = Date.now() - requestStartTime;
+    logger.info('User consents retrieved', {
+      requestId,
+      userId,
+      count: consents.length,
+      responseTime
+    });
+    
+    res.json({
+      success: true,
+      consents: consents.map(c => ({
+        id: c.id,
+        consentType: c.consentType,
+        accepted: c.accepted,
+        version: c.version,
+        acceptedAt: c.acceptedAt
+      })),
+      requestId
+    });
+    
+  } catch (error) {
+    const responseTime = Date.now() - requestStartTime;
+    logger.error('Error retrieving user consents', {
+      requestId,
+      error: error.message,
+      responseTime
+    });
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve consent records',
+      requestId
+    });
+  }
+});
 
 /**
  * @swagger

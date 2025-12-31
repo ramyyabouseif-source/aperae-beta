@@ -101,6 +101,20 @@ export default function PrivacySettingsScreen() {
       } catch (error) {
         console.log('No preferences found:', error);
       }
+
+      // Export consent records (if user is authenticated)
+      let consents = [];
+      try {
+        const { AuthService } = await import('../services/authService');
+        const accessToken = await AuthService.getAccessToken();
+        if (accessToken) {
+          const ConsentApiService = (await import('../services/consentApiService')).default;
+          consents = await ConsentApiService.getUserConsents(accessToken);
+        }
+      } catch (error) {
+        console.log('No consent records found or user not authenticated:', error);
+        // Non-blocking - continue export even if consent records can't be retrieved
+      }
       
       // Combine all user data
       const userDataExport = {
@@ -112,6 +126,7 @@ export default function PrivacySettingsScreen() {
         privacySettings: exportedData.privacySettings,
         favorites: favorites,
         preferences: preferences,
+        consents: consents, // Consent records for compliance/traceability
       };
       
       // Create JSON file

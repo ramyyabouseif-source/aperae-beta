@@ -13,52 +13,83 @@ datasource db {
 }
 
 model User {
-  id                    String   @id @default(uuid())
-  email                 String   @unique
-  passwordHash          String   @map("password_hash")
-  role                  String   @default("user")
-  isEmailVerified       Boolean  @default(false) @map("is_email_verified")
-  emailVerificationToken String? @map("email_verification_token")
-  createdAt             DateTime @default(now()) @map("created_at")
-  lastLogin             DateTime? @map("last_login")
-  
+  id                     String    @id @default(uuid())
+  email                  String    @unique
+  passwordHash           String    @map("password_hash")
+  role                   String    @default("user")
+  isEmailVerified        Boolean   @default(false) @map("is_email_verified")
+  emailVerificationToken String?   @map("email_verification_token")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  lastLogin              DateTime? @map("last_login")
+
   // Relations
-  sessions              Session[]
-  preferences           UserPreference?
-  
-  @@map("users")
+  sessions    Session[]
+  preferences UserPreference?
+  consents    UserConsent[]
+
   @@index([email])
+  @@map("users")
 }
 
 model Session {
-  id                String   @id @default(uuid())
-  userId            String   @map("user_id")
-  refreshTokenHash  String   @map("refresh_token_hash")
-  device            String?
-  ip                String?
-  expiresAt         DateTime @map("expires_at")
-  revokedAt         DateTime? @map("revoked_at")
-  createdAt         DateTime @default(now()) @map("created_at")
-  lastUsed          DateTime @default(now()) @map("last_used")
-  
+  id               String    @id @default(uuid())
+  userId           String    @map("user_id")
+  refreshTokenHash String    @map("refresh_token_hash")
+  device           String?
+  ip               String?
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  lastUsed         DateTime  @default(now()) @map("last_used")
+
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@map("sessions")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([refreshTokenHash])
   @@index([expiresAt])
+  @@map("sessions")
 }
 
 model UserPreference {
   userId    String   @id @map("user_id")
   dataJson  Json     @map("data_json")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-  
+
   // Relations
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("user_preferences")
+}
+
+// =============================================================================
+// USER CONSENT STORAGE (Privacy-Compliant Consent Tracking)
+// =============================================================================
+
+model UserConsent {
+  id String @id @default(uuid())
+
+  // Pseudonymized identifiers (privacy-preserving)
+  userId       String? @db.Uuid // Optional - only if user is logged in
+  deviceIdHash String? // SHA-256 hash for anonymous users (not reversible)
+
+  // Consent data (minimal data for compliance)
+  consentType String // 'age_verification', 'terms', 'privacy_policy'
+  accepted    Boolean
+  version     String? // Version of terms/policy accepted (e.g., '1.0')
+
+  // Compliance metadata
+  acceptedAt   DateTime  @default(now())
+  anonymizedAt DateTime? // When data was anonymized (for retention policies)
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([deviceIdHash])
+  @@index([consentType])
+  @@index([acceptedAt])
+  @@map("user_consents")
 }
 
 // =============================================================================
@@ -66,58 +97,58 @@ model UserPreference {
 // =============================================================================
 
 model Wine {
-  id                String   @id @default(uuid())
-  wineName          String
-  producer          String?
-  vintage           String?  // Can be year or "NV"
-  region            String?
-  country           String?
-  wineType          String?  // Red, White, Rosé, Sparkling, Dessert, etc.
-  grapeVariety      String[] @default([]) // Array of grape varieties
-  appellation       String?  // Specific appellation/AOC/DOC
-  
+  id           String   @id @default(uuid())
+  wineName     String
+  producer     String?
+  vintage      String? // Can be year or "NV"
+  region       String?
+  country      String?
+  wineType     String? // Red, White, Rosé, Sparkling, Dessert, etc.
+  grapeVariety String[] @default([]) // Array of grape varieties
+  appellation  String? // Specific appellation/AOC/DOC
+
   // Pricing & Availability (from public sources only)
-  averagePrice      Float?   // Average market price in USD
-  priceRange        Json?    // {min: X, max: Y, currency: "USD"}
-  
+  averagePrice Float? // Average market price in USD
+  priceRange   Json? // {min: X, max: Y, currency: "USD"}
+
   // Ratings & Reviews (from public datasets only)
-  criticScores      Json?    // {wineSpectator: 95, wineAdvocate: 94, wineEnthusiast: 92}
-  communityRating   Float?   // Average rating from community (0-5 or 0-100)
-  reviewCount       Int      @default(0)
-  
+  criticScores    Json? // {wineSpectator: 95, wineAdvocate: 94, wineEnthusiast: 92}
+  communityRating Float? // Average rating from community (0-5 or 0-100)
+  reviewCount     Int    @default(0)
+
   // Tasting Notes (AI-generated or from public sources with attribution)
-  tastingNotes      String?  // Structured tasting notes
-  aromas            String[] @default([]) // Array of aroma descriptors
-  palate            String?  // Palate description
-  finish            String?  // Finish description
-  body              String?  // Light, Medium, Full, Medium-Full
-  acidity           String?  // Low, Medium, High
-  tannins           String?  // Low, Medium, High
-  sweetness         String?  // Dry, Off-Dry, Medium-Sweet, Sweet
-  
+  tastingNotes String? // Structured tasting notes
+  aromas       String[] @default([]) // Array of aroma descriptors
+  palate       String? // Palate description
+  finish       String? // Finish description
+  body         String? // Light, Medium, Full, Medium-Full
+  acidity      String? // Low, Medium, High
+  tannins      String? // Low, Medium, High
+  sweetness    String? // Dry, Off-Dry, Medium-Sweet, Sweet
+
   // Food Pairing (curated or AI-generated)
-  foodPairings      String[] @default([]) // Common food pairings
-  
+  foodPairings String[] @default([]) // Common food pairings
+
   // Quality Metrics (from public datasets)
-  qualityScore      Float?   // Overall quality score (0-100)
-  alcoholContent    Float?   // Alcohol by volume percentage
-  
+  qualityScore   Float? // Overall quality score (0-100)
+  alcoholContent Float? // Alcohol by volume percentage
+
   // Metadata
-  source            String   // "kaggle", "uci", "manual", "wikipedia", etc.
-  sourceUrl         String?  // URL to original data source
-  sourceLicense     String?  // License info (e.g., "Public Domain", "CC0")
-  attribution       String?  // Required attribution text if needed
-  dataQuality       Int      @default(50) // 0-100 quality score
-  lastUpdated       DateTime @default(now()) @updatedAt
-  createdAt         DateTime @default(now())
-  
+  source        String // "kaggle", "uci", "manual", "wikipedia", etc.
+  sourceUrl     String? // URL to original data source
+  sourceLicense String? // License info (e.g., "Public Domain", "CC0")
+  attribution   String? // Required attribution text if needed
+  dataQuality   Int      @default(50) // 0-100 quality score
+  lastUpdated   DateTime @default(now()) @updatedAt
+  createdAt     DateTime @default(now())
+
   // Search optimization
-  searchVector      String?  // Full-text search vector
-  normalizedName    String   // Lowercase, normalized for matching
-  
+  searchVector   String? // Full-text search vector
+  normalizedName String // Lowercase, normalized for matching
+
   // Relations
-  pairings          WinePairing[]
-  
+  pairings WinePairing[]
+
   @@unique([wineName, producer, vintage])
   @@index([wineName])
   @@index([producer])
@@ -130,21 +161,21 @@ model Wine {
 }
 
 model WinePairing {
-  id              String   @id @default(uuid())
-  wineId          String
-  dish            String   // Dish name
-  dishCategory    String?  // e.g., "Meat", "Seafood", "Vegetarian", "Dessert"
-  pairingType     String   @default("classic") // "classic", "alternative", "experimental"
-  confidence      Int      @default(0) // 0-100
-  rationale       String?  // Why this pairing works
-  source          String   @default("ai") // "ai", "curated", "dataset"
-  
+  id           String  @id @default(uuid())
+  wineId       String
+  dish         String // Dish name
+  dishCategory String? // e.g., "Meat", "Seafood", "Vegetarian", "Dessert"
+  pairingType  String  @default("classic") // "classic", "alternative", "experimental"
+  confidence   Int     @default(0) // 0-100
+  rationale    String? // Why this pairing works
+  source       String  @default("ai") // "ai", "curated", "dataset"
+
   // Relations
-  wine            Wine     @relation(fields: [wineId], references: [id], onDelete: Cascade)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now()) @updatedAt
-  
+  wine Wine @relation(fields: [wineId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   @@index([dish])
   @@index([wineId])
   @@index([dishCategory])
@@ -157,91 +188,91 @@ model WinePairing {
 // =============================================================================
 
 model WineRecommendation {
-  id                        String    @id @default(uuid())
-  request_id                String
-  dish                      String
-  created_at                DateTime  @default(now())
-  user_id                   String?   @db.Uuid
-  prompt_version            String
-  api_response_time_ms      Int
-  model_used                String
-  
+  id                   String   @id @default(uuid())
+  request_id           String
+  dish                 String
+  created_at           DateTime @default(now())
+  user_id              String?  @db.Uuid
+  prompt_version       String
+  api_response_time_ms Int
+  model_used           String
+
   // Dish Analysis
-  dominant_weight           String?
-  fat_content               String?
-  primary_protein           String?
-  dominant_flavors          String[]
-  spice_level               String?
-  acidity_level             String?
-  applicable_principles     String[]
-  key_challenge             String?   @db.Text
-  
+  dominant_weight       String?
+  fat_content           String?
+  primary_protein       String?
+  dominant_flavors      String[]
+  spice_level           String?
+  acidity_level         String?
+  applicable_principles String[]
+  key_challenge         String?  @db.Text
+
   // Extracted/Inferred Fields
-  cooking_method            String?
-  cooking_method_impact     String?
-  sauce                     String?
-  sauce_characteristic      String?
-  sauce_priority            String?
-  max_abv                   Float?
-  
+  cooking_method        String?
+  cooking_method_impact String?
+  sauce                 String?
+  sauce_characteristic  String?
+  sauce_priority        String?
+  max_abv               Float?
+
   // Ideal Profile
-  ideal_acidity             String?
-  ideal_acid_type           String?
-  ideal_tannin              String?
-  ideal_body                String?
-  ideal_sweetness           String?
-  ideal_notes               String?   @db.Text
-  
+  ideal_acidity   String?
+  ideal_acid_type String?
+  ideal_tannin    String?
+  ideal_body      String?
+  ideal_sweetness String?
+  ideal_notes     String? @db.Text
+
   // Wine Recommendation Data
-  tier_label                String?
-  tier_rationale            String?   @db.Text
-  tier_fallback_applied     Boolean   @default(false)
-  wine_name                 String?
-  producer                  String?
-  region                    String?
-  vintage                   String?
-  grape                     String?
-  
+  tier_label            String?
+  tier_rationale        String? @db.Text
+  tier_fallback_applied Boolean @default(false)
+  wine_name             String?
+  producer              String?
+  region                String?
+  vintage               String?
+  grape                 String?
+
   // Pairing Rationale
-  rationale                 String?   @db.Text
+  rationale                  String?  @db.Text
   pairing_principles_applied String[]
-  
+
   // Tasting Notes
-  aromas                    String[]
-  palate                    String?   @db.Text
-  finish                    String?   @db.Text
-  
+  aromas String[]
+  palate String?  @db.Text
+  finish String?  @db.Text
+
   // Serving Guidance
-  serving_temperature       String?
-  serving_glassware         String?
-  serving_decanting         String?
-  
+  serving_temperature String?
+  serving_glassware   String?
+  serving_decanting   String?
+
   // Confidence Scoring
-  confidence_score          Int?
-  confidence_pairing_science Int?
-  confidence_wine_knowledge Int?
+  confidence_score               Int?
+  confidence_pairing_science     Int?
+  confidence_wine_knowledge      Int?
   confidence_complexity_handling Int?
-  confidence_rationale      String?   @db.Text
-  
+  confidence_rationale           String? @db.Text
+
   // Additional Fields
-  vintage_rationale         String?   @db.Text
-  story                     String?   @db.Text
-  expert_rating             String?
-  price_point               String?
-  category                  String?
-  retailer_suggestion       String?
-  image_url                 String?
-  
+  vintage_rationale   String? @db.Text
+  story               String? @db.Text
+  expert_rating       String?
+  price_point         String?
+  category            String?
+  retailer_suggestion String?
+  image_url           String?
+
   // Full Response Data (for debugging/analysis)
-  full_response_json        Json?
-  
+  full_response_json Json?
+
   // Avoid Data (from parent response)
-  avoid_types               String[]
-  avoid_reason              String?   @db.Text
-  
+  avoid_types  String[]
+  avoid_reason String?  @db.Text
+
   // Closing Narrative
-  closing_narrative         String?   @db.Text
-  
+  closing_narrative String? @db.Text
+
   @@index([request_id])
   @@index([dish])
   @@index([created_at])
@@ -253,28 +284,28 @@ model WineRecommendation {
 // =============================================================================
 
 model MenuWine {
-  id                String    @id @default(uuid())
-  request_id        String    // Links to the same request_id as WineRecommendation
-  dish              String?   // Dish name from menu context (optional)
-  created_at        DateTime  @default(now())
-  
+  id         String   @id @default(uuid())
+  request_id String // Links to the same request_id as WineRecommendation
+  dish       String? // Dish name from menu context (optional)
+  created_at DateTime @default(now())
+
   // Parsed Wine Data (from OCR)
-  wine_name         String
-  producer          String?
-  vintage           String?   // Can be year or "NV"
-  grape             String?
-  region            String?
-  price             String?  // Price as extracted from OCR (preserve original format)
-  
+  wine_name String
+  producer  String?
+  vintage   String? // Can be year or "NV"
+  grape     String?
+  region    String?
+  price     String? // Price as extracted from OCR (preserve original format)
+
   // Additional Metadata
-  category          String?  // Wine category (Red, White, etc.)
-  serving_style     String?  // "glass", "bottle", or "both"
-  description       String?  @db.Text
-  ocr_confidence    Float?   // OCR confidence score for this wine
-  
+  category       String? // Wine category (Red, White, etc.)
+  serving_style  String? // "glass", "bottle", or "both"
+  description    String? @db.Text
+  ocr_confidence Float? // OCR confidence score for this wine
+
   // Full OCR line for debugging/analysis
-  raw_ocr_line      String?  @db.Text
-  
+  raw_ocr_line String? @db.Text
+
   @@index([request_id])
   @@index([dish])
   @@index([created_at])
@@ -282,4 +313,3 @@ model MenuWine {
   @@index([producer])
   @@map("menu_wines")
 }
-

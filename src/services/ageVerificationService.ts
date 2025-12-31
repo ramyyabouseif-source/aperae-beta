@@ -46,12 +46,27 @@ export class AgeVerificationService {
 
   /**
    * Verify age (store verification)
+   * Stores both locally (for app functionality) and in backend (for compliance/traceability)
    */
   static async verifyAge(age: number): Promise<void> {
     try {
+      // Store locally for app functionality
       await SecureStorageService.setItem(AGE_VERIFIED_KEY, 'true');
       await SecureStorageService.setItem(AGE_VERIFICATION_DATE_KEY, new Date().toISOString());
       await SecureStorageService.setItem(AGE_VERIFICATION_AGE_KEY, age.toString());
+
+      // Store in backend for compliance/traceability (privacy-compliant)
+      try {
+        const ConsentApiService = (await import('./consentApiService')).default;
+        await ConsentApiService.storeConsent({
+          consentType: 'age_verification',
+          accepted: true,
+          // Note: We store boolean "accepted" not the actual age (privacy-preserving)
+        });
+      } catch (backendError) {
+        // Log but don't fail - local storage is primary, backend is for compliance
+        console.warn('Failed to store age verification to backend (non-blocking):', backendError);
+      }
     } catch (error) {
       console.error('Error storing age verification:', error);
       throw error;

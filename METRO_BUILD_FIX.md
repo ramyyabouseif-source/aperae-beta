@@ -50,3 +50,4 @@ The build will create a `dist` folder (not `web-build`) with your static files. 
 **Note:** Expo SDK 50+ uses Metro bundler by default. The old `expo export:web` command was for Webpack, which has been deprecated.
 
 
+

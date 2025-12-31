@@ -35,7 +35,6 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
   const PAGE_SIZE = 20; // Items per page
 
   useEffect(() => {
-    loadLayoutPreference();
     loadFavorites(1, false);
     loadStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps

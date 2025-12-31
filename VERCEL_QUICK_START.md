@@ -43,3 +43,4 @@ Visit `https://www.aperae.com` - Your app should be live! 🎉
 **Need more details?** See [VERCEL_SETUP_GUIDE.md](./VERCEL_SETUP_GUIDE.md) for complete step-by-step instructions.
 
 
+

@@ -695,7 +695,7 @@ export default function SimpleEnhancedHomeScreen() {
             )}
 
             {/* Responsible Drinking Disclaimer - After wine cards with proper spacing */}
-            <View style={{ marginTop: 24, marginBottom: 16 }}>
+            <View style={styles.finalNotesSection}>
               <ResponsibleDrinkingDisclaimer />
             </View>
           </View>

@@ -601,19 +601,12 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
           <View style={styles.contentWrapper}>
             {/* Image Overlay for badges - Top Row */}
             <View style={styles.imageOverlay}>
-              {/* Badge Container - Left Side (Tier then Category) */}
+              {/* Badge Container - Left Side (Tier only) */}
               <View style={styles.badgeContainer}>
-                {/* Tier Label Badge - First */}
+                {/* Tier Label Badge */}
                 {wine.tierLabel && (
                   <View style={[styles.tierBadge, getTierBadgeStyle(wine.tierLabel)]}>
                     <Text style={styles.tierBadgeText}>{wine.tierLabel}</Text>
-                  </View>
-                )}
-                
-                {/* Category Badge - Second (after tier) */}
-                {(wine.category || wine.grape) && (
-                  <View style={styles.categoryBadge}>
-                    <Text style={styles.categoryBadgeText}>{wine.category || wine.grape}</Text>
                   </View>
                 )}
               </View>
@@ -657,6 +650,12 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                   {wine.producer} • {wine.vintage}
                 </Text>
                 
+                {/* Grape - Display as text below producer+vintage */}
+                {wine.grape && (
+                  <Text style={styles.producerText}>
+                    {wine.grape}
+                  </Text>
+                )}
                 
                 {/* User Rating - My Cellar Feature */}
                 {(() => {
@@ -688,7 +687,7 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
             <View style={styles.tastingNotesContainer}>
               <Text style={styles.tastingNotesLabel}>Tasting Notes:</Text>
               {tastingNotes.aromas.length > 0 && (
-                <Text style={styles.tastingNotesText}>
+                <Text style={styles.tastingNotesText} numberOfLines={expanded ? undefined : 3}>
                   <Text style={styles.tastingNotesLabelWord}>Aromas:</Text> {tastingNotes.aromas.join(', ')}
                 </Text>
               )}
@@ -698,7 +697,7 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                 </Text>
               )}
               {tastingNotes.finish && (
-                <Text style={styles.tastingNotesText}>
+                <Text style={styles.tastingNotesText} numberOfLines={expanded ? undefined : 3}>
                   <Text style={styles.tastingNotesLabelWord}>Finish:</Text> {tastingNotes.finish}
                 </Text>
               )}
@@ -910,21 +909,6 @@ const styles = StyleSheet.create({
     gap: 8,
     flexWrap: 'wrap',
   },
-  categoryBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: 'rgba(139, 0, 0, 0.8)', // Dark red with transparency
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)', // Subtle white border for visibility on dark overlay
-  },
-  categoryBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
   priceText: {
     color: '#fff',
     fontSize: 16, // Match V1
@@ -945,7 +929,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20, // Match imageOverlay right: 12 + 8 = 20 to align with price badge
     justifyContent: 'space-between',
-    marginTop: 60, // Space for badges
+    marginTop: 40, // Reduced space for badges to allow more room for content
   },
   titleSection: {
     marginBottom: 12,

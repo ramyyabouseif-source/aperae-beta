@@ -75,17 +75,29 @@ const csrfProtection = (req, res, next) => {
 
   // If origin is present, validate it
   if (origin) {
-    // Get allowed origins from CORS configuration
+    // Get allowed origins from CORS configuration (match server.js CORS config)
+    const envOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:19006',
       'https://localhost:3000',
       'https://localhost:19006',
-      process.env.ALLOWED_ORIGINS?.split(',') || []
-    ].flat();
+      'exp://127.0.0.1:8081',
+      'exp://localhost:8081',
+      // Production domains
+      'https://www.aperae.com',
+      'https://aperae.com',
+      ...envOrigins
+    ];
 
-    // Check if origin matches allowed origins
-    if (!allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+    // Check if origin matches allowed origins (exact match or prefix match)
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (origin === allowed) return true;
+      if (origin.startsWith(allowed)) return true;
+      return false;
+    });
+    
+    if (!isAllowed) {
       logger.warn('CSRF protection: Invalid origin', {
         ip: req.ip,
         origin,

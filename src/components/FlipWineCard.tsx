@@ -789,13 +789,12 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 12,
     minHeight: 320, // Minimum height to prevent collapse
-    overflow: Platform.OS === 'web' ? 'visible' : 'hidden', // Allow overflow on web to prevent text clipping
   },
   card: {
     width: '100%',
     minHeight: 320, // Match V1 card height
     borderRadius: 20,
-    overflow: Platform.OS === 'web' ? 'visible' : 'hidden', // Allow overflow on web to prevent text clipping
+    overflow: 'hidden',
     backgroundColor: '#fff',
   },
   cardFront: {
@@ -941,12 +940,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: Platform.OS === 'web' ? 12 : 20,
+    paddingTop: 20,
     paddingBottom: 20,
     paddingLeft: 20,
     paddingRight: 20, // Match imageOverlay right: 12 + 8 = 20 to align with price badge
     justifyContent: 'space-between',
-    marginTop: Platform.OS === 'web' ? 50 : 60, // Space for badges (less on web for better spacing)
+    marginTop: 60, // Space for badges
   },
   titleSection: {
     marginBottom: 12,

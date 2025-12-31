@@ -652,7 +652,7 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                 
                 {/* Grape - Display as text below producer+vintage */}
                 {wine.grape && (
-                  <Text style={styles.producerText}>
+                  <Text style={[styles.producerText, styles.grapeText]}>
                     {wine.grape}
                   </Text>
                 )}
@@ -929,7 +929,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20, // Match imageOverlay right: 12 + 8 = 20 to align with price badge
     justifyContent: 'space-between',
-    marginTop: 40, // Reduced space for badges to allow more room for content
+    marginTop: 25, // Minimal space for tierLabel badge - WineName appears ~2 rows below badge
   },
   titleSection: {
     marginBottom: 12,
@@ -950,6 +950,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)', // White with opacity like V1
     fontWeight: '500',
+  },
+  grapeText: {
+    fontStyle: 'italic',
   },
   category: {
     fontSize: 12,

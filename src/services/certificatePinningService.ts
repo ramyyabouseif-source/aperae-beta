@@ -190,7 +190,7 @@ class CertificatePinningService {
       
       // Check protocol (production mode or non-local URLs)
       if (urlObj.protocol !== 'https:') {
-        console.warn(`Insecure protocol detected: ${urlObj.protocol}`);
+        console.warn(`[CertificatePinning] Insecure protocol detected: ${urlObj.protocol} for URL: ${url}`);
         return false;
       }
 
@@ -206,15 +206,17 @@ class CertificatePinningService {
 
         for (const pattern of suspiciousPatterns) {
           if (pattern.test(urlObj.hostname)) {
-            console.warn(`Suspicious hostname pattern detected: ${urlObj.hostname}`);
+            console.warn(`[CertificatePinning] Suspicious hostname pattern detected: ${urlObj.hostname}`);
             return false;
           }
         }
       }
 
+      // Allow all HTTPS URLs (including api.aperae.com)
+      console.log(`[CertificatePinning] URL security validation passed: ${url}`);
       return true;
     } catch (error) {
-      console.error('URL security validation error:', error);
+      console.error('[CertificatePinning] URL security validation error:', error, 'URL:', url);
       return false;
     }
   }

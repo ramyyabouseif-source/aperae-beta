@@ -46,8 +46,14 @@ class SecureHttpClient {
     const url = `${this.baseURL}${endpoint}`;
     
     // Validate URL security
-    if (!certificatePinningService.validateUrlSecurity(url)) {
-      throw new Error('Insecure URL detected - request blocked for security');
+    console.log(`[SecureHttpClient] Validating URL security for: ${url}`);
+    const isUrlSecure = certificatePinningService.validateUrlSecurity(url);
+    console.log(`[SecureHttpClient] URL security validation result: ${isUrlSecure}`);
+    
+    if (!isUrlSecure) {
+      const errorMsg = `Insecure URL detected - request blocked for security: ${url}`;
+      console.error(`[SecureHttpClient] ${errorMsg}`);
+      throw new Error(errorMsg);
     }
 
     // Prepare request configuration

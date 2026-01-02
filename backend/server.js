@@ -3025,6 +3025,123 @@ app.get('/api/consent/user', authenticateToken, async (req, res) => {
 
 /**
  * @swagger
+ * /api/consent/compliance-report:
+ *   get:
+ *     summary: Get compliance report for anonymous user
+ *     description: Returns a formatted compliance report showing completion status of all required consents for an anonymous user (identified by device ID hash)
+ *     tags: [Consent]
+ *     parameters:
+ *       - in: query
+ *         name: deviceIdHash
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: SHA-256 hash of the device ID
+ *     responses:
+ *       200:
+ *         description: Compliance report retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 complianceStatus:
+ *                   type: string
+ *                   enum: [FULLY_COMPLIANT, PARTIAL_COMPLIANCE, NON_COMPLIANT]
+ *                   description: Overall compliance status
+ *                 consentsCompleted:
+ *                   type: integer
+ *                   description: Number of required consents completed
+ *                 requiredConsents:
+ *                   type: integer
+ *                   description: Total number of required consents
+ *                 consentRecords:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       type:
+ *                         type: string
+ *                         enum: [age_verification, terms, privacy_policy]
+ *                       accepted:
+ *                         type: boolean
+ *                       version:
+ *                         type: string
+ *                         nullable: true
+ *                       acceptedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         nullable: true
+ *                 firstConsent:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *                   description: Timestamp of first consent acceptance
+ *                 lastConsent:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *                   description: Timestamp of last consent acceptance
+ *                 requestId:
+ *                   type: string
+ *       400:
+ *         description: Bad request - missing deviceIdHash parameter
+ *       500:
+ *         description: Internal server error
+ */
+app.get('/api/consent/compliance-report', async (req, res) => {
+  const requestStartTime = Date.now();
+  const requestId = generateRequestId();
+  
+  try {
+    const { deviceIdHash } = req.query;
+    
+    if (!deviceIdHash) {
+      return res.status(400).json({
+        success: false,
+        error: 'deviceIdHash query parameter is required',
+        requestId
+      });
+    }
+    
+    const report = await consentService.getComplianceReportByDeviceIdHash(deviceIdHash);
+    
+    const responseTime = Date.now() - requestStartTime;
+    logger.info('Compliance report retrieved', {
+      requestId,
+      deviceIdHash: deviceIdHash.substring(0, 8) + '...', // Log only first 8 chars for privacy
+      complianceStatus: report.complianceStatus,
+      consentsCompleted: report.consentsCompleted,
+      responseTime
+    });
+    
+    res.json({
+      success: true,
+      ...report,
+      requestId
+    });
+    
+  } catch (error) {
+    const responseTime = Date.now() - requestStartTime;
+    logger.error('Error retrieving compliance report', {
+      requestId,
+      error: error.message,
+      responseTime
+    });
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve compliance report',
+      requestId
+    });
+  }
+});
+
+/**
+ * @swagger
  * /api/ocr/extract-text:
  *   post:
  *     summary: Extract text from image using OCR

@@ -259,7 +259,90 @@ class ConsentService {
       return false;
     }
   }
+
+  /**
+   * Get compliance report for anonymous user (by device ID hash)
+   * Returns formatted report showing completion status of all required consents
+   * @param {string} deviceIdHash - Hashed device ID
+   * @returns {Promise<object>} Compliance report with status and consent records
+   */
+  async getComplianceReportByDeviceIdHash(deviceIdHash) {
+    try {
+      if (!deviceIdHash) {
+        throw new Error('Device ID hash is required');
+      }
+
+      // Get all consent records for this device
+      const allConsents = await prisma.userConsent.findMany({
+        where: {
+          deviceIdHash: deviceIdHash,
+          userId: null, // Only anonymous user records
+          anonymizedAt: null,
+        },
+        orderBy: {
+          acceptedAt: 'asc',
+        },
+      });
+
+      // Required consent types
+      const requiredConsentTypes = ['age_verification', 'terms', 'privacy_policy'];
+      
+      // Get the most recent accepted consent for each type
+      const consentMap = new Map();
+      allConsents.forEach(consent => {
+        if (consent.accepted && !consentMap.has(consent.consentType)) {
+          consentMap.set(consent.consentType, consent);
+        }
+      });
+
+      // Build consent records array
+      const consentRecords = requiredConsentTypes.map(consentType => {
+        const consent = consentMap.get(consentType);
+        return {
+          type: consentType,
+          accepted: !!consent && consent.accepted,
+          version: consent?.version || null,
+          acceptedAt: consent?.acceptedAt || null,
+        };
+      });
+
+      // Calculate compliance status
+      const acceptedCount = consentRecords.filter(r => r.accepted).length;
+      const allAccepted = consentRecords.every(r => r.accepted);
+      
+      let complianceStatus;
+      if (acceptedCount === requiredConsentTypes.length && allAccepted) {
+        complianceStatus = 'FULLY_COMPLIANT';
+      } else if (acceptedCount > 0) {
+        complianceStatus = 'PARTIAL_COMPLIANCE';
+      } else {
+        complianceStatus = 'NON_COMPLIANT';
+      }
+
+      // Get first and last consent timestamps
+      const acceptedConsents = consentRecords.filter(r => r.acceptedAt);
+      const firstConsent = acceptedConsents.length > 0 
+        ? acceptedConsents[0].acceptedAt 
+        : null;
+      const lastConsent = acceptedConsents.length > 0 
+        ? acceptedConsents[acceptedConsents.length - 1].acceptedAt 
+        : null;
+
+      return {
+        complianceStatus,
+        consentsCompleted: acceptedCount,
+        requiredConsents: requiredConsentTypes.length,
+        consentRecords,
+        firstConsent,
+        lastConsent,
+      };
+    } catch (error) {
+      logger.error('Error getting compliance report', { error: error.message, deviceIdHash });
+      throw error;
+    }
+  }
 }
 
 module.exports = new ConsentService();
+
 

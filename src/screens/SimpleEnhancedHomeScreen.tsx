@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -66,6 +66,7 @@ export default function SimpleEnhancedHomeScreen() {
   const [loadingMessage, setLoadingMessage] = useState('');
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [pairingNotesExpanded, setPairingNotesExpanded] = useState(false);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const navigation = useNavigation();
   const scrollViewRef = useRef<ScrollView>(null);
   
@@ -648,6 +649,7 @@ export default function SimpleEnhancedHomeScreen() {
                   key={`${wine.wineName}-${index}`}
                   wine={wine}
                   index={wineImageIndices[index] ?? 0}
+                  isFavorite={favorites.has(wine.wineName)}
                   onAddToFavorites={handleAddToFavorites}
                   onRemoveFromFavorites={handleRemoveFromFavorites}
                 />

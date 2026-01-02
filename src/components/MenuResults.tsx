@@ -3,7 +3,7 @@
  * Displays analyzed menu items and wine recommendations
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,21 @@ interface MenuResultsProps {
 export default function MenuResults({ analysisResult, onClose, isLoading = false }: MenuResultsProps) {
   // Note: onClose is kept for potential future use (e.g., collapse section)
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+
+  // Load existing favorites on mount
+  useEffect(() => {
+    const loadFavorites = async () => {
+      try {
+        const allFavorites = await FavoritesService.getFavorites();
+        const favoriteNames = new Set(allFavorites.map(wine => wine.wineName));
+        setFavorites(favoriteNames);
+      } catch (error) {
+        console.error('Error loading favorites:', error);
+      }
+    };
+
+    loadFavorites();
+  }, []);
   
   /**
    * DISPLAY LAYER: Sanitize Text for User Experience

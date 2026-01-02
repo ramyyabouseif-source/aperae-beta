@@ -280,7 +280,6 @@ export class WineService {
 
         // Use secure HTTP client with certificate pinning
         const secureClient = this.getSecureClient();
-        const API_BASE_URL = getApiBaseUrl();
         
         // Only include ngrok header if using ngrok URL (development)
         const headers: Record<string, string> = {};

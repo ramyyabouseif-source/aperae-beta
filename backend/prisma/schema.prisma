@@ -70,17 +70,17 @@ model UserConsent {
   id String @id @default(uuid())
 
   // Pseudonymized identifiers (privacy-preserving)
-  userId       String? @db.Uuid // Optional - only if user is logged in
-  deviceIdHash String? // SHA-256 hash for anonymous users (not reversible)
+  userId       String? @db.Uuid @map("user_id") // Optional - only if user is logged in
+  deviceIdHash String? @map("device_id_hash") // SHA-256 hash for anonymous users (not reversible)
 
   // Consent data (minimal data for compliance)
-  consentType String // 'age_verification', 'terms', 'privacy_policy'
+  consentType String @map("consent_type") // 'age_verification', 'terms', 'privacy_policy'
   accepted    Boolean
   version     String? // Version of terms/policy accepted (e.g., '1.0')
 
   // Compliance metadata
-  acceptedAt   DateTime  @default(now())
-  anonymizedAt DateTime? // When data was anonymized (for retention policies)
+  acceptedAt   DateTime  @default(now()) @map("accepted_at")
+  anonymizedAt DateTime? @map("anonymized_at") // When data was anonymized (for retention policies)
 
   // Relations
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)

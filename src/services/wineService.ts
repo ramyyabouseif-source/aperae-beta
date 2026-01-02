@@ -280,11 +280,15 @@ export class WineService {
 
         // Use secure HTTP client with certificate pinning
         const secureClient = this.getSecureClient();
-        const response = await secureClient.post('/recommendations', requestBody, {
-          'ngrok-skip-browser-warning': 'true',
-          // Add CSRF protection in production
-          // 'X-CSRF-Token': csrfToken
-        });
+        const API_BASE_URL = getApiBaseUrl();
+        
+        // Only include ngrok header if using ngrok URL (development)
+        const headers: Record<string, string> = {};
+        if (API_BASE_URL.includes('ngrok')) {
+          headers['ngrok-skip-browser-warning'] = 'true';
+        }
+        
+        const response = await secureClient.post('/recommendations', requestBody, headers);
 
         const attemptEndTime = performance.now();
         const attemptResponseTime = attemptEndTime - attemptStartTime;

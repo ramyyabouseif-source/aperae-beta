@@ -75,12 +75,17 @@ export class OCRService {
         console.log('OCR endpoint:', ocrEndpoint);
         console.log('Image size (base64 length):', base64Image.length);
         
+        // Only include ngrok header if using ngrok URL (development)
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        if (backendUrl.includes('ngrok')) {
+          headers['ngrok-skip-browser-warning'] = 'true';
+        }
+        
         const response = await fetch(ocrEndpoint, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning
-          },
+          headers,
           body: JSON.stringify({
             image: base64Image,
           }),

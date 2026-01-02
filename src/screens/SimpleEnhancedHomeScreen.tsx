@@ -351,6 +351,21 @@ export default function SimpleEnhancedHomeScreen() {
     }
   };
 
+  // Load existing favorites on mount
+  useEffect(() => {
+    const loadFavorites = async () => {
+      try {
+        const allFavorites = await FavoritesService.getFavorites();
+        const favoriteNames = new Set(allFavorites.map(wine => wine.wineName));
+        setFavorites(favoriteNames);
+      } catch (error) {
+        console.error('Error loading favorites:', error);
+      }
+    };
+
+    loadFavorites();
+  }, []);
+
   const handleAddToFavorites = async (wine: WineRecommendation) => {
     try {
       // Ensure all fields are preserved when adding to favorites
@@ -360,10 +375,13 @@ export default function SimpleEnhancedHomeScreen() {
         addedAt: new Date().toISOString(),
       };
       await FavoritesService.addToFavorites(favoriteWine);
+      setFavorites(new Set([...favorites, wine.wineName]));
       Alert.alert('Success', 'Wine added to your cellar!');
     } catch (error: any) {
       if (error.message && error.message.includes('already in favorites')) {
         Alert.alert('Already Added', 'This wine is already in your cellar!');
+        // Update state even if already in favorites
+        setFavorites(new Set([...favorites, wine.wineName]));
       } else {
         Alert.alert('Error', 'Failed to add wine to your cellar');
       }
@@ -373,6 +391,9 @@ export default function SimpleEnhancedHomeScreen() {
   const handleRemoveFromFavorites = async (wine: any) => {
     try {
       await FavoritesService.removeFromFavorites(wine);
+      const newFavorites = new Set(favorites);
+      newFavorites.delete(wine.wineName || wine);
+      setFavorites(newFavorites);
       Alert.alert('Success', 'Wine removed from favorites!');
     } catch (error) {
       Alert.alert('Error', 'Failed to remove wine from favorites');

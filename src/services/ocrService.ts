@@ -215,21 +215,81 @@ export class OCRService {
 
   /**
    * Convert image URI to base64 string
-   * Uses expo-file-system for React Native/Expo compatibility
+   * Uses expo-file-system for React Native/Expo, browser APIs for web
    */
   private static async convertImageToBase64(imageUri: string): Promise<string> {
     try {
       console.log('Converting image to base64...');
       console.log('Image URI:', imageUri);
       
-      // Use expo-file-system to read the file as base64
-      // In expo-file-system v19+, use string literal 'base64' directly
-      const base64 = await FileSystem.readAsStringAsync(imageUri, {
-        encoding: 'base64' as any,
-      });
-      
-      console.log('Base64 conversion completed, length:', base64.length);
-      return base64;
+      // Handle web platform differently
+      if (Platform.OS === 'web') {
+        // On web, images can be blob URLs or data URIs
+        if (imageUri.startsWith('blob:')) {
+          // Fetch the blob and convert to base64
+          const response = await fetch(imageUri);
+          const blob = await response.blob();
+          
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const result = reader.result as string;
+              // FileReader returns data URI (data:image/...;base64,xxx)
+              // Extract just the base64 part
+              const base64 = result.split(',')[1];
+              if (!base64) {
+                reject(new Error('Failed to extract base64 from data URI'));
+                return;
+              }
+              console.log('Base64 conversion completed (web blob), length:', base64.length);
+              resolve(base64);
+            };
+            reader.onerror = () => {
+              reject(new Error('FileReader failed to read blob'));
+            };
+            reader.readAsDataURL(blob);
+          });
+        } else if (imageUri.startsWith('data:')) {
+          // Already a data URI, extract base64 part
+          const base64 = imageUri.split(',')[1];
+          if (!base64) {
+            throw new Error('Invalid data URI format');
+          }
+          console.log('Base64 conversion completed (web data URI), length:', base64.length);
+          return base64;
+        } else {
+          // Try to fetch as regular URL
+          const response = await fetch(imageUri);
+          const blob = await response.blob();
+          
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const result = reader.result as string;
+              const base64 = result.split(',')[1];
+              if (!base64) {
+                reject(new Error('Failed to extract base64 from data URI'));
+                return;
+              }
+              console.log('Base64 conversion completed (web URL), length:', base64.length);
+              resolve(base64);
+            };
+            reader.onerror = () => {
+              reject(new Error('FileReader failed to read blob'));
+            };
+            reader.readAsDataURL(blob);
+          });
+        }
+      } else {
+        // React Native/Expo: Use expo-file-system to read the file as base64
+        // In expo-file-system v19+, use string literal 'base64' directly
+        const base64 = await FileSystem.readAsStringAsync(imageUri, {
+          encoding: 'base64' as any,
+        });
+        
+        console.log('Base64 conversion completed (native), length:', base64.length);
+        return base64;
+      }
     } catch (error: any) {
       const errorMessage = error?.message || (typeof error === 'string' ? error : error?.toString() || 'Unknown error');
       console.error('Image conversion error:', errorMessage);

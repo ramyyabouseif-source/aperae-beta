@@ -75,12 +75,11 @@ export class DishService {
 
     for (let attempt = 0; attempt < this.MAX_RETRIES; attempt++) {
       try {
+        // Note: timeout is handled by SecureHttpClient constructor (default: 90000ms)
+        // No need to pass it as a header - that causes CORS errors
         const response = await client.post<DishRecommendationResponse>(
           '/dish-recommendations',
-          { wine: wine.trim() },
-          {
-            timeout: NETWORK_CONFIG.timeout,
-          }
+          { wine: wine.trim() }
         );
 
         // Validate response structure

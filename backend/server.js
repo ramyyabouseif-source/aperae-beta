@@ -205,7 +205,7 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200, // Some legacy browsers choke on 204
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'User-Agent'],
   exposedHeaders: ['X-API-Version', 'X-Request-ID']
 };
 
@@ -301,12 +301,14 @@ app.use('/api/recommendations', recommendationLimiter);
 app.use('/api/auth', authLimiter);
 
 // Request size limits
+// Increased limit for OCR endpoint which handles large image payloads
+// Images will be compressed by the OCR endpoint, but need to accept larger initial payloads
 app.use(express.json({ 
-  limit: '1mb', // Limit JSON payloads to 1MB
+  limit: '10mb', // Increased to 10MB to handle large image uploads (OCR endpoint compresses them)
   strict: true // Only parse arrays and objects
 }));
 app.use(express.urlencoded({ 
-  limit: '1mb', // Limit URL-encoded payloads to 1MB
+  limit: '1mb', // Keep URL-encoded payloads at 1MB (not used for image uploads)
   extended: true 
 }));
 

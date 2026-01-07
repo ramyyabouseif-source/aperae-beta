@@ -44,7 +44,8 @@ class TimeoutMiddleware {
       return Number.isFinite(n) && n > 0 ? n : d;
     };
     return {
-      recommendations: parse(process.env.API_TIMEOUT_RECOMMENDATIONS_MS, 60000),
+      // CRITICAL-5: Set to 85s (5s buffer before Render's 90s limit)
+      recommendations: parse(process.env.API_TIMEOUT_RECOMMENDATIONS_MS, 85000),
       ocr: parse(process.env.API_TIMEOUT_OCR_MS, 30000),
       auth: parse(process.env.API_TIMEOUT_AUTH_MS, 10000),
       default: parse(process.env.API_TIMEOUT_DEFAULT_MS, 30000)

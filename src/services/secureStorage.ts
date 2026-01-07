@@ -12,13 +12,16 @@ export class SecureStorageService {
 
   /**
    * Store an item securely
+   * CRITICAL-2: Use sessionStorage instead of localStorage for better security (still XSS vulnerable but cleared on tab close)
+   * TODO: Migrate to httpOnly cookies for production (requires backend changes)
    */
   static async setItem(key: string, value: string): Promise<void> {
     try {
       if (Platform.OS === 'web') {
-        // Web: Use localStorage with prefix
+        // Web: Use sessionStorage (cleared on tab close, still XSS vulnerable but better than localStorage)
+        // TODO: Migrate to httpOnly cookies for production
         const storageKey = this.WEB_STORAGE_PREFIX + key;
-        localStorage.setItem(storageKey, value);
+        sessionStorage.setItem(storageKey, value);
       } else {
         // iOS/Android: Use Expo SecureStore
         await SecureStore.setItemAsync(key, value);
@@ -31,13 +34,14 @@ export class SecureStorageService {
   
   /**
    * Retrieve an item
+   * CRITICAL-2: Use sessionStorage instead of localStorage
    */
   static async getItem(key: string): Promise<string | null> {
     try {
       if (Platform.OS === 'web') {
-        // Web: Use localStorage with prefix
+        // Web: Use sessionStorage with prefix
         const storageKey = this.WEB_STORAGE_PREFIX + key;
-        return localStorage.getItem(storageKey);
+        return sessionStorage.getItem(storageKey);
       } else {
         // iOS/Android: Use Expo SecureStore
         return await SecureStore.getItemAsync(key);
@@ -50,13 +54,14 @@ export class SecureStorageService {
   
   /**
    * Remove an item
+   * CRITICAL-2: Use sessionStorage instead of localStorage
    */
   static async removeItem(key: string): Promise<void> {
     try {
       if (Platform.OS === 'web') {
-        // Web: Use localStorage with prefix
+        // Web: Use sessionStorage with prefix
         const storageKey = this.WEB_STORAGE_PREFIX + key;
-        localStorage.removeItem(storageKey);
+        sessionStorage.removeItem(storageKey);
       } else {
         // iOS/Android: Use Expo SecureStore
         await SecureStore.deleteItemAsync(key);
@@ -69,13 +74,14 @@ export class SecureStorageService {
   
   /**
    * Check if an item exists
+   * CRITICAL-2: Use sessionStorage instead of localStorage
    */
   static async hasItem(key: string): Promise<boolean> {
     try {
       if (Platform.OS === 'web') {
-        // Web: Use localStorage with prefix
+        // Web: Use sessionStorage with prefix
         const storageKey = this.WEB_STORAGE_PREFIX + key;
-        return localStorage.getItem(storageKey) !== null;
+        return sessionStorage.getItem(storageKey) !== null;
       } else {
         // iOS/Android: Use Expo SecureStore
         const item = await SecureStore.getItemAsync(key);

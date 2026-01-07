@@ -53,6 +53,27 @@ try {
   process.exit(1);
 }
 
+// Global error handlers for unhandled promise rejections and uncaught exceptions
+// CRITICAL-1: Prevent server crashes from unhandled errors
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Promise Rejection', {
+    reason: reason instanceof Error ? reason.message : String(reason),
+    stack: reason instanceof Error ? reason.stack : undefined,
+    promise: promise.toString()
+  });
+  // Don't exit in production - let Render handle restarts
+  // But log for monitoring
+});
+
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception', {
+    error: error.message,
+    stack: error.stack
+  });
+  // Exit gracefully after logging
+  process.exit(1);
+});
+
 // Trust proxy for rate limiting
 app.set('trust proxy', 1);
 
@@ -114,92 +135,66 @@ app.use((req, res, next) => {
 
 app.use(securityLogger);
 
-// CORS configuration - allow both localhost and ngrok domains
-const allowedOrigins = (() => {
-  const env = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-  const defaults = [
-    'http://localhost:3000',
-    'http://localhost:19006',
-    'https://localhost:3000',
-    'https://localhost:19006',
-    'exp://127.0.0.1:8081',
-    'exp://localhost:8081',
-    // Production domains
-    'https://www.aperae.com',
-    'https://aperae.com',
-  ];
-  return env.length ? env : defaults;
-})();
-
-// Dynamically add ngrok domains
-const ngrokPattern = /^https:\/\/[a-z0-9]+\.ngrok-free\.app$/;
+// CORS configuration - CRITICAL-4: Strict production configuration
+// In production, only allow production domains. In development, allow localhost, ngrok, etc.
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Check if origin is in allowed list
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    
-    // Check if origin matches ngrok pattern
-    if (ngrokPattern.test(origin)) {
-      return callback(null, true);
-    }
-    
-    // Allow localhost with any port for development
-    if (origin && origin.startsWith('http://localhost:')) {
-      return callback(null, true);
-    }
-    
-    // Allow 192.168.x.x addresses for local network
-    if (origin && /^https?:\/\/192\.168\.\d+\.\d+/.test(origin)) {
-      return callback(null, true);
-    }
-    
-    // Allow Expo tunnel URLs for development
-    if (origin && origin.startsWith('exp://')) {
-      return callback(null, true);
-    }
-    
-    // For development, only allow specific development origins
-    if (process.env.NODE_ENV !== 'production') {
-      const devOrigins = [
-        'http://localhost:3000',
-        'http://localhost:19006',
-        'https://localhost:3000',
-        'https://localhost:19006',
-        'exp://127.0.0.1:8081',
-        'exp://192.168.1.152:8081',
-        'exp://localhost:8081',
-        'exp://192.168.1.152:8081',
-        // Allow production domains in development for testing
+    // In production, ONLY allow production domains
+    if (process.env.NODE_ENV === 'production') {
+      const productionOrigins = [
         'https://www.aperae.com',
         'https://aperae.com',
       ];
       
-      if (devOrigins.includes(origin)) {
-        logger.debug('CORS: Allowing development origin', { origin });
-      return callback(null, true);
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) {
+        return callback(null, true);
       }
       
-      // Log rejected origins for debugging
-      logger.warn('CORS: Rejected origin in development', { origin });
-      return callback(new Error('Origin not allowed in development mode'));
+      if (productionOrigins.includes(origin)) {
+        logger.debug('CORS: Allowing production origin', { origin });
+        return callback(null, true);
+      }
+      
+      logger.warn('CORS: Rejected origin in production', { origin });
+      return callback(new Error('Not allowed by CORS'));
     }
     
-    // In production, allow production domains
-    const productionOrigins = [
+    // Development: Allow localhost, ngrok, etc.
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:19006',
+      'https://localhost:3000',
+      'https://localhost:19006',
+      'exp://127.0.0.1:8081',
+      'exp://localhost:8081',
+      // Production domains for testing
       'https://www.aperae.com',
       'https://aperae.com',
     ];
     
-    if (productionOrigins.includes(origin)) {
-      logger.debug('CORS: Allowing production origin', { origin });
+    // Allow requests with no origin
+    if (!origin) return callback(null, true);
+    
+    // Check exact match
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     
+    // Check ngrok pattern (development only)
+    const ngrokPattern = /^https:\/\/[a-z0-9]+\.ngrok-free\.app$/;
+    if (ngrokPattern.test(origin)) {
+      logger.debug('CORS: Allowing ngrok origin in development', { origin });
+      return callback(null, true);
+    }
+    
+    // Check localhost with any port (development only)
+    if (origin.startsWith('http://localhost:') || origin.startsWith('https://localhost:')) {
+      logger.debug('CORS: Allowing localhost origin in development', { origin });
+      return callback(null, true);
+    }
+    
+    logger.warn('CORS: Rejected origin', { origin, env: process.env.NODE_ENV });
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
@@ -380,21 +375,30 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
  *                   description: Current server timestamp
  */
 // Helper function to check dependency health
+// CRITICAL-6: Actually test database connection and validate dependencies
 async function checkDependencyHealth() {
   const dependencies = {
-    database: { status: 'unknown', message: 'Not implemented' },
-    redis: { status: 'unknown', message: 'Not implemented' },
-    anthropic: { status: 'unknown', message: 'Not configured' },
-    googleVision: { status: 'unknown', message: 'Not configured' }
+    database: { status: 'unknown', message: 'Not checked' },
+    anthropic: { status: 'unknown', message: 'Not checked' },
+    googleVision: { status: 'unknown', message: 'Not checked' }
   };
 
-  // Check Anthropic API
-  if (MOCK_MODE) {
-    dependencies.anthropic = { status: 'skipped', message: 'Mock mode enabled' };
-  } else if (process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== 'sk-ant-your-claude-api-key-here') {
+  // Actually test database connection
+  // Use lazy require to avoid circular dependency issues
+  const prisma = require('./prisma/client');
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    dependencies.database = { status: 'healthy', message: 'Connected' };
+  } catch (error) {
+    dependencies.database = { status: 'unhealthy', message: error.message };
+    logger.error('Database health check failed', { error: error.message });
+  }
+
+  // Test Anthropic API (lightweight check - just validate key format)
+  if (process.env.ANTHROPIC_API_KEY && !MOCK_MODE) {
     try {
-      // Simple check - verify key format (starts with sk-ant-)
-      if (process.env.ANTHROPIC_API_KEY.startsWith('sk-ant-')) {
+      if (process.env.ANTHROPIC_API_KEY.startsWith('sk-ant-') && 
+          process.env.ANTHROPIC_API_KEY.length > 20) {
         dependencies.anthropic = { status: 'healthy', message: 'API key configured' };
       } else {
         dependencies.anthropic = { status: 'unhealthy', message: 'Invalid API key format' };
@@ -402,42 +406,38 @@ async function checkDependencyHealth() {
     } catch (error) {
       dependencies.anthropic = { status: 'unhealthy', message: error.message };
     }
+  } else if (MOCK_MODE) {
+    dependencies.anthropic = { status: 'skipped', message: 'Mock mode enabled' };
   } else {
     dependencies.anthropic = { status: 'unhealthy', message: 'API key not configured' };
   }
 
-  // Check Google Vision API
-  if (MOCK_MODE) {
-    dependencies.googleVision = { status: 'skipped', message: 'Mock mode enabled' };
-  } else if (visionClient) {
+  // Test Google Vision (if configured)
+  if (visionClient) {
     dependencies.googleVision = { status: 'healthy', message: 'Client initialized' };
   } else {
-    dependencies.googleVision = { status: 'unhealthy', message: 'Client not initialized' };
-  }
-
-  // Check database (when implemented)
-  if (process.env.DB_HOST) {
-    dependencies.database = { status: 'not_implemented', message: 'Database driver not installed' };
-  }
-
-  // Check Redis (when implemented)
-  if (process.env.REDIS_HOST) {
-    dependencies.redis = { status: 'not_implemented', message: 'Redis client not installed' };
+    dependencies.googleVision = { status: 'skipped', message: 'Not configured' };
   }
 
   return dependencies;
 }
 
-// Liveness: always 200, report status in body
+// Liveness: return 503 if critical dependencies are down
+// CRITICAL-6: Health check validates actual dependency health
 app.get('/api/health', async (req, res) => {
   const healthStatus = monitoring.getHealthStatus();
   const dependencies = await checkDependencyHealth();
-  const allHealthy = Object.values(dependencies).every(dep => 
-    dep.status === 'healthy' || dep.status === 'skipped' || dep.status === 'not_implemented'
-  );
-  const overallStatus = allHealthy ? 'healthy' : 'degraded';
-  res.status(200).json({ 
-    status: overallStatus,
+  
+  // Database is critical - if down, return 503
+  const isDatabaseHealthy = dependencies.database.status === 'healthy';
+  const isAnthropicHealthy = dependencies.anthropic.status === 'healthy' || 
+                             dependencies.anthropic.status === 'skipped';
+  
+  const allCriticalHealthy = isDatabaseHealthy && isAnthropicHealthy;
+  const statusCode = allCriticalHealthy ? 200 : 503;
+  
+  res.status(statusCode).json({ 
+    status: allCriticalHealthy ? 'healthy' : 'degraded',
     ...healthStatus,
     mockMode: MOCK_MODE,
     dependencies,
@@ -975,10 +975,28 @@ app.post('/api/recommendations',
       requestIdSource: req.body.requestId ? 'client' : 'server'
     });
     
+    // CRITICAL-5: Set timeout (85 seconds - 5s buffer before Render's 90s limit)
+    const timeout = setTimeout(() => {
+      if (!res.headersSent) {
+        logger.warn('Request timeout - returning fallback', { 
+          requestId,
+          timeout: '85s',
+          dish: req.body.dish 
+        });
+        const fallback = getFallbackResponse(
+          req.body.dish, 
+          requestId, 
+          !!(req.body.availableWines && Array.isArray(req.body.availableWines) && req.body.availableWines.length > 0)
+        );
+        res.status(200).json(fallback);
+      }
+    }, 85000);
+    
     try {
       const { dish, availableWines } = req.body;
       
       if (!dish) {
+        clearTimeout(timeout);
         const responseTime = Date.now() - requestStartTime;
         RequestLogger.logRequestError('recommendations', requestId, responseTime, 'Missing dish parameter');
         return res.status(400).json({ error: 'Dish parameter is required', requestId });
@@ -994,6 +1012,7 @@ app.post('/api/recommendations',
       }
 
       if (MOCK_MODE) {
+        clearTimeout(timeout);
         logger.debug('Using mock mode for recommendations', { requestId, dish, isMenuContext });
         const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
         
@@ -1011,6 +1030,7 @@ app.post('/api/recommendations',
       
       // Check if Anthropic API key is configured
       if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'sk-ant-your-claude-api-key-here') {
+        clearTimeout(timeout);
         logger.warn('Anthropic API key not configured, falling back to mock data', { requestId, isMenuContext });
         const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
         return res.json(mockResponse);
@@ -1522,6 +1542,7 @@ app.post('/api/recommendations',
         // Use res.send() with the serialized string instead of res.json()
         // This gives us more control and better error handling
         try {
+          clearTimeout(timeout); // Clear timeout on successful response
           res.status(200).send(serializedResponse);
           logger.info('Response send() called successfully', { 
             requestId,
@@ -1561,6 +1582,7 @@ app.post('/api/recommendations',
       }
       
     } catch (error) {
+      clearTimeout(timeout); // Clear timeout on error
       const responseTime = Date.now() - requestStartTime;
       
       // Enhanced error logging
@@ -1585,6 +1607,7 @@ app.post('/api/recommendations',
       const errorIsMenuContext = req.body.availableWines && Array.isArray(req.body.availableWines) && req.body.availableWines.length > 0;
       
       // Fallback to mock data on any error
+      clearTimeout(timeout); // Clear timeout before sending error fallback
       logger.debug('Falling back to mock data due to error', { requestId, error: error.message, isMenuContext: errorIsMenuContext });
       const mockResponse = getFallbackResponse(req.body.dish || 'unknown', requestId, errorIsMenuContext);
       try {

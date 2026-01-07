@@ -7,7 +7,7 @@
  */
 
 const { PrismaClient } = require('@prisma/client');
-const logger = require('./logger');
+const logger = require('../logger');
 
 // Create singleton instance with connection pooling configuration
 const prisma = new PrismaClient({

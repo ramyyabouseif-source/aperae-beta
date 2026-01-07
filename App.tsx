@@ -158,7 +158,11 @@ export default function App() {
       >
         <Tab.Screen
           name="Home"
-          component={AdaptiveHomeScreen}
+          component={() => (
+            <ErrorBoundary>
+              <AdaptiveHomeScreen />
+            </ErrorBoundary>
+          )}
           options={{
             tabBarLabel: 'Home',
             tabBarIcon: ({ color, size }) => (
@@ -224,7 +228,11 @@ export default function App() {
       >
         <Stack.Screen
           name="MenuMain"
-          component={AdaptiveMenuScreen}
+          component={() => (
+            <ErrorBoundary>
+              <AdaptiveMenuScreen />
+            </ErrorBoundary>
+          )}
           options={{
             headerTitle: () => (
               <View style={styles.menuHeaderContainer}>
@@ -268,7 +276,11 @@ export default function App() {
       >
         <Stack.Screen
           name="FavoritesMain"
-          component={AdaptiveFavoritesScreen}
+          component={() => (
+            <ErrorBoundary>
+              <AdaptiveFavoritesScreen />
+            </ErrorBoundary>
+          )}
           options={{
             headerTitle: () => (
               <View style={styles.menuHeaderContainer}>
@@ -335,7 +347,11 @@ export default function App() {
         />
         <Stack.Screen
           name="Preferences"
-          component={AdaptivePreferencesScreen}
+          component={() => (
+            <ErrorBoundary>
+              <AdaptivePreferencesScreen />
+            </ErrorBoundary>
+          )}
           options={{
             title: 'Wine Preferences',
             headerShown: true,

@@ -30,7 +30,19 @@ const validateRecommendationRequest = [
     .isLength({ min: 1, max: 500 })
     .withMessage('Dish must be between 1 and 500 characters')
     .matches(/^[a-zA-Z0-9\s\-.,!?()'"]+$/)
-    .withMessage('Dish contains invalid characters')
+    .withMessage('Dish contains invalid characters'),
+  body('preferences')
+    .optional()
+    .isObject()
+    .withMessage('Preferences must be an object'),
+  body('availableWines')
+    .optional()
+    .isArray()
+    .withMessage('Available wines must be an array'),
+  body('requestId')
+    .optional()
+    .isUUID()
+    .withMessage('Request ID must be a valid UUID')
 ];
 
 // Validation rules for dish recommendations (wine -> dish pairing)
@@ -156,7 +168,7 @@ const validateRefreshRequest = [
   body('refreshToken')
     .notEmpty()
     .withMessage('Refresh token is required')
-    .isLength({ min: 10, max: 1000 })
+    .isString()
     .withMessage('Invalid refresh token format')
     .customSanitizer(value => {
       if (typeof value === 'string') {
@@ -167,22 +179,65 @@ const validateRefreshRequest = [
     })
 ];
 
-// Generic HTML sanitization function
-const sanitizeHtml = (value) => {
-  if (typeof value !== 'string') return value;
-  
-  // Remove HTML tags
-  let sanitized = value.replace(/<[^>]*>/g, '');
-  
-  // Remove script content and javascript: protocols
-  sanitized = sanitized.replace(/javascript:/gi, '');
-  sanitized = sanitized.replace(/on\w+\s*=/gi, '');
-  
-  // Remove any remaining potentially dangerous characters
-  sanitized = sanitized.replace(/[<>\"'&]/g, '');
-  
-  return sanitized;
-};
+// HIGH-4: Validation rules for consent endpoint
+const validateConsentRequest = [
+  body('consentType')
+    .trim()
+    .isIn(['age_verification', 'terms_of_service', 'privacy_policy'])
+    .withMessage('Invalid consent type'),
+  body('accepted')
+    .isBoolean()
+    .withMessage('Accepted must be a boolean'),
+  body('version')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Version must be between 1 and 50 characters')
+    .customSanitizer(value => {
+      if (typeof value === 'string') {
+        return value.replace(/[<>\"'&]/g, '');
+      }
+      return value;
+    }),
+  body('deviceId')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 255 })
+    .withMessage('Device ID must be between 1 and 255 characters')
+    .customSanitizer(value => {
+      if (typeof value === 'string') {
+        return value.replace(/[<>\"'&]/g, '');
+      }
+      return value;
+    })
+];
+
+// HIGH-4: Validation rules for OCR endpoint
+const validateOcrRequest = [
+  body('image')
+    .notEmpty()
+    .withMessage('Image data is required')
+    .isString()
+    .withMessage('Image must be a base64 encoded string')
+    .custom((value) => {
+      // Basic base64 validation
+      if (!value || typeof value !== 'string') {
+        return false;
+      }
+      // Check if it looks like base64 (starts with data:image/ or is pure base64)
+      const base64Pattern = /^(data:image\/(jpeg|jpg|png|gif|webp);base64,)?[A-Za-z0-9+/=]+$/;
+      if (!base64Pattern.test(value)) {
+        throw new Error('Invalid base64 image format');
+      }
+      // Check size (10MB limit)
+      const sizeInBytes = (value.length * 3) / 4;
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (sizeInBytes > maxSize) {
+        throw new Error('Image size exceeds 10MB limit');
+      }
+      return true;
+    })
+];
 
 module.exports = {
   validateRecommendationRequest,
@@ -190,6 +245,7 @@ module.exports = {
   validateRegistrationRequest,
   validateLoginRequest,
   validateRefreshRequest,
-  handleValidationErrors,
-  sanitizeHtml
+  validateConsentRequest,
+  validateOcrRequest,
+  handleValidationErrors
 };

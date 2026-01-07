@@ -248,6 +248,18 @@ export class WineService {
     }>,
     requestId?: string
   ): Promise<WineRecommendationResponse> {
+    // HIGH-2: Frontend rate limiting - 5 requests per minute per dish
+    const rateLimitKey = `wine-recommendation-${dish}`;
+    const maxRequests = 5;
+    const windowMs = 60000; // 1 minute
+    
+    if (!rateLimiter.canMakeRequest(rateLimitKey, maxRequests, windowMs)) {
+      const retryAfter = rateLimiter.getRetryAfter(rateLimitKey, maxRequests, windowMs);
+      const errorMessage = `Rate limit exceeded. Please wait ${Math.ceil(retryAfter / 1000)} seconds before requesting recommendations for "${dish}" again.`;
+      console.warn('Rate limit exceeded', { dish, retryAfter });
+      throw new Error(errorMessage);
+    }
+    
     let lastError: Error | null = null;
     
     for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {

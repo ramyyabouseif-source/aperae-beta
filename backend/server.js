@@ -13,6 +13,8 @@ const {
   validateRegistrationRequest,
   validateLoginRequest,
   validateRefreshRequest,
+  validateConsentRequest,
+  validateOcrRequest,
   handleValidationErrors 
 } = require('./validation');
 const { ImageAnnotatorClient } = require('@google-cloud/vision');
@@ -100,14 +102,37 @@ app.use(helmet({
 }));
 
 // Request ID middleware
+// HIGH-5: Use UUID format for better traceability
 const addRequestId = (req, res, next) => {
-  req.requestId = crypto.randomBytes(12).toString('base64url');
+  // Use crypto.randomUUID if available (Node.js 19.7.0+), fallback to manual UUID generation
+  if (typeof crypto.randomUUID === 'function') {
+    req.requestId = crypto.randomUUID();
+  } else {
+    // Fallback for older Node.js versions - generate UUID v4 manually
+    req.requestId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
   res.setHeader('X-Request-ID', req.requestId);
   next();
 };
 
 // Generate secure request ID
-const generateRequestId = () => crypto.randomBytes(12).toString('base64url');
+// HIGH-5: Use UUID format for better traceability and validation
+const generateRequestId = () => {
+  // Use crypto.randomUUID if available (Node.js 19.7.0+), fallback to manual UUID generation
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback for older Node.js versions - generate UUID v4 manually
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
 
 app.use(addRequestId); 
 
@@ -2922,7 +2947,7 @@ app.post('/api/dish-recommendations',
  *       200:
  *         description: Consent stored successfully
  */
-app.post('/api/consent', optionalAuth, csrfProtection, async (req, res) => {
+app.post('/api/consent', optionalAuth, csrfProtection, validateConsentRequest, handleValidationErrors, async (req, res) => {
   const requestStartTime = Date.now();
   const requestId = generateRequestId();
   
@@ -3207,7 +3232,7 @@ app.get('/api/consent/compliance-report', async (req, res) => {
  *       500:
  *         description: Internal server error
  */
-app.post('/api/ocr/extract-text', async (req, res) => {
+app.post('/api/ocr/extract-text', validateOcrRequest, handleValidationErrors, async (req, res) => {
   const requestStartTime = Date.now();
   const requestId = generateRequestId();
   

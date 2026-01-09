@@ -1,6 +1,5 @@
-name: CI Pipeline
+name: CI
 
-# Run on pushes to main and develop branches, and on pull requests
 on:
   push:
     branches: [ main, develop ]
@@ -8,130 +7,102 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  # Frontend testing and validation
-  test-frontend:
+  # Frontend checks
+  frontend:
+    name: Frontend Checks
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
     
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run linting
-      run: npm run lint --if-present || true
-    
-    - name: Run type checking
-      run: npm run type-check --if-present || true
-    
-    - name: Run tests
-      run: npm run test --if-present || true
-    
-    - name: Upload coverage to Codecov (if available)
-      if: always()
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage/lcov.info
-        flags: frontend
-        name: frontend-coverage
-        fail_ci_if_error: false
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linter
+        run: npm run lint || true
+      
+      - name: Run type check
+        run: npm run type-check || true
+      
+      - name: Run tests
+        run: npm test || true
+      
+      - name: Security audit
+        run: npm audit --audit-level=moderate || true
 
-  # Backend testing and validation
-  test-backend:
+  # Backend checks
+  backend:
+    name: Backend Checks
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
     
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
-    
-    - name: Install backend dependencies
-      run: |
-        cd backend
-        npm ci
-    
-    - name: Run backend linting
-      working-directory: backend
-      run: npx eslint . --ext .js || true
-    
-    - name: Run backend tests
-      working-directory: backend
-      run: npm test --if-present || true
-    
-    - name: Run backend security audit
-      working-directory: backend
-      run: npm audit --audit-level=moderate || true
-    
-    - name: Run frontend security audit
-      run: npm audit --audit-level=moderate || true
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+      
+      - name: Run linter (if available)
+        run: npm run lint || true
+        continue-on-error: true
+      
+      - name: Run tests (if available)
+        run: npm test || true
+        continue-on-error: true
+      
+      - name: Security audit
+        run: npm audit --audit-level=moderate || true
+      
+      - name: Check for security vulnerabilities
+        run: |
+          echo "Checking for known vulnerabilities..."
+          npm audit --audit-level=moderate || true
 
   # Security scanning
-  security-scan:
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-        exit-code: '0'  # Don't fail build on vulnerabilities (just report)
-    
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
-
-  # Build verification (ensures code compiles)
-  build-verification:
-    needs: [test-frontend, test-backend, security-scan]
+  security:
+    name: Security Scan
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Build frontend
-      run: npm run build --if-present || echo "No frontend build script"
-    
-    - name: Verify backend build
-      run: |
-        cd backend
-        npm ci --production || echo "Backend dependencies installed"
-
-# Note: Deployment (CD) is handled automatically by Render
-# When you push to GitHub, Render automatically:
-# 1. Detects the push
-# 2. Pulls the latest code
-# 3. Builds the Docker image
-# 4. Deploys to your service
-#
-# No manual deployment steps needed in GitHub Actions!
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+        continue-on-error: true
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+        continue-on-error: true

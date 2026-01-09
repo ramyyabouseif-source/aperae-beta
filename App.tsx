@@ -72,17 +72,44 @@ export default function App() {
   };
 
   const handleAgeVerified = () => {
+    // Force state update immediately
     setIsAgeVerified(true);
+    // Double-check after a brief delay to ensure state persisted
+    setTimeout(async () => {
+      const verified = await AgeVerificationService.isAgeVerified();
+      if (!verified) {
+        console.warn('Age verification state mismatch, re-checking...');
+        setIsAgeVerified(verified);
+      }
+    }, 100);
   };
 
   const handleAcceptTerms = async () => {
     try {
       console.log('Accepting terms...');
       await TermsService.acceptTerms();
+      // Force state update immediately
       setHasAcceptedTerms(true);
       console.log('Terms accepted successfully');
+      // Double-check after a brief delay
+      setTimeout(async () => {
+        const accepted = await TermsService.hasAcceptedTerms();
+        if (!accepted) {
+          console.warn('Terms acceptance state mismatch, re-checking...');
+          setHasAcceptedTerms(accepted);
+        }
+      }, 100);
     } catch (error) {
       console.error('Error accepting terms:', error);
+      // Check if local storage at least worked
+      try {
+        const accepted = await TermsService.hasAcceptedTerms();
+        if (accepted) {
+          setHasAcceptedTerms(true);
+        }
+      } catch (checkError) {
+        console.error('Error checking terms acceptance:', checkError);
+      }
     }
   };
 
@@ -90,11 +117,30 @@ export default function App() {
     try {
       console.log('Accepting privacy policy...');
       await PrivacyPolicyService.acceptPrivacyPolicy();
+      // Force state update immediately
       setHasAcceptedPrivacyPolicy(true);
       setShowPrivacyPolicy(false);
       console.log('Privacy Policy accepted successfully');
+      // Double-check after a brief delay
+      setTimeout(async () => {
+        const accepted = await PrivacyPolicyService.hasAcceptedPrivacyPolicy();
+        if (!accepted) {
+          console.warn('Privacy policy acceptance state mismatch, re-checking...');
+          setHasAcceptedPrivacyPolicy(accepted);
+        }
+      }, 100);
     } catch (error) {
       console.error('Error accepting privacy policy:', error);
+      // Check if local storage at least worked
+      try {
+        const accepted = await PrivacyPolicyService.hasAcceptedPrivacyPolicy();
+        if (accepted) {
+          setHasAcceptedPrivacyPolicy(true);
+          setShowPrivacyPolicy(false);
+        }
+      } catch (checkError) {
+        console.error('Error checking privacy policy acceptance:', checkError);
+      }
     }
   };
 

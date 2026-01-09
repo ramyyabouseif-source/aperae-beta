@@ -23,7 +23,7 @@ function PrivacyPolicyContent({ onAccept, navigation }: PrivacyPolicyScreenProps
     }
   };
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
     if (!hasScrolledToBottom) {
       Alert.alert('Please Scroll', 'Please scroll to the bottom of the Privacy Policy to continue.');
       return;
@@ -35,7 +35,14 @@ function PrivacyPolicyContent({ onAccept, navigation }: PrivacyPolicyScreenProps
     }
     
     if (onAccept) {
-      onAccept();
+      try {
+        // Call the async handler
+        await onAccept();
+      } catch (error) {
+        console.error('Error accepting privacy policy:', error);
+        // Still proceed - local storage might have succeeded
+        // The parent component will handle the state update
+      }
     } else if (navigation) {
       // If no onAccept callback but navigation is available, navigate back
       navigation.goBack();
@@ -247,6 +254,7 @@ function PrivacyPolicyContent({ onAccept, navigation }: PrivacyPolicyScreenProps
           <TouchableOpacity
             style={[styles.checkboxContainer, isAgreed && styles.checkboxChecked]}
             onPress={() => setIsAgreed(!isAgreed)}
+            activeOpacity={0.7}
           >
             <Text style={styles.checkboxText}>✓</Text>
           </TouchableOpacity>
@@ -258,7 +266,9 @@ function PrivacyPolicyContent({ onAccept, navigation }: PrivacyPolicyScreenProps
         <TouchableOpacity
           style={[styles.acceptButton, (!hasScrolledToBottom || !isAgreed) && styles.acceptButtonDisabled]}
           onPress={handleAccept}
+          onPressIn={handleAccept}
           disabled={!hasScrolledToBottom || !isAgreed}
+          activeOpacity={0.8}
         >
           <Text style={styles.acceptButtonText}>
             {!hasScrolledToBottom ? 'Scroll to Continue' : !isAgreed ? 'Check Agreement' : 'AGREE'}

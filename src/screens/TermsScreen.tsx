@@ -23,18 +23,26 @@ function TermsScreenContent({ onAccept, onPrivacyPolicyPress, navigation }: Term
     }
   };
 
-  const handleAccept = () => {
-    if (hasScrolledToBottom) {
-      if (onAccept) {
-        onAccept();
-      } else if (navigation) {
-        // If no onAccept callback but navigation is available, navigate back
-        navigation.goBack();
-      }
-      // If neither onAccept nor navigation available, just do nothing
-    } else {
+  const handleAccept = async () => {
+    if (!hasScrolledToBottom) {
       Alert.alert('Please Scroll', 'Please scroll to the bottom of the terms to continue.');
+      return;
     }
+    
+    if (onAccept) {
+      try {
+        // Call the async handler
+        await onAccept();
+      } catch (error) {
+        console.error('Error accepting terms:', error);
+        // Still proceed - local storage might have succeeded
+        // The parent component will handle the state update
+      }
+    } else if (navigation) {
+      // If no onAccept callback but navigation is available, navigate back
+      navigation.goBack();
+    }
+    // If neither onAccept nor navigation available, just do nothing
   };
 
   const handlePrivacyPolicyPress = () => {
@@ -256,7 +264,9 @@ function TermsScreenContent({ onAccept, onPrivacyPolicyPress, navigation }: Term
         <TouchableOpacity
           style={[styles.acceptButton, !hasScrolledToBottom && styles.acceptButtonDisabled]}
           onPress={handleAccept}
+          onPressIn={handleAccept}
           disabled={!hasScrolledToBottom}
+          activeOpacity={0.8}
         >
           <Text style={styles.acceptButtonText}>
             {onAccept 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { AgeVerificationService } from '../services/ageVerificationService';
 import { LEGAL_CONFIG } from '../config/legal';
@@ -11,8 +11,11 @@ const LEGAL_DRINKING_AGE = 21;
 
 export default function AgeVerificationScreen({ onVerified }: AgeVerificationScreenProps) {
   const [selectedAge, setSelectedAge] = useState<number | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const handleVerify = async () => {
+    if (isVerifying) return; // Prevent double-clicks
+    
     if (!selectedAge) {
       Alert.alert('Required', 'Please confirm your age to continue.');
       return;
@@ -32,13 +35,34 @@ export default function AgeVerificationScreen({ onVerified }: AgeVerificationScr
       return;
     }
 
+    setIsVerifying(true);
     try {
       // Store age verification using the service
       await AgeVerificationService.verifyAge(selectedAge);
-      onVerified();
+      // Call onVerified even if backend storage fails (local storage is primary)
+      // Use setTimeout to ensure state update happens
+      setTimeout(() => {
+        onVerified();
+      }, 0);
     } catch (error) {
       console.error('Error storing age verification:', error);
-      Alert.alert('Error', 'Failed to save age verification. Please try again.');
+      // Still proceed if local storage succeeded (backend failure is non-blocking)
+      // Check if local storage at least worked
+      try {
+        const verified = await AgeVerificationService.isAgeVerified();
+        if (verified) {
+          // Local storage succeeded, proceed anyway
+          setTimeout(() => {
+            onVerified();
+          }, 0);
+        } else {
+          Alert.alert('Error', 'Failed to save age verification. Please try again.');
+          setIsVerifying(false);
+        }
+      } catch (checkError) {
+        Alert.alert('Error', 'Failed to save age verification. Please try again.');
+        setIsVerifying(false);
+      }
     }
   };
 
@@ -84,6 +108,7 @@ export default function AgeVerificationScreen({ onVerified }: AgeVerificationScr
               selectedAge !== null && selectedAge < LEGAL_DRINKING_AGE && styles.ageButtonSelected,
             ]}
             onPress={() => setSelectedAge(17)}
+            activeOpacity={0.7}
           >
             <Text style={[
               styles.ageButtonText,
@@ -95,11 +120,15 @@ export default function AgeVerificationScreen({ onVerified }: AgeVerificationScr
         </View>
 
         <TouchableOpacity
-          style={[styles.verifyButton, !selectedAge && styles.verifyButtonDisabled]}
+          style={[styles.verifyButton, (!selectedAge || isVerifying) && styles.verifyButtonDisabled]}
           onPress={handleVerify}
-          disabled={!selectedAge}
+          onPressIn={handleVerify}
+          disabled={!selectedAge || isVerifying}
+          activeOpacity={0.8}
         >
-          <Text style={styles.verifyButtonText}>Continue</Text>
+          <Text style={styles.verifyButtonText}>
+            {isVerifying ? 'Verifying...' : 'Continue'}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.disclaimerContainer}>

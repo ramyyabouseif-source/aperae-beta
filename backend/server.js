@@ -730,7 +730,21 @@ app.post('/api/auth/login', validateLoginRequest, handleValidationErrors, async 
     
   } catch (error) {
     const responseTime = Date.now() - requestStartTime;
-    RequestLogger.logRequestError('login', requestId, responseTime, error);
+    // MEDIUM-3: Include IP address in failed auth logging for security monitoring
+    RequestLogger.logRequestError('login', requestId, responseTime, error, {
+      email: req.body.email,
+      ip: req.ip,
+      userAgent: req.headers['user-agent']
+    });
+    
+    // Also log to security logger for failed authentication attempts
+    logger.warn('Failed login attempt', {
+      email: req.body.email,
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+      requestId,
+      error: error.message
+    });
     
     res.status(401).json({
       error: error.message,
@@ -1147,25 +1161,23 @@ app.post('/api/recommendations',
       RequestLogger.logExternalApiCall('anthropic', requestId, claudeResponseTime);
 
       logger.debug('Claude API response received', { requestId });
-      console.log('=== CLAUDE API RESPONSE RECEIVED ===');
-      console.log('Request ID:', requestId);
-      console.log('Response Time:', claudeResponseTime, 'ms');
-      console.log('Stop Reason:', message.stop_reason || 'unknown');
-      console.log('Message Keys:', Object.keys(message || {}));
-      console.log('Has Content:', !!message.content);
-      console.log('Content Length:', message.content?.length || 0);
+      
+      // LOW-1: Reduce verbose logging in production - only log detailed info in development
+      if (process.env.NODE_ENV === 'development') {
+        logger.debug('Claude API response details', {
+          requestId,
+          responseTime: `${claudeResponseTime}ms`,
+          stopReason: message.stop_reason || 'unknown',
+          hasContent: !!message.content,
+          contentLength: message.content?.length || 0,
+          contentType: message.content?.map(b => b?.type).join(', ') || 'none'
+        });
+      }
       
       // Check if response was truncated
       if (message.stop_reason === 'max_tokens') {
         logger.warn('Claude response truncated due to max_tokens limit', { requestId });
-        console.warn('⚠️ WARNING: Response was truncated due to max_tokens limit');
       }
-      if (message.content && message.content.length > 0) {
-        console.log('Content Types:', message.content.map(b => b?.type).join(', '));
-        console.log('First Content Block:', JSON.stringify(message.content[0], null, 2).substring(0, 500));
-      }
-      console.log('Full Message (first 2000 chars):', JSON.stringify(message, null, 2).substring(0, 2000));
-      console.log('====================================');
       
       // Parse the response
       let responseData;
@@ -1203,11 +1215,16 @@ app.post('/api/recommendations',
         // Extract JSON from markdown code blocks if present
         // Claude often wraps JSON in ```json ... ``` blocks
         const originalText = responseText;
-        console.log('=== JSON EXTRACTION START ===');
-        console.log('Original text length:', responseText.length);
-        console.log('Original starts with:', responseText.substring(0, 100));
-        console.log('Has ```json:', responseText.includes('```json'));
-        console.log('Has ```:', responseText.includes('```'));
+        
+        // LOW-1: Only log extraction details in development
+        if (process.env.NODE_ENV === 'development') {
+          logger.debug('JSON extraction start', {
+            requestId,
+            textLength: responseText.length,
+            hasJsonBlock: responseText.includes('```json'),
+            hasCodeBlock: responseText.includes('```')
+          });
+        }
         
         // More robust extraction: handle both with and without closing backticks
         if (responseText.includes('```json')) {
@@ -1235,9 +1252,8 @@ app.post('/api/recommendations',
             
             responseText = extracted.trim();
             logger.debug('Extracted JSON from markdown block', { requestId });
-            console.log('Extracted successfully, starts with:', responseText.substring(0, 50));
           } else {
-            console.error('Could not find ```json start pattern');
+            logger.debug('Could not find ```json start pattern', { requestId });
           }
         } else if (responseText.includes('```')) {
           logger.debug('Extracting JSON from generic code block', { requestId });
@@ -1273,22 +1289,14 @@ app.post('/api/recommendations',
           .replace(/\s+$/, '')      // Remove trailing whitespace
           .trim();
         
-        console.log('Final extracted length:', responseText.length);
-        console.log('Final extracted starts with:', responseText.substring(0, 50));
-        console.log('=== JSON EXTRACTION END ===');
-        
-        // Log extraction result for debugging
-        if (originalText && originalText !== responseText) {
+        // LOW-1: Only log extraction details in development
+        if (process.env.NODE_ENV === 'development' && originalText && originalText !== responseText) {
           logger.debug('JSON extraction completed', {
             requestId,
             originalLength: originalText.length,
             extractedLength: responseText.length,
             extractedPreview: responseText.substring(0, 200)
           });
-          console.log('=== JSON EXTRACTION ===');
-          console.log('Original starts with:', originalText.substring(0, 50));
-          console.log('Extracted starts with:', responseText.substring(0, 50));
-          console.log('========================');
         }
         
         // Try to parse JSON

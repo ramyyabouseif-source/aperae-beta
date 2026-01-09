@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import certificatePinningService from './certificatePinningService';
+import { getValidAccessToken } from '../utils/tokenValidator';
 
 /**
  * Secure HTTP Client with Certificate Pinning
@@ -15,9 +16,9 @@ class SecureHttpClient {
     this.timeout = timeout;
     this.defaultHeaders = {
       'Content-Type': 'application/json',
-      'User-Agent': 'PocketSomm/1.0.0',
+      'User-Agent': 'Aperae/1.0.0',
       // Add CSRF-friendly header for state-changing requests
-      'X-Requested-With': 'PocketSomm',
+      'X-Requested-With': 'Aperae',
     };
   }
 
@@ -79,12 +80,25 @@ class SecureHttpClient {
     requestConfig.signal = controller.signal;
 
     try {
+      // HIGH-4: Check if access token is valid before making request
+      if (this.defaultHeaders['Authorization']) {
+        const token = this.defaultHeaders['Authorization'].replace('Bearer ', '');
+        const validToken = await getValidAccessToken();
+        if (!validToken || validToken !== token) {
+          console.warn('[SecureHttpClient] Access token expired, may need refresh');
+          // Don't throw here - let the API return 401 so the app can handle refresh
+        }
+      }
+
       console.log(`Making secure request to: ${url}`);
       
       // Make the request
       const response = await fetch(url, requestConfig);
       
       clearTimeout(timeoutId);
+      
+      // LOW-4: Extract request ID from response headers
+      const requestId = response.headers.get('X-Request-ID');
       
       // Check if response is ok
       if (!response.ok) {
@@ -101,9 +115,17 @@ class SecureHttpClient {
           } else if (errorData.message) {
             errorMessage = `HTTP ${response.status}: ${errorData.message}`;
           }
+          
+          // LOW-4: Include request ID in error message if available
+          if (requestId || errorData.requestId) {
+            errorMessage += ` (Request ID: ${requestId || errorData.requestId})`;
+          }
         } catch (parseError) {
           // If JSON parsing fails, use status text
           errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          if (requestId) {
+            errorMessage += ` (Request ID: ${requestId})`;
+          }
         }
         throw new Error(errorMessage);
       }

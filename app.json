@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "PocketSomm",
-    "slug": "pocketsomm",
+    "name": "Aperae",
+    "slug": "aperae",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -47,8 +47,8 @@
           "include": ["@babel/plugin-proposal-export-namespace-from"]
         }
       },
-      "name": "PocketSomm - AI Wine Sommelier",
-      "shortName": "PocketSomm",
+      "name": "Aperae - AI Wine Sommelier",
+      "shortName": "Aperae",
       "lang": "en",
       "scope": "/",
       "themeColor": "#8B0000",
@@ -68,7 +68,7 @@
       },
       "apiBaseUrl": "https://api.aperae.com/api"
     },
-    "scheme": "pocketsomm",
+    "scheme": "aperae",
     "privacy": "public",
     "platforms": [
       "ios",

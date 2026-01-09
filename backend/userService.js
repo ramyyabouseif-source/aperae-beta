@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const logger = require('./logger');
 
 /**
- * User service for PocketSomm backend
+ * User service for Aperae backend
  * Handles user registration, authentication, session management, and user data operations
  * @class UserService
  * @note Uses database storage for sessions (persistent across server restarts)

@@ -1,4 +1,4 @@
-// PocketSomm Design System - Main Export
+// Aperae Design System - Main Export
 // Centralized design system exports
 
 export { COLORS, LEGACY_COLORS } from './colors';

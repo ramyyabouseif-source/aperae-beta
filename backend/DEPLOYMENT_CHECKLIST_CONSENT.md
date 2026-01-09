@@ -189,3 +189,5 @@ LIMIT 10;
 - ✅ Device IDs are properly hashed
 - ✅ All three consent types work (age_verification, terms, privacy_policy)
 
+
+

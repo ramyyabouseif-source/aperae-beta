@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
 /**
- * Authentication service for PocketSomm backend
+ * Authentication service for Aperae backend
  * Handles JWT token generation, password hashing, and password validation
  * @class AuthService
  */

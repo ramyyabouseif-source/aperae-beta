@@ -10,7 +10,7 @@ async function testVisionAPI() {
     
     // Initialize the client
     const client = new ImageAnnotatorClient({
-      projectId: 'pocketsomm-vision-api',
+      projectId: 'aperae-vision-api',
       keyFilename: './google-vision-key.json',
     });
     

@@ -1,4 +1,4 @@
-// PocketSomm Design System - Spacing
+// Aperae Design System - Spacing
 // Consistent spacing system for layout
 
 export const SPACING = {

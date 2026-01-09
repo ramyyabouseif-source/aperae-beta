@@ -1,7 +1,7 @@
 {
-  "name": "pocketsomm-backend",
+  "name": "aperae-backend",
   "version": "1.0.0",
-  "description": "PocketSomm Backend API",
+  "description": "Aperae Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

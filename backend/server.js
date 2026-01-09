@@ -104,34 +104,31 @@ app.use(helmet({
 // Request ID middleware
 // HIGH-5: Use UUID format for better traceability
 const addRequestId = (req, res, next) => {
-  // Use crypto.randomUUID if available (Node.js 19.7.0+), fallback to manual UUID generation
-  if (typeof crypto.randomUUID === 'function') {
-    req.requestId = crypto.randomUUID();
-  } else {
-    // Fallback for older Node.js versions - generate UUID v4 manually
-    req.requestId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
+  // Use secure request ID generation
+  req.requestId = generateRequestId();
   res.setHeader('X-Request-ID', req.requestId);
   next();
 };
 
 // Generate secure request ID
 // HIGH-5: Use UUID format for better traceability and validation
+// Always use cryptographically secure random bytes for fallback
 const generateRequestId = () => {
-  // Use crypto.randomUUID if available (Node.js 19.7.0+), fallback to manual UUID generation
+  // Use crypto.randomUUID if available (Node.js 19.7.0+)
   if (typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
-  // Fallback for older Node.js versions - generate UUID v4 manually
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+  // Secure fallback using crypto.randomBytes (always cryptographically secure)
+  const bytes = crypto.randomBytes(16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40; // Version 4
+  bytes[8] = (bytes[8] & 0x3f) | 0x80; // Variant 10
+  return [
+    bytes.toString('hex', 0, 4),
+    bytes.toString('hex', 4, 6),
+    bytes.toString('hex', 6, 8),
+    bytes.toString('hex', 8, 10),
+    bytes.toString('hex', 10, 16)
+  ].join('-');
 };
 
 app.use(addRequestId); 
@@ -162,10 +159,15 @@ app.use(securityLogger);
 
 // CORS configuration - CRITICAL-4: Strict production configuration
 // In production, only allow production domains. In development, allow localhost, ngrok, etc.
+// Use explicit production check with multiple fallbacks to prevent misconfiguration
+const isProduction = process.env.NODE_ENV === 'production' || 
+                     process.env.RENDER === 'true' || // Render sets this
+                     (process.env.API_BASE_URL && process.env.API_BASE_URL.includes('api.aperae.com'));
+
 const corsOptions = {
   origin: function (origin, callback) {
-    // In production, ONLY allow production domains
-    if (process.env.NODE_ENV === 'production') {
+    // CRITICAL-4: Always restrict in production, regardless of NODE_ENV
+    if (isProduction) {
       const productionOrigins = [
         'https://www.aperae.com',
         'https://aperae.com',
@@ -206,20 +208,22 @@ const corsOptions = {
       return callback(null, true);
     }
     
-    // Check ngrok pattern (development only)
-    const ngrokPattern = /^https:\/\/[a-z0-9]+\.ngrok-free\.app$/;
-    if (ngrokPattern.test(origin)) {
-      logger.debug('CORS: Allowing ngrok origin in development', { origin });
-      return callback(null, true);
+    // Development only: Check ngrok pattern
+    if (!isProduction) {
+      const ngrokPattern = /^https:\/\/[a-z0-9]+\.ngrok-free\.app$/;
+      if (ngrokPattern.test(origin)) {
+        logger.debug('CORS: Allowing ngrok origin in development', { origin });
+        return callback(null, true);
+      }
+      
+      // Check localhost with any port (development only)
+      if (origin.startsWith('http://localhost:') || origin.startsWith('https://localhost:')) {
+        logger.debug('CORS: Allowing localhost origin in development', { origin });
+        return callback(null, true);
+      }
     }
     
-    // Check localhost with any port (development only)
-    if (origin.startsWith('http://localhost:') || origin.startsWith('https://localhost:')) {
-      logger.debug('CORS: Allowing localhost origin in development', { origin });
-      return callback(null, true);
-    }
-    
-    logger.warn('CORS: Rejected origin', { origin, env: process.env.NODE_ENV });
+    logger.warn('CORS: Rejected origin', { origin, env: process.env.NODE_ENV, isProduction });
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
@@ -332,6 +336,10 @@ app.use(express.urlencoded({
   extended: true 
 }));
 
+// CRITICAL-1: Register global error handler (must be after all routes)
+// This catches any unhandled errors in route handlers
+app.use(secureErrorHandler);
+
 // Load mock data
 const mockData = require('./mockData.json');
 const mockDishData = require('./mockDishData.json');
@@ -366,7 +374,7 @@ const mockDishData = require('./mockDishData.json');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'PocketSomm API Documentation'
+  customSiteTitle: 'Aperae API Documentation'
 }));
 
 // Routes
@@ -730,20 +738,47 @@ app.post('/api/auth/login', validateLoginRequest, handleValidationErrors, async 
     
   } catch (error) {
     const responseTime = Date.now() - requestStartTime;
+    const email = req.body.email;
+    const ip = req.ip;
+    
+    // MEDIUM-5: Track failed auth attempts for brute force detection
+    const key = `${ip}:${email}`;
+    
+    // Track failed attempts (in production, use Redis for distributed tracking)
+    if (!global.failedAuthAttempts) {
+      global.failedAuthAttempts = new Map();
+    }
+    const attempts = global.failedAuthAttempts.get(key) || 0;
+    global.failedAuthAttempts.set(key, attempts + 1);
+    
+    // Alert if potential brute force attack (5+ failed attempts)
+    if (attempts + 1 >= 5) {
+      logger.warn('Potential brute force attack detected', {
+        ip,
+        email,
+        attempts: attempts + 1,
+        requestId,
+        userAgent: req.headers['user-agent']
+      });
+      // TODO: In production, send alert via Sentry or email
+    }
+    
     // MEDIUM-3: Include IP address in failed auth logging for security monitoring
     RequestLogger.logRequestError('login', requestId, responseTime, error, {
-      email: req.body.email,
-      ip: req.ip,
-      userAgent: req.headers['user-agent']
+      email,
+      ip,
+      userAgent: req.headers['user-agent'],
+      failedAttempts: attempts + 1
     });
     
     // Also log to security logger for failed authentication attempts
     logger.warn('Failed login attempt', {
-      email: req.body.email,
-      ip: req.ip,
+      email,
+      ip,
       userAgent: req.headers['user-agent'],
       requestId,
-      error: error.message
+      error: error.message,
+      failedAttempts: attempts + 1
     });
     
     res.status(401).json({
@@ -3240,7 +3275,25 @@ app.get('/api/consent/compliance-report', async (req, res) => {
  *       500:
  *         description: Internal server error
  */
-app.post('/api/ocr/extract-text', validateOcrRequest, handleValidationErrors, async (req, res) => {
+// MEDIUM-1: Image size validation middleware for OCR endpoint
+const validateImageSize = (req, res, next) => {
+  if (req.body.image) {
+    const base64Length = req.body.image.length;
+    // Base64 is ~33% larger than binary, so estimate actual size
+    const estimatedSizeMB = (base64Length * 3) / 4 / 1024 / 1024;
+    
+    if (estimatedSizeMB > 5) { // 5MB limit
+      return res.status(400).json({
+        error: 'Image too large',
+        message: 'Maximum image size is 5MB. Please compress your image before uploading.',
+        requestId: req.requestId
+      });
+    }
+  }
+  next();
+};
+
+app.post('/api/ocr/extract-text', validateImageSize, validateOcrRequest, handleValidationErrors, async (req, res) => {
   const requestStartTime = Date.now();
   const requestId = generateRequestId();
   
@@ -3393,7 +3446,7 @@ app.use((req, res, next) => {
 app.use(secureErrorHandler);
 
 app.listen(PORT, '0.0.0.0', () => {
-  logger.info('PocketSomm Backend started', {
+  logger.info('Aperae Backend started', {
     port: PORT,
     mockMode: MOCK_MODE,
     anthropicConfigured: !!process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== 'sk-ant-your-claude-api-key-here',

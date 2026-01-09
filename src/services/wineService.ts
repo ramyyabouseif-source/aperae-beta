@@ -253,8 +253,9 @@ export class WineService {
     const maxRequests = 5;
     const windowMs = 60000; // 1 minute
     
-    if (!rateLimiter.canMakeRequest(rateLimitKey, maxRequests, windowMs)) {
-      const retryAfter = rateLimiter.getRetryAfter(rateLimitKey, maxRequests, windowMs);
+    const canMakeRequest = await rateLimiter.canMakeRequest(rateLimitKey, maxRequests, windowMs);
+    if (!canMakeRequest) {
+      const retryAfter = await rateLimiter.getRetryAfter(rateLimitKey, maxRequests, windowMs);
       const errorMessage = `Rate limit exceeded. Please wait ${Math.ceil(retryAfter / 1000)} seconds before requesting recommendations for "${dish}" again.`;
       console.warn('Rate limit exceeded', { dish, retryAfter });
       throw new Error(errorMessage);

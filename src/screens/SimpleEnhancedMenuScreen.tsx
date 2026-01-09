@@ -96,7 +96,7 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
         if (!cameraPermission.granted) {
           Alert.alert(
             'Camera Permission Required',
-            'PocketSomm needs access to your camera to take photos of wine lists. Please enable camera access in your device settings.',
+            'Aperae needs access to your camera to take photos of wine lists. Please enable camera access in your device settings.',
             [
               { text: 'Cancel', style: 'cancel' },
               { text: 'Settings', onPress: () => {
@@ -143,7 +143,7 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
       if (!permissionGranted) {
         Alert.alert(
           'Photo Library Permission Required',
-          'PocketSomm needs access to your photo library to select wine list images. Please enable photo library access in your device settings.',
+          'Aperae needs access to your photo library to select wine list images. Please enable photo library access in your device settings.',
           [
             { text: 'Cancel', style: 'cancel' },
             { text: 'Settings', onPress: () => {

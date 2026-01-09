@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -30,6 +30,7 @@ export default function App() {
   const [hasAcceptedPrivacyPolicy, setHasAcceptedPrivacyPolicy] = useState<boolean | null>(null);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [forceUpdate, setForceUpdate] = useState(0); // Force re-render trigger
 
   useEffect(() => {
     checkAcceptanceStatus();
@@ -71,78 +72,83 @@ export default function App() {
     }
   };
 
-  const handleAgeVerified = () => {
-    // Force state update immediately
+  const handleAgeVerified = useCallback(async () => {
+    // Set state immediately to trigger re-render - this is the key fix for mobile web
     setIsAgeVerified(true);
-    // Double-check after a brief delay to ensure state persisted
-    setTimeout(async () => {
-      const verified = await AgeVerificationService.isAgeVerified();
-      if (!verified) {
-        console.warn('Age verification state mismatch, re-checking...');
-        setIsAgeVerified(verified);
+    setForceUpdate(prev => prev + 1); // Force immediate re-render
+    
+    // Verify storage succeeded (non-blocking, in background)
+    Promise.resolve().then(async () => {
+      try {
+        const verified = await AgeVerificationService.isAgeVerified();
+        if (!verified) {
+          console.warn('Age verification state mismatch, re-checking...');
+          setIsAgeVerified(verified);
+        }
+      } catch (error) {
+        console.error('Error verifying age verification state:', error);
       }
-    }, 100);
-  };
+    });
+  }, []);
 
-  const handleAcceptTerms = async () => {
+  const handleAcceptTerms = useCallback(async () => {
+    // Set state optimistically FIRST to trigger immediate re-render on mobile web
+    setHasAcceptedTerms(true);
+    setForceUpdate(prev => prev + 1); // Force immediate re-render
+    
     try {
       console.log('Accepting terms...');
-      await TermsService.acceptTerms();
-      // Force state update immediately
-      setHasAcceptedTerms(true);
-      console.log('Terms accepted successfully');
-      // Double-check after a brief delay
-      setTimeout(async () => {
-        const accepted = await TermsService.hasAcceptedTerms();
-        if (!accepted) {
-          console.warn('Terms acceptance state mismatch, re-checking...');
-          setHasAcceptedTerms(accepted);
-        }
-      }, 100);
+      // Then perform the async operation (non-blocking for UI)
+      TermsService.acceptTerms().then(() => {
+        console.log('Terms accepted successfully');
+      }).catch((error) => {
+        console.error('Error accepting terms:', error);
+        // Check if local storage at least worked
+        TermsService.hasAcceptedTerms().then((accepted) => {
+          if (!accepted) {
+            // Revert optimistic update if storage failed
+            setHasAcceptedTerms(false);
+          }
+        }).catch((checkError) => {
+          console.error('Error checking terms acceptance:', checkError);
+          setHasAcceptedTerms(false);
+        });
+      });
     } catch (error) {
-      console.error('Error accepting terms:', error);
-      // Check if local storage at least worked
-      try {
-        const accepted = await TermsService.hasAcceptedTerms();
-        if (accepted) {
-          setHasAcceptedTerms(true);
-        }
-      } catch (checkError) {
-        console.error('Error checking terms acceptance:', checkError);
-      }
+      console.error('Error in handleAcceptTerms:', error);
+      // Error handling is done in promise chain above
     }
-  };
+  }, []);
 
-  const handleAcceptPrivacyPolicy = async () => {
+  const handleAcceptPrivacyPolicy = useCallback(async () => {
+    // Set state optimistically FIRST to trigger immediate re-render on mobile web
+    setHasAcceptedPrivacyPolicy(true);
+    setShowPrivacyPolicy(false);
+    setForceUpdate(prev => prev + 1); // Force immediate re-render
+    
     try {
       console.log('Accepting privacy policy...');
-      await PrivacyPolicyService.acceptPrivacyPolicy();
-      // Force state update immediately
-      setHasAcceptedPrivacyPolicy(true);
-      setShowPrivacyPolicy(false);
-      console.log('Privacy Policy accepted successfully');
-      // Double-check after a brief delay
-      setTimeout(async () => {
-        const accepted = await PrivacyPolicyService.hasAcceptedPrivacyPolicy();
-        if (!accepted) {
-          console.warn('Privacy policy acceptance state mismatch, re-checking...');
-          setHasAcceptedPrivacyPolicy(accepted);
-        }
-      }, 100);
+      // Then perform the async operation (non-blocking for UI)
+      PrivacyPolicyService.acceptPrivacyPolicy().then(() => {
+        console.log('Privacy Policy accepted successfully');
+      }).catch((error) => {
+        console.error('Error accepting privacy policy:', error);
+        // Check if local storage at least worked
+        PrivacyPolicyService.hasAcceptedPrivacyPolicy().then((accepted) => {
+          if (!accepted) {
+            // Revert optimistic update if storage failed
+            setHasAcceptedPrivacyPolicy(false);
+          }
+        }).catch((checkError) => {
+          console.error('Error checking privacy policy acceptance:', checkError);
+          setHasAcceptedPrivacyPolicy(false);
+        });
+      });
     } catch (error) {
-      console.error('Error accepting privacy policy:', error);
-      // Check if local storage at least worked
-      try {
-        const accepted = await PrivacyPolicyService.hasAcceptedPrivacyPolicy();
-        if (accepted) {
-          setHasAcceptedPrivacyPolicy(true);
-          setShowPrivacyPolicy(false);
-        }
-      } catch (checkError) {
-        console.error('Error checking privacy policy acceptance:', checkError);
-      }
+      console.error('Error in handleAcceptPrivacyPolicy:', error);
+      // Error handling is done in promise chain above
     }
-  };
+  }, []);
 
   const handlePrivacyPolicyPress = () => {
     setShowPrivacyPolicy(true);

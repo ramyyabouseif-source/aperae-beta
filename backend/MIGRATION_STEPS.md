@@ -58,3 +58,5 @@ To remove the table (if needed):
 DROP TABLE IF EXISTS "user_consents" CASCADE;
 ```
 
+
+

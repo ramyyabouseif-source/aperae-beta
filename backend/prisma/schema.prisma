@@ -1,4 +1,4 @@
-// Prisma schema for PocketSomm backend
+// Prisma schema for Aperae backend
 // This schema defines the database models for users, sessions, and preferences
 
 generator client {

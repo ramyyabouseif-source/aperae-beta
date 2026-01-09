@@ -35,14 +35,12 @@ function PrivacyPolicyContent({ onAccept, navigation }: PrivacyPolicyScreenProps
     }
     
     if (onAccept) {
-      try {
-        // Call the async handler
-        await onAccept();
-      } catch (error) {
+      // Call the async handler - don't await, let parent handle state optimistically
+      // This ensures immediate UI update on mobile web
+      onAccept().catch((error) => {
         console.error('Error accepting privacy policy:', error);
-        // Still proceed - local storage might have succeeded
-        // The parent component will handle the state update
-      }
+        // Error is handled in parent component
+      });
     } else if (navigation) {
       // If no onAccept callback but navigation is available, navigate back
       navigation.goBack();

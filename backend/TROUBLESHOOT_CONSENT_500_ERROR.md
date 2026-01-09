@@ -109,3 +109,5 @@ Should return 200 with consent object.
 
 I've updated the error handling to include more detailed error messages in development mode. Check backend logs for the actual database error message which will help identify the exact issue.
 
+
+

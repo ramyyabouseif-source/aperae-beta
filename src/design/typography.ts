@@ -1,4 +1,4 @@
-// PocketSomm Design System - Typography
+// Aperae Design System - Typography
 // Modern, readable typography system
 
 export const TYPOGRAPHY = {

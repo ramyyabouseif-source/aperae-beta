@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 /**
- * Security validation utilities for PocketSomm backend
+ * Security validation utilities for Aperae backend
  */
 class SecurityValidator {
   /**

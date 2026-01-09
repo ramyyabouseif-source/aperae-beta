@@ -1,10 +1,19 @@
 // Error handling middleware
 const secureErrorHandler = (err, req, res, next) => {
   // Log the error
-  console.error('Error:', err);
+  const logger = require('./logger');
+  logger.error('Unhandled error in route handler', {
+    error: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method,
+    requestId: req.requestId
+  });
   
-  // Don't leak error details in production
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  // MEDIUM-4: More explicit check to prevent error leakage
+  // Only show details if explicitly enabled in development
+  const isDevelopment = process.env.NODE_ENV === 'development' && 
+                       process.env.ENABLE_DEBUG_ERRORS === 'true';
   
   // Default error response
   let statusCode = 500;
@@ -29,7 +38,7 @@ const secureErrorHandler = (err, req, res, next) => {
   res.status(statusCode).json({
     error: message,
     ...(isDevelopment && { details: err.message, stack: err.stack }),
-    requestId: req.requestId
+    requestId: req.requestId || 'unknown'
   });
 };
 

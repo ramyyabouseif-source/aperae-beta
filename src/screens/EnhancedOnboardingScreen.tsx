@@ -29,7 +29,7 @@ interface OnboardingStep {
 const onboardingSteps: OnboardingStep[] = [
   {
     id: 1,
-    title: 'Welcome to PocketSomm',
+    title: 'Welcome to Aperae',
     subtitle: 'Your Personal Wine Expert',
     description: 'Discover the perfect wine for any occasion with AI-powered recommendations tailored to your taste.',
     icon: 'wine',
@@ -240,7 +240,7 @@ const EnhancedOnboardingScreen: React.FC<EnhancedOnboardingScreenProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>PocketSomm</Text>
+        <Text style={styles.headerTitle}>Aperae</Text>
         <Text style={styles.headerSubtitle}>Your Wine Journey Starts Here</Text>
       </View>
 

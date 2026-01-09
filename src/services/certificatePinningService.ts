@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 
 /**
- * Certificate Pinning Service for PocketSomm
+ * Certificate Pinning Service for Aperae
  * Provides SSL certificate pinning to prevent man-in-the-middle attacks
  */
 class CertificatePinningService {
@@ -212,7 +212,10 @@ class CertificatePinningService {
         }
       }
 
-      // Allow all HTTPS URLs (including api.aperae.com)
+      // MEDIUM-8: Allow all HTTPS URLs with valid certificates
+      // In production, we rely on the OS/browser certificate validation
+      // Certificate pinning is optional and can be enabled for additional security
+      // For MVP, allowing all HTTPS URLs is acceptable
       console.log(`[CertificatePinning] URL security validation passed: ${url}`);
       return true;
     } catch (error) {

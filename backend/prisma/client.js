@@ -18,10 +18,27 @@ const prisma = new PrismaClient({
   // Ensure DATABASE_URL includes ?pgbouncer=true&connection_limit=5
 });
 
-// CRITICAL-3: Add connection health check
-prisma.$connect().catch((error) => {
-  logger.error('Failed to connect to database', { error: error.message });
-  // Don't exit - let the app try to reconnect on next query
+// CRITICAL-3: Validate database connection on startup
+// Fail fast if database is unreachable
+async function validateConnection() {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    logger.info('Database connection validated successfully');
+  } catch (error) {
+    logger.error('Database connection failed on startup', { 
+      error: error.message,
+      code: error.code,
+      meta: error.meta
+    });
+    // Fail fast - exit if database is unreachable
+    process.exit(1);
+  }
+}
+
+// Validate connection immediately
+validateConnection().catch((error) => {
+  logger.error('Database validation error', { error: error.message });
+  process.exit(1);
 });
 
 // Handle graceful shutdown

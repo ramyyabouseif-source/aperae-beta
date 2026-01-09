@@ -1,4 +1,4 @@
-# PocketSomm Backend Environment Variables
+# Aperae Backend Environment Variables
 # Copy this file to backend/.env and fill in your actual values
 
 # JWT Secrets (REQUIRED - Generate secure random strings)
@@ -14,7 +14,7 @@ NODE_ENV=development
 OPENAI_API_KEY=your-openai-api-key-here
 
 # Database Configuration (if using database)
-# DATABASE_URL=postgresql://user:password@localhost:5432/pocketsomm
+# DATABASE_URL=postgresql://user:password@localhost:5432/aperae
 
 # Security Settings
 # CORS Configuration - Add production domains when deploying

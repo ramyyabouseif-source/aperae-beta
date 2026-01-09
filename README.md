@@ -1,6 +1,6 @@
-# PocketSomm - AI Wine Sommelier App
+# Aperae - AI Wine Sommelier App
 
-PocketSomm is a React Native mobile application that provides AI-powered wine recommendations based on food pairings and user preferences. The app features a sophisticated backend API that leverages OpenAI's GPT models to deliver expert-level wine recommendations.
+Aperae is a React Native mobile application that provides AI-powered wine recommendations based on food pairings and user preferences. The app features a sophisticated backend API that leverages Anthropic Claude and OpenAI's GPT models to deliver expert-level wine recommendations.
 
 ## 🍷 Features
 

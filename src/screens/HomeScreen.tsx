@@ -208,7 +208,7 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome to PocketSomm</Text>
+        <Text style={styles.title}>Welcome to Aperae</Text>
         <Text style={styles.subtitle}>
           Your AI-powered wine sommelier
         </Text>

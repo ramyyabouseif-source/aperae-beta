@@ -8,7 +8,7 @@ import { Platform } from 'react-native';
  */
 export class SecureStorageService {
   // Web storage key prefix to avoid conflicts
-  private static readonly WEB_STORAGE_PREFIX = 'pocketsomm_secure_';
+  private static readonly WEB_STORAGE_PREFIX = 'aperae_secure_';
 
   /**
    * Store an item securely

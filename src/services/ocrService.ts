@@ -29,8 +29,8 @@ export interface MenuItem {
 
 export class OCRService {
   private static readonly GOOGLE_VISION_API_URL = 'https://vision.googleapis.com/v1/images:annotate';
-  private static readonly SERVICE_ACCOUNT_EMAIL = 'pocketsomm-vision-service@pocketsomm-vision-api.iam.gserviceaccount.com';
-  private static readonly PROJECT_ID = 'pocketsomm-vision-api';
+  private static readonly SERVICE_ACCOUNT_EMAIL = 'aperae-vision-service@aperae-vision-api.iam.gserviceaccount.com';
+  private static readonly PROJECT_ID = 'aperae-vision-api';
 
   /**
    * Get OAuth2 access token using service account

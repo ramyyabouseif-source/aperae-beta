@@ -173,3 +173,5 @@ GROUP BY consent_type;
 5. ✅ Monitor for any errors in production logs
 6. ✅ Update privacy policy documentation if needed
 
+
+

@@ -5,12 +5,12 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'PocketSomm API',
+      title: 'Aperae API',
       version: '1.0.0',
-      description: 'AI-powered wine recommendation API for PocketSomm mobile application',
+      description: 'AI-powered wine recommendation API for Aperae mobile application',
       contact: {
-        name: 'PocketSomm Support',
-        email: 'support@pocketsomm.com',
+        name: 'Aperae Support',
+        email: 'support@aperae.com',
       },
       license: {
         name: 'MIT',
@@ -20,7 +20,7 @@ const options = {
     servers: [
       {
         url: process.env.NODE_ENV === 'production' 
-          ? 'https://api.pocketsomm.com' 
+          ? 'https://api.aperae.com' 
           : `http://localhost:${process.env.PORT || 3001}`,
         description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server',
       },

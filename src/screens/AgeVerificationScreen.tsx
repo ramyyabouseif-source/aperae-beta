@@ -39,11 +39,9 @@ export default function AgeVerificationScreen({ onVerified }: AgeVerificationScr
     try {
       // Store age verification using the service
       await AgeVerificationService.verifyAge(selectedAge);
-      // Call onVerified even if backend storage fails (local storage is primary)
-      // Use setTimeout to ensure state update happens
-      setTimeout(() => {
-        onVerified();
-      }, 0);
+      // Call onVerified immediately - don't wait, let parent handle state
+      // The parent will set state optimistically for immediate UI update
+      onVerified();
     } catch (error) {
       console.error('Error storing age verification:', error);
       // Still proceed if local storage succeeded (backend failure is non-blocking)
@@ -52,9 +50,7 @@ export default function AgeVerificationScreen({ onVerified }: AgeVerificationScr
         const verified = await AgeVerificationService.isAgeVerified();
         if (verified) {
           // Local storage succeeded, proceed anyway
-          setTimeout(() => {
-            onVerified();
-          }, 0);
+          onVerified();
         } else {
           Alert.alert('Error', 'Failed to save age verification. Please try again.');
           setIsVerifying(false);

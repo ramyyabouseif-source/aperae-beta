@@ -72,3 +72,4 @@ Write-Host "1. If backend is working, check Render dashboard for service" -Foreg
 Write-Host "2. If service is missing, see RENDER_PRODUCTION_TROUBLESHOOTING.md" -ForegroundColor White
 Write-Host "3. If consent endpoint fails, check backend logs and database" -ForegroundColor White
 
+

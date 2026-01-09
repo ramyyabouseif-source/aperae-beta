@@ -1,4 +1,4 @@
-// PocketSomm Design System - Colors
+// Aperae Design System - Colors
 // Inspired by premium wine and modern app design
 
 export const COLORS = {

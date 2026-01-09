@@ -310,7 +310,7 @@ class PrivacyManager {
    */
   getPrivacyPolicyText(): string {
     return `
-PRIVACY POLICY - PocketSomm
+PRIVACY POLICY - Aperae
 
 Data Collection:
 - Wine Preferences: Required for personalized recommendations
@@ -333,7 +333,7 @@ Your Rights:
 - Withdraw consent
 - Data portability
 
-Contact: privacy@pocketsomm.com
+Contact: privacy@aperae.com
 Last Updated: ${new Date().toLocaleDateString()}
     `.trim();
   }

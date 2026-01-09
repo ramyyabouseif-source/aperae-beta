@@ -66,7 +66,7 @@ try {
     Write-Host "2. Press Ctrl+C to stop the server" -ForegroundColor White
     Write-Host "3. Wait 2-3 seconds" -ForegroundColor White
     Write-Host "4. Start the server again: npm start" -ForegroundColor White
-    Write-Host "5. Wait for 'PocketSomm Backend started' message" -ForegroundColor White
+    Write-Host "5. Wait for 'Aperae Backend started' message" -ForegroundColor White
     Write-Host ""
     Write-Host "Press Enter AFTER you've restarted the server..." -ForegroundColor Yellow
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan

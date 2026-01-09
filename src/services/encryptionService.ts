@@ -3,7 +3,7 @@ import * as Crypto from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 
 /**
- * Encryption Service for PocketSomm (Expo Compatible)
+ * Encryption Service for Aperae (Expo Compatible)
  * Provides secure encryption/decryption for sensitive data
  * 
  * Security Features:
@@ -18,7 +18,7 @@ import * as SecureStore from 'expo-secure-store';
 class EncryptionService {
   private static instance: EncryptionService;
   private encryptionKey: string | null = null;
-  private readonly KEY_STORAGE_KEY = 'pocketsomm_encryption_key';
+  private readonly KEY_STORAGE_KEY = 'aperae_encryption_key';
 
   private constructor() {
     // Key will be generated and stored securely on first use

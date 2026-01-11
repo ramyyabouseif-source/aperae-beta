@@ -235,6 +235,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Geo-blocking middleware (blocks EU/EEA countries to avoid GDPR obligations)
+// Applied after CORS but before CSRF to block early
+const geoBlockMiddleware = require('./middleware/geoBlock');
+app.use(geoBlockMiddleware);
+
 // CSRF Protection (applied after CORS to validate origins)
 app.use(csrfProtection);
 

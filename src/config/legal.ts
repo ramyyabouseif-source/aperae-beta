@@ -14,11 +14,16 @@ export const LEGAL_CONFIG = {
   privacyLastUpdated: "November 5, 2025",
   privacyVersion: "1.0",
 
+  // Cookie Policy
+  cookiePolicyLastUpdated: "January 10, 2026",
+  cookiePolicyEffectiveDate: "January 10, 2026",
+  cookiePolicyVersion: "1.0",
+
   // Contact Information
   contact: {
-    legal: "legal@aperae.com",
-    privacy: "privacy@aperae.com",
-    support: "support@aperae.com",
+    legal: "aperaeai@gmail.com",
+    privacy: "aperaeai@gmail.com",
+    support: "aperaeai@gmail.com",
     address: "Aperae Legal Department\n[Your Company Address]"
   },
 

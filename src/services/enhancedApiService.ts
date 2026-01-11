@@ -130,7 +130,23 @@ class EnhancedApiService {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Try to parse error response for detailed error info
+        let errorData: any = {};
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          // If JSON parsing fails, use status text
+          errorData = { message: response.statusText };
+        }
+
+        // Create error with status and details
+        const error: any = new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+        error.status = response.status;
+        error.code = errorData.code;
+        error.country = errorData.country;
+        error.countryName = errorData.countryName;
+        error.requestId = errorData.requestId;
+        throw error;
       }
 
       const data = await response.json();

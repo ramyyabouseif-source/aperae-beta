@@ -125,6 +125,48 @@ export class EnhancedErrorHandler {
       };
     }
 
+    // Geo-blocking errors (403 with GEO_BLOCKED code)
+    if (error.status === 403 && (error.code === 'GEO_BLOCKED' || error.message?.includes('not available in your region'))) {
+      return {
+        title: 'Service Not Available',
+        message: error.message || 'Aperae is currently available in the United States only.',
+        recoveryActions: [
+          {
+            label: 'Contact Support',
+            action: () => this.reportIssue(error),
+            variant: 'primary',
+          },
+        ],
+        severity: 'medium',
+        category: 'geo-blocking',
+        timestamp,
+        context: {
+          ...baseContext,
+          country: error.country,
+          countryName: error.countryName,
+        },
+      };
+    }
+
+    // Forbidden errors (403)
+    if (error.status === 403) {
+      return {
+        title: 'Access Denied',
+        message: error.message || 'You do not have permission to access this resource.',
+        recoveryActions: [
+          {
+            label: 'Go Back',
+            action: () => this.navigateToSignIn(),
+            variant: 'primary',
+          },
+        ],
+        severity: 'medium',
+        category: 'authorization',
+        timestamp,
+        context: baseContext,
+      };
+    }
+
     // Authentication errors
     if (error.status === 401 || error.message?.includes('unauthorized')) {
       return {

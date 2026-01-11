@@ -18,8 +18,10 @@ import AdaptivePreferencesScreen from './src/screens/AdaptivePreferencesScreen';
 import TermsScreen from './src/screens/TermsScreen';
 import AgeVerificationScreen from './src/screens/AgeVerificationScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
+import CookiePolicyScreen from './src/screens/CookiePolicyScreen';
 import PrivacySettingsScreen from './src/screens/PrivacySettingsScreen';
 import AboutScreen from './src/screens/AboutScreen';
+import GeoBlockedScreen from './src/screens/GeoBlockedScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -31,10 +33,53 @@ export default function App() {
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [forceUpdate, setForceUpdate] = useState(0); // Force re-render trigger
+  const [isGeoBlocked, setIsGeoBlocked] = useState<boolean | null>(null);
+  const [geoBlockData, setGeoBlockData] = useState<{country?: string; countryName?: string} | null>(null);
 
   useEffect(() => {
+    checkGeoBlocking();
     checkAcceptanceStatus();
   }, []);
+
+  // Check for geo-blocking on app startup
+  const checkGeoBlocking = async () => {
+    try {
+      // Make a lightweight health check request to detect geo-blocking
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://api.aperae.com/api';
+      const response = await fetch(`${apiUrl}/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // If 403, check if it's geo-blocking
+      if (response.status === 403) {
+        try {
+          const errorData = await response.json();
+          if (errorData.code === 'GEO_BLOCKED') {
+            setIsGeoBlocked(true);
+            setGeoBlockData({
+              country: errorData.country,
+              countryName: errorData.countryName,
+            });
+            setIsLoading(false);
+            return;
+          }
+        } catch (e) {
+          // If JSON parsing fails, might still be geo-blocking
+          console.warn('Could not parse geo-blocking error:', e);
+        }
+      }
+
+      // Not geo-blocked
+      setIsGeoBlocked(false);
+    } catch (error) {
+      // On network error, assume not geo-blocked (might be offline)
+      console.warn('Geo-blocking check failed (might be offline):', error);
+      setIsGeoBlocked(false);
+    }
+  };
 
   const checkAcceptanceStatus = async () => {
     try {
@@ -155,11 +200,21 @@ export default function App() {
   };
 
   // Show loading screen while checking status
-  if (isLoading) {
+  if (isLoading && isGeoBlocked === null) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#8B0000" />
       </View>
+    );
+  }
+
+  // Show geo-blocked screen FIRST (before age verification or anything else)
+  if (isGeoBlocked === true) {
+    return (
+      <GeoBlockedScreen 
+        country={geoBlockData?.country}
+        countryName={geoBlockData?.countryName}
+      />
     );
   }
 

@@ -333,7 +333,7 @@ Your Rights:
 - Withdraw consent
 - Data portability
 
-Contact: privacy@aperae.com
+Contact: aperaeai@gmail.com
 Last Updated: ${new Date().toLocaleDateString()}
     `.trim();
   }

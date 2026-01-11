@@ -1,62 +1,56 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AgeVerificationService } from '../services/ageVerificationService';
 import { LEGAL_CONFIG } from '../config/legal';
 
 interface AgeVerificationScreenProps {
   onVerified: () => void;
+  onTermsPress?: () => void;
+  onPrivacyPress?: () => void;
 }
 
 const LEGAL_DRINKING_AGE = 21;
 
-export default function AgeVerificationScreen({ onVerified }: AgeVerificationScreenProps) {
-  const [selectedAge, setSelectedAge] = useState<number | null>(null);
+export default function AgeVerificationScreen({ 
+  onVerified, 
+  onTermsPress, 
+  onPrivacyPress 
+}: AgeVerificationScreenProps) {
+  const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const handleVerify = async () => {
-    if (isVerifying) return; // Prevent double-clicks
+  const handleContinue = async () => {
+    if (isVerifying) return;
     
-    if (!selectedAge) {
-      Alert.alert('Required', 'Please confirm your age to continue.');
+    if (!isAgeConfirmed) {
+      Alert.alert('Required', 'Please confirm you are 21 or older to continue.');
       return;
     }
 
-    if (selectedAge < LEGAL_DRINKING_AGE) {
-      Alert.alert(
-        'Age Restriction',
-        `You must be ${LEGAL_DRINKING_AGE} or older to use ${LEGAL_CONFIG.appName}. This app provides wine recommendations for individuals of legal drinking age only.`,
-        [
-          {
-            text: 'OK',
-            style: 'default',
-          },
-        ]
-      );
+    if (!agreedToTerms) {
+      Alert.alert('Required', 'Please accept the Terms of Use and Privacy Notice to continue.');
       return;
     }
 
     setIsVerifying(true);
     try {
-      // Store age verification using the service
-      await AgeVerificationService.verifyAge(selectedAge);
-      // Call onVerified immediately - don't wait, let parent handle state
-      // The parent will set state optimistically for immediate UI update
+      await AgeVerificationService.verifyAge(LEGAL_DRINKING_AGE);
       onVerified();
     } catch (error) {
       console.error('Error storing age verification:', error);
-      // Still proceed if local storage succeeded (backend failure is non-blocking)
-      // Check if local storage at least worked
+      
       try {
         const verified = await AgeVerificationService.isAgeVerified();
         if (verified) {
-          // Local storage succeeded, proceed anyway
           onVerified();
         } else {
-          Alert.alert('Error', 'Failed to save age verification. Please try again.');
+          Alert.alert('Error', 'Failed to save verification. Please try again.');
           setIsVerifying(false);
         }
       } catch (checkError) {
-        Alert.alert('Error', 'Failed to save age verification. Please try again.');
+        Alert.alert('Error', 'Failed to save verification. Please try again.');
         setIsVerifying(false);
       }
     }
@@ -65,75 +59,113 @@ export default function AgeVerificationScreen({ onVerified }: AgeVerificationScr
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <MaterialCommunityIcons name="glass-wine" size={60} color="#fff" />
         <Text style={styles.title}>Age Verification</Text>
         <Text style={styles.subtitle}>
-          You must be {LEGAL_DRINKING_AGE} or older to use {LEGAL_CONFIG.appName}
+          Required for Alcohol-Related Content
         </Text>
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>Legal Drinking Age Required</Text>
-          <Text style={styles.infoText}>
-            {LEGAL_CONFIG.appName} provides wine recommendations and educational content about wine and food pairings. 
-            To use this app, you must be at least {LEGAL_DRINKING_AGE} years of age (or the legal drinking age in your jurisdiction).
-          </Text>
-        </View>
-
-        <Text style={styles.question}>Are you {LEGAL_DRINKING_AGE} years or older?</Text>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.ageButton,
-              selectedAge === LEGAL_DRINKING_AGE && styles.ageButtonSelected,
-            ]}
-            onPress={() => setSelectedAge(LEGAL_DRINKING_AGE)}
-          >
-            <Text style={[
-              styles.ageButtonText,
-              selectedAge === LEGAL_DRINKING_AGE && styles.ageButtonTextSelected,
-            ]}>
-              Yes, I am {LEGAL_DRINKING_AGE} or older
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.content}>
+          {/* Why We Ask */}
+          <View style={styles.infoCard}>
+            <Text style={styles.infoTitle}>Why do we ask?</Text>
+            <Text style={styles.infoText}>
+              {LEGAL_CONFIG.appName} provides wine recommendations and alcohol-related content. 
+              Federal and state laws require age verification for such content.
             </Text>
-          </TouchableOpacity>
+            <Text style={[styles.infoText, styles.infoTextSpacing]}>
+              We use self-attestation (honor system) and do not verify government IDs.
+            </Text>
+          </View>
 
+          {/* Age Confirmation */}
           <TouchableOpacity
-            style={[
-              styles.ageButton,
-              selectedAge !== null && selectedAge < LEGAL_DRINKING_AGE && styles.ageButtonSelected,
-            ]}
-            onPress={() => setSelectedAge(17)}
+            style={[styles.ageButton, isAgeConfirmed && styles.ageButtonSelected]}
+            onPress={() => setIsAgeConfirmed(!isAgeConfirmed)}
             activeOpacity={0.7}
           >
-            <Text style={[
-              styles.ageButtonText,
-              selectedAge !== null && selectedAge < LEGAL_DRINKING_AGE && styles.ageButtonTextSelected,
-            ]}>
-              No, I am under {LEGAL_DRINKING_AGE}
+            <View style={styles.checkboxContainer}>
+              <View style={[styles.checkbox, isAgeConfirmed && styles.checkboxChecked]}>
+                {isAgeConfirmed && <Text style={styles.checkmark}>✓</Text>}
+              </View>
+              <Text style={styles.ageButtonText}>
+                I am 21 years or older (or the legal drinking age in my area)
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Terms Acceptance */}
+          <TouchableOpacity
+            style={[styles.termsButton, agreedToTerms && styles.termsButtonSelected]}
+            onPress={() => setAgreedToTerms(!agreedToTerms)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.checkboxContainer}>
+              <View style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}>
+                {agreedToTerms && <Text style={styles.checkmark}>✓</Text>}
+              </View>
+              <View style={styles.termsTextContainer}>
+                <Text style={styles.termsText}>
+                  I have read and agree to the{' '}
+                  {onTermsPress ? (
+                    <Text style={styles.link} onPress={onTermsPress}>
+                      Terms of Use
+                    </Text>
+                  ) : (
+                    <Text style={styles.linkText}>Terms of Use</Text>
+                  )}
+                  {' '}and{' '}
+                  {onPrivacyPress ? (
+                    <Text style={styles.link} onPress={onPrivacyPress}>
+                      Privacy Notice
+                    </Text>
+                  ) : (
+                    <Text style={styles.linkText}>Privacy Notice</Text>
+                  )}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* Important Disclaimers */}
+          <View style={styles.disclaimerContainer}>
+            <Text style={styles.disclaimerTitle}>⚠️ Important Disclaimers</Text>
+            <Text style={styles.disclaimerText}>
+              • AI recommendations may be inaccurate (~10% error rate){'\n'}
+              • Not professional sommelier or medical advice{'\n'}
+              • Personal project - use entirely at your own risk{'\n'}
+              • Drink responsibly - never drink and drive{'\n'}
+              • If you're under 21, you may not use this app
+            </Text>
+          </View>
+
+          {/* Continue Button */}
+          <TouchableOpacity
+            style={[
+              styles.continueButton,
+              (!isAgeConfirmed || !agreedToTerms || isVerifying) && styles.continueButtonDisabled
+            ]}
+            onPress={handleContinue}
+            disabled={!isAgeConfirmed || !agreedToTerms || isVerifying}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.continueButtonText}>
+              {isVerifying ? 'Please wait...' : 'I Agree & Continue'}
             </Text>
           </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity
-          style={[styles.verifyButton, (!selectedAge || isVerifying) && styles.verifyButtonDisabled]}
-          onPress={handleVerify}
-          onPressIn={handleVerify}
-          disabled={!selectedAge || isVerifying}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.verifyButtonText}>
-            {isVerifying ? 'Verifying...' : 'Continue'}
-          </Text>
-        </TouchableOpacity>
-
-        <View style={styles.disclaimerContainer}>
-          <Text style={styles.disclaimerText}>
-            ⚠️ Please drink responsibly. These recommendations are for educational purposes only. 
-            Not intended for persons under the legal drinking age.
-          </Text>
+          {/* Help Resources */}
+          <View style={styles.helpContainer}>
+            <Text style={styles.helpTitle}>Need Help?</Text>
+            <Text style={styles.helpText}>
+              For alcohol-related concerns:{'\n'}
+              SAMHSA Hotline: 1-800-662-4357 (24/7, free, confidential)
+            </Text>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -146,13 +178,14 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#5B2433', // Dark tone background
     padding: 20,
-    paddingTop: 60, // Push header down to prevent cutoff
+    paddingTop: 60,
     alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
+    marginTop: 12,
     marginBottom: 8,
   },
   subtitle: {
@@ -160,15 +193,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  content: {
     padding: 20,
   },
   infoCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 20,
-    marginBottom: 30,
+    marginBottom: 24,
     borderWidth: 1,
     borderColor: '#E0E0E0',
     shadowColor: '#000',
@@ -180,23 +218,16 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#5B2433',
+    color: '#5B2433', // Dark tone text
     marginBottom: 12,
   },
   infoText: {
-    fontSize: 16,
-    color: '#5B2433',
-    lineHeight: 24,
+    fontSize: 15,
+    color: '#5B2433', // Dark tone text
+    lineHeight: 22,
   },
-  question: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#5B2433',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  buttonContainer: {
-    marginBottom: 24,
+  infoTextSpacing: {
+    marginTop: 12,
   },
   ageButton: {
     backgroundColor: '#FFFFFF',
@@ -205,7 +236,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 2,
     borderColor: '#E0E0E0',
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -213,23 +243,94 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   ageButtonSelected: {
-    borderColor: '#5B2433',
+    borderColor: '#5B2433', // Dark tone
     backgroundColor: '#FFF5F5',
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
   },
-  ageButtonText: {
-    fontSize: 18,
-    color: '#5B2433',
-    fontWeight: '600',
+  termsButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 24,
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  ageButtonTextSelected: {
-    color: '#5B2433',
+  termsButtonSelected: {
+    borderColor: '#5B2433', // Dark tone
+    backgroundColor: '#FFF5F5',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderColor: '#5B2433', // Dark tone
+    borderRadius: 4,
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  checkboxChecked: {
+    backgroundColor: '#5B2433', // Dark tone
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
   },
-  verifyButton: {
-    backgroundColor: '#5B2433',
+  ageButtonText: {
+    fontSize: 16,
+    color: '#5B2433', // Dark tone text
+    fontWeight: '600',
+    flex: 1,
+    lineHeight: 24,
+  },
+  termsTextContainer: {
+    flex: 1,
+  },
+  termsText: {
+    fontSize: 15,
+    color: '#5B2433', // Dark tone text
+    lineHeight: 22,
+  },
+  link: {
+    color: '#BF9694', // Metallic accent
+    textDecorationLine: 'underline',
+    fontWeight: '600',
+  },
+  linkText: {
+    color: '#BF9694', // Metallic accent
+    fontWeight: '600',
+  },
+  disclaimerContainer: {
+    backgroundColor: '#FFF3CD',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#FFC107',
+  },
+  disclaimerTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#856404',
+    marginBottom: 8,
+  },
+  disclaimerText: {
+    fontSize: 14,
+    color: '#856404',
+    lineHeight: 20,
+  },
+  continueButton: {
+    backgroundColor: '#5B2433', // Dark tone
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 32,
@@ -241,28 +342,32 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
-  verifyButtonDisabled: {
+  continueButtonDisabled: {
     backgroundColor: '#CCCCCC',
     shadowOpacity: 0,
     elevation: 0,
   },
-  verifyButtonText: {
+  continueButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  disclaimerContainer: {
-    backgroundColor: '#FFF3CD',
+  helpContainer: {
+    backgroundColor: 'rgba(191, 150, 148, 0.15)', // Light metallic accent background
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#FFC107',
+    borderColor: 'rgba(191, 150, 148, 0.3)', // Metallic accent border
   },
-  disclaimerText: {
+  helpTitle: {
     fontSize: 14,
-    color: '#856404',
-    textAlign: 'center',
-    lineHeight: 20,
+    fontWeight: 'bold',
+    color: '#5B2433', // Dark tone text
+    marginBottom: 8,
+  },
+  helpText: {
+    fontSize: 13,
+    color: '#5B2433', // Dark tone text
+    lineHeight: 18,
   },
 });
-

@@ -31,6 +31,8 @@ export default function App() {
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState<boolean | null>(null);
   const [hasAcceptedPrivacyPolicy, setHasAcceptedPrivacyPolicy] = useState<boolean | null>(null);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  const [showTermsFromAge, setShowTermsFromAge] = useState(false);
+  const [showPrivacyFromAge, setShowPrivacyFromAge] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [forceUpdate, setForceUpdate] = useState(0); // Force re-render trigger
   const [isGeoBlocked, setIsGeoBlocked] = useState<boolean | null>(null);
@@ -119,19 +121,26 @@ export default function App() {
 
   const handleAgeVerified = useCallback(async () => {
     // Set state immediately to trigger re-render - this is the key fix for mobile web
+    // Age verification screen now also accepts Terms and Privacy Policy, so set all three
     setIsAgeVerified(true);
+    setHasAcceptedTerms(true);
+    setHasAcceptedPrivacyPolicy(true);
     setForceUpdate(prev => prev + 1); // Force immediate re-render
     
     // Verify storage succeeded (non-blocking, in background)
     Promise.resolve().then(async () => {
       try {
         const verified = await AgeVerificationService.isAgeVerified();
-        if (!verified) {
-          console.warn('Age verification state mismatch, re-checking...');
+        const termsAccepted = await TermsService.hasAcceptedTerms();
+        const privacyAccepted = await PrivacyPolicyService.hasAcceptedPrivacyPolicy();
+        if (!verified || !termsAccepted || !privacyAccepted) {
+          console.warn('Verification/acceptance state mismatch, re-checking...');
           setIsAgeVerified(verified);
+          setHasAcceptedTerms(termsAccepted);
+          setHasAcceptedPrivacyPolicy(privacyAccepted);
         }
       } catch (error) {
-        console.error('Error verifying age verification state:', error);
+        console.error('Error verifying verification/acceptance state:', error);
       }
     });
   }, []);
@@ -199,6 +208,14 @@ export default function App() {
     setShowPrivacyPolicy(true);
   };
 
+  const handleTermsPressFromAge = useCallback(() => {
+    setShowTermsFromAge(true);
+  }, []);
+
+  const handlePrivacyPressFromAge = useCallback(() => {
+    setShowPrivacyFromAge(true);
+  }, []);
+
   // Show loading screen while checking status
   if (isLoading && isGeoBlocked === null) {
     return (
@@ -220,18 +237,30 @@ export default function App() {
 
   // Age verification must come FIRST (before any other screens)
   if (!isAgeVerified) {
-    return <AgeVerificationScreen onVerified={handleAgeVerified} />;
-  }
-
-  // Show terms screen after age verification
-  if (!hasAcceptedTerms) {
-    return <TermsScreen onAccept={handleAcceptTerms} onPrivacyPolicyPress={handlePrivacyPolicyPress} />;
-  }
-
-  // Show privacy policy screen if Terms accepted but Privacy Policy not accepted
-  // OR if user explicitly requested to view it from Terms screen
-  if (!hasAcceptedPrivacyPolicy || showPrivacyPolicy) {
-    return <PrivacyPolicyScreen onAccept={handleAcceptPrivacyPolicy} />;
+    // Show Terms or Privacy Policy screens if user clicked links from age verification
+    if (showTermsFromAge) {
+      return (
+        <TermsScreen 
+          onAccept={() => setShowTermsFromAge(false)} 
+          onPrivacyPolicyPress={handlePrivacyPolicyPress} 
+        />
+      );
+    }
+    if (showPrivacyFromAge) {
+      return (
+        <PrivacyPolicyScreen 
+          onAccept={() => setShowPrivacyFromAge(false)} 
+        />
+      );
+    }
+    // Show age verification screen with links to Terms/Privacy
+    return (
+      <AgeVerificationScreen 
+        onVerified={handleAgeVerified}
+        onTermsPress={handleTermsPressFromAge}
+        onPrivacyPress={handlePrivacyPressFromAge}
+      />
+    );
   }
 
   // Main Tab Navigator Component

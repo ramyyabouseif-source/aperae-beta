@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Image } from 'react-native';
 import { AgeVerificationService } from '../services/ageVerificationService';
+import { TermsService } from '../services/termsService';
+import { PrivacyPolicyService } from '../services/privacyPolicyService';
 import { LEGAL_CONFIG } from '../config/legal';
 
 interface AgeVerificationScreenProps {
@@ -36,14 +37,23 @@ export default function AgeVerificationScreen({
 
     setIsVerifying(true);
     try {
-      await AgeVerificationService.verifyAge(LEGAL_DRINKING_AGE);
+      // Accept all three: Age verification, Terms, and Privacy Policy
+      await Promise.all([
+        AgeVerificationService.verifyAge(LEGAL_DRINKING_AGE),
+        TermsService.acceptTerms(),
+        PrivacyPolicyService.acceptPrivacyPolicy(),
+      ]);
       onVerified();
     } catch (error) {
-      console.error('Error storing age verification:', error);
+      console.error('Error storing verification/acceptance:', error);
       
+      // Check if at least age verification succeeded
       try {
         const verified = await AgeVerificationService.isAgeVerified();
-        if (verified) {
+        const termsAccepted = await TermsService.hasAcceptedTerms();
+        const privacyAccepted = await PrivacyPolicyService.hasAcceptedPrivacyPolicy();
+        
+        if (verified && termsAccepted && privacyAccepted) {
           onVerified();
         } else {
           Alert.alert('Error', 'Failed to save verification. Please try again.');
@@ -59,7 +69,11 @@ export default function AgeVerificationScreen({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <MaterialCommunityIcons name="glass-wine" size={60} color="#fff" />
+        <Image 
+          source={require('../../assets/images/Aperae Logo.jpg')} 
+          style={styles.logo}
+          resizeMode="contain"
+        />
         <Text style={styles.title}>Age Verification</Text>
         <Text style={styles.subtitle}>
           Required for Alcohol-Related Content
@@ -180,6 +194,11 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
     alignItems: 'center',
+  },
+  logo: {
+    width: 120,
+    height: 40,
+    marginBottom: 16,
   },
   title: {
     fontSize: 24,

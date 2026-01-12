@@ -20,7 +20,8 @@ const CSRF_SKIP_PATHS = new Set([
   '/api/auth/register',
   '/api/auth/login',
   '/api/auth/refresh',
-  '/api/auth/logout'
+  '/api/auth/logout',
+  '/api/consent/single-point'
 ]);
 
 /**

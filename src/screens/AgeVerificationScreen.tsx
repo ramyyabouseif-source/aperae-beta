@@ -39,58 +39,49 @@ export default function AgeVerificationScreen({
 
     setIsVerifying(true);
     try {
-      // Call single point consent endpoint
-      const apiBaseUrl = getApiBaseUrl();
-      const deviceId = await getDeviceId();
-      
-      const response = await fetch(`${apiBaseUrl}/consent/single-point`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest', // CSRF protection header
-        },
-        body: JSON.stringify({
-          ageVerified: true,
-          termsAccepted: true,
-          privacyAccepted: true,
-          termsVersion: LEGAL_CONFIG.termsVersion,
-          privacyVersion: LEGAL_CONFIG.privacyVersion,
-          deviceId: deviceId,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Failed to store consent' }));
-        throw new Error(errorData.error || 'Failed to store consent');
-      }
-
-      // Store locally as well (for offline access and backward compatibility)
+      // Store locally first (for offline access and immediate UI update)
       await Promise.all([
         AgeVerificationService.verifyAge(LEGAL_DRINKING_AGE),
         TermsService.acceptTerms(),
         PrivacyPolicyService.acceptPrivacyPolicy(),
       ]);
       
+      // Call single point consent endpoint (non-blocking - continue even if it fails)
+      try {
+        const apiBaseUrl = getApiBaseUrl();
+        const deviceId = await getDeviceId();
+        
+        const response = await fetch(`${apiBaseUrl}/consent/single-point`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest', // CSRF protection header
+          },
+          body: JSON.stringify({
+            ageVerified: true,
+            termsAccepted: true,
+            privacyAccepted: true,
+            termsVersion: LEGAL_CONFIG.termsVersion,
+            privacyVersion: LEGAL_CONFIG.privacyVersion,
+            deviceId: deviceId,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Failed to store consent' }));
+          console.warn('Failed to store consent to backend (non-blocking):', errorData.error || 'Failed to store consent');
+        }
+      } catch (apiError) {
+        // API error is non-blocking - local storage succeeded, so continue
+        console.warn('Failed to store consent to backend (non-blocking):', apiError);
+      }
+      
+      // Always call onVerified() after local storage succeeds
       onVerified();
     } catch (error) {
       console.error('Error storing verification/acceptance:', error);
-      
-      // Check if at least age verification succeeded
-      try {
-        const verified = await AgeVerificationService.isAgeVerified();
-        const termsAccepted = await TermsService.hasAcceptedTerms();
-        const privacyAccepted = await PrivacyPolicyService.hasAcceptedPrivacyPolicy();
-        
-        if (verified && termsAccepted && privacyAccepted) {
-          onVerified();
-        } else {
-          Alert.alert('Error', 'Failed to save verification. Please try again.');
-          setIsVerifying(false);
-        }
-      } catch (checkError) {
-        Alert.alert('Error', 'Failed to save verification. Please try again.');
-        setIsVerifying(false);
-      }
+      Alert.alert('Error', 'Failed to save verification. Please try again.');
+      setIsVerifying(false);
     }
   };
 

@@ -985,7 +985,7 @@ export default function PrivacyPolicyScreen(props: PrivacyPolicyScreenProps) {
   // If onAccept is provided, we're in gate screen context (no NavigationContainer)
   // In that case, don't use navigation hook at all
   if (props.onAccept) {
-    return <PrivacyPolicyContent onAccept={props.onAccept} onCookiePolicyPress={props.onCookiePolicyPress} />;
+    return <PrivacyPolicyContent onAccept={props.onAccept} onBack={props.onBack} onCookiePolicyPress={props.onCookiePolicyPress} />;
   }
   
   // Otherwise, we're inside NavigationContainer - use navigation hook

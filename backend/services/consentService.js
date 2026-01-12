@@ -341,6 +341,122 @@ class ConsentService {
       throw error;
     }
   }
+
+  /**
+   * Store single point consent (all three consents together)
+   * @param {object} params - Consent parameters
+   * @param {boolean} params.ageVerified - Age verification status
+   * @param {boolean} params.termsAccepted - Terms acceptance status
+   * @param {boolean} params.privacyAccepted - Privacy policy acceptance status
+   * @param {string} [params.termsVersion] - Terms version (e.g., '1.0')
+   * @param {string} [params.privacyVersion] - Privacy policy version (e.g., '1.0')
+   * @param {string} [params.userId] - User ID if logged in
+   * @param {string} [params.deviceId] - Device ID from client (optional, will be hashed)
+   * @param {object} [params.req] - Express request object (for device fingerprinting on web)
+   * @returns {Promise<object>} Created consent record
+   */
+  async storeSinglePointConsent({
+    ageVerified,
+    termsAccepted,
+    privacyAccepted,
+    termsVersion = null,
+    privacyVersion = null,
+    userId = null,
+    deviceId = null,
+    req = null
+  }) {
+    try {
+      // Validate all three consents are true
+      if (!ageVerified || !termsAccepted || !privacyAccepted) {
+        throw new Error('All three consents must be accepted for single point consent');
+      }
+
+      // Get pseudonymized device ID
+      const deviceIdHash = this._getDeviceIdHash(req, deviceId);
+
+      // Build consent data JSON
+      const consentData = {
+        age_verification: ageVerified,
+        terms: termsAccepted,
+        privacy_policy: privacyAccepted,
+        terms_version: termsVersion,
+        privacy_version: privacyVersion,
+        accepted_together: true,
+        source: 'age_verification_screen'
+      };
+
+      // Store single consent record
+      const consent = await prisma.userConsent.create({
+        data: {
+          userId: userId || null,
+          deviceIdHash: deviceIdHash,
+          consentType: 'single_point_consent',
+          accepted: true,
+          version: `${termsVersion || '1.0'}-${privacyVersion || '1.0'}`, // Combined version
+          consentData: consentData,
+          acceptedAt: new Date(),
+        },
+      });
+
+      logger.info('Single point consent stored', {
+        userId: userId || 'anonymous',
+        hasDeviceIdHash: !!deviceIdHash,
+        consentData
+      });
+
+      return consent;
+    } catch (error) {
+      logger.error('Error storing single point consent', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Check if user has given single point consent
+   * @param {string} userId - User ID (optional)
+   * @param {string} deviceIdHash - Hashed device ID (optional, for anonymous users)
+   * @returns {Promise<boolean>} True if single point consent was given
+   */
+  async hasSinglePointConsent(userId, deviceIdHash) {
+    try {
+      const where = {
+        consentType: 'single_point_consent',
+        accepted: true,
+        anonymizedAt: null,
+      };
+
+      if (userId) {
+        where.userId = userId;
+      } else if (deviceIdHash) {
+        where.deviceIdHash = deviceIdHash;
+        where.userId = null;
+      } else {
+        return false;
+      }
+
+      const consent = await prisma.userConsent.findFirst({
+        where: where,
+        orderBy: {
+          acceptedAt: 'desc',
+        },
+      });
+
+      if (!consent) return false;
+
+      // Also check that all three consents in consent_data are true
+      const consentData = consent.consentData;
+      if (consentData) {
+        return consentData.age_verification === true &&
+               consentData.terms === true &&
+               consentData.privacy_policy === true;
+      }
+
+      return true; // If consent_data is null, assume valid (backward compatibility)
+    } catch (error) {
+      logger.error('Error checking single point consent', { error: error.message, userId });
+      return false;
+    }
+  }
 }
 
 module.exports = new ConsentService();

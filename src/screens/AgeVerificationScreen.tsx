@@ -4,6 +4,8 @@ import { AgeVerificationService } from '../services/ageVerificationService';
 import { TermsService } from '../services/termsService';
 import { PrivacyPolicyService } from '../services/privacyPolicyService';
 import { LEGAL_CONFIG } from '../config/legal';
+import { getApiBaseUrl } from '../utils/api';
+import { getDeviceId } from '../utils/deviceId';
 
 interface AgeVerificationScreenProps {
   onVerified: () => void;
@@ -37,12 +39,38 @@ export default function AgeVerificationScreen({
 
     setIsVerifying(true);
     try {
-      // Accept all three: Age verification, Terms, and Privacy Policy
+      // Call single point consent endpoint
+      const apiBaseUrl = getApiBaseUrl();
+      const deviceId = await getDeviceId();
+      
+      const response = await fetch(`${apiBaseUrl}/consent/single-point`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest', // CSRF protection header
+        },
+        body: JSON.stringify({
+          ageVerified: true,
+          termsAccepted: true,
+          privacyAccepted: true,
+          termsVersion: LEGAL_CONFIG.termsVersion,
+          privacyVersion: LEGAL_CONFIG.privacyVersion,
+          deviceId: deviceId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to store consent' }));
+        throw new Error(errorData.error || 'Failed to store consent');
+      }
+
+      // Store locally as well (for offline access and backward compatibility)
       await Promise.all([
         AgeVerificationService.verifyAge(LEGAL_DRINKING_AGE),
         TermsService.acceptTerms(),
         PrivacyPolicyService.acceptPrivacyPolicy(),
       ]);
+      
       onVerified();
     } catch (error) {
       console.error('Error storing verification/acceptance:', error);
@@ -105,7 +133,7 @@ export default function AgeVerificationScreen({
                 {isAgeConfirmed && <Text style={styles.checkmark}>✓</Text>}
               </View>
               <Text style={styles.ageButtonText}>
-                I am 21 years or older (or the legal drinking age in my area)
+                I am 21 years or older (or the legal drinking age in my jurisdiction)
               </Text>
             </View>
           </TouchableOpacity>
@@ -148,10 +176,11 @@ export default function AgeVerificationScreen({
             <Text style={styles.disclaimerTitle}>⚠️ Important Disclaimers</Text>
             <Text style={styles.disclaimerText}>
               • AI recommendations may be inaccurate (~10% error rate){'\n'}
-              • Not professional sommelier or medical advice{'\n'}
+              • Not a professional sommelier, chef, or medical advice{'\n'}
               • Personal project - use entirely at your own risk{'\n'}
               • Drink responsibly - never drink and drive{'\n'}
-              • If you're under 21, you may not use this app
+              • Eat responsibly - check all ingredients for allergens and dietary restrictions{'\n'}
+              • Do not use this service if you are not of legal drinking age
             </Text>
           </View>
 

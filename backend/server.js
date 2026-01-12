@@ -3069,6 +3069,82 @@ app.post('/api/consent', optionalAuth, csrfProtection, validateConsentRequest, h
 });
 
 /**
+ * Store single point consent (age verification + terms + privacy policy)
+ */
+app.post('/api/consent/single-point', optionalAuth, csrfProtection, async (req, res) => {
+  const requestStartTime = Date.now();
+  const requestId = generateRequestId();
+  
+  RequestLogger.logRequestStart('single-point-consent', requestId);
+
+  try {
+    const {
+      ageVerified,
+      termsAccepted,
+      privacyAccepted,
+      termsVersion,
+      privacyVersion,
+      deviceId
+    } = req.body;
+
+    // Validate all three are accepted
+    if (!ageVerified || !termsAccepted || !privacyAccepted) {
+      const responseTime = Date.now() - requestStartTime;
+      RequestLogger.logRequestError('single-point-consent', requestId, responseTime, 'All three consents must be accepted');
+      return res.status(400).json({
+        success: false,
+        error: 'All three consents must be accepted',
+        requestId
+      });
+    }
+
+    // Get user ID if authenticated (optional)
+    const userId = req.user?.id || null;
+
+    // Store single point consent
+    const consent = await consentService.storeSinglePointConsent({
+      ageVerified,
+      termsAccepted,
+      privacyAccepted,
+      termsVersion: termsVersion || '1.0',
+      privacyVersion: privacyVersion || '1.0',
+      userId,
+      deviceId: deviceId || null,
+      req
+    });
+
+    const responseTime = Date.now() - requestStartTime;
+    RequestLogger.logRequestSuccess('single-point-consent', requestId, responseTime);
+
+    res.json({
+      success: true,
+      consent: {
+        id: consent.id,
+        consentType: consent.consentType,
+        accepted: consent.accepted,
+        version: consent.version,
+        acceptedAt: consent.acceptedAt
+      },
+      requestId
+    });
+
+  } catch (error) {
+    const responseTime = Date.now() - requestStartTime;
+    RequestLogger.logRequestError('single-point-consent', requestId, responseTime, error);
+
+    const errorMessage = process.env.NODE_ENV === 'development' 
+      ? error.message 
+      : 'Failed to store consent';
+    
+    res.status(500).json({
+      success: false,
+      error: errorMessage,
+      requestId
+    });
+  }
+});
+
+/**
  * @swagger
  * /api/consent/user:
  *   get:

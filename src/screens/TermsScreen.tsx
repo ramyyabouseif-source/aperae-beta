@@ -1,17 +1,19 @@
 import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { LEGAL_CONFIG } from '../config/legal';
 
 interface TermsScreenProps {
   onAccept?: () => void;
+  onBack?: () => void;
   onPrivacyPolicyPress?: () => void;
   onCookiePolicyPress?: () => void;
   navigation?: any; // Optional navigation prop for when used in NavigationContainer
 }
 
 // Inner component that doesn't use navigation hook
-function TermsScreenContent({ onAccept, onPrivacyPolicyPress, onCookiePolicyPress, navigation }: TermsScreenProps) {
+function TermsScreenContent({ onAccept, onBack, onPrivacyPolicyPress, onCookiePolicyPress, navigation }: TermsScreenProps) {
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -65,9 +67,28 @@ function TermsScreenContent({ onAccept, onPrivacyPolicyPress, onCookiePolicyPres
     }
   };
 
+  const handleBack = () => {
+    if (onBack) {
+      // If onBack is provided, we're shown from AgeVerificationScreen - go back to it
+      onBack();
+    } else if (navigation) {
+      navigation.goBack();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        {/* Back button when shown from AgeVerificationScreen */}
+        {onBack && (
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={handleBack}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+        )}
         <Image 
           source={require('../../assets/images/Aperae Logo.jpg')} 
           style={styles.logo}
@@ -902,7 +923,7 @@ function TermsScreenContent({ onAccept, onPrivacyPolicyPress, onCookiePolicyPres
 
 // Wrapper component - handles navigation hook properly
 // This component is used when screen is inside NavigationContainer (from navigation stack)
-function TermsScreenWithNavigation(props: Omit<TermsScreenProps, 'onAccept'>) {
+function TermsScreenWithNavigation(props: Omit<TermsScreenProps, 'onAccept' | 'onBack'>) {
   // useNavigation hook is safe to call here since we're always inside NavigationContainer
   const navigation = useNavigation();
   return <TermsScreenContent {...props} navigation={navigation} />;
@@ -918,7 +939,7 @@ export default function TermsScreen(props: TermsScreenProps) {
   
   // Otherwise, we're inside NavigationContainer - use navigation hook
   // This component will be rendered from the navigation stack, so hook is safe
-  const navigationProps: Omit<TermsScreenProps, 'onAccept'> = {};
+  const navigationProps: Omit<TermsScreenProps, 'onAccept' | 'onBack'> = {};
   if (props.onPrivacyPolicyPress) {
     navigationProps.onPrivacyPolicyPress = props.onPrivacyPolicyPress;
   }
@@ -938,6 +959,14 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60, // Push header down to prevent cutoff
     alignItems: 'center',
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    zIndex: 1,
+    padding: 8,
   },
   logo: {
     width: 120,
@@ -1079,4 +1108,5 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(191, 150, 148, 0.4)', // Stronger border for importance
   },
 });
+
 

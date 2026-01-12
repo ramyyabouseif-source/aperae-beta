@@ -61,7 +61,7 @@ export default function AboutScreen() {
           onPress={handleViewTerms}
         >
           <Ionicons name="document-text-outline" size={20} color="#5B2433" />
-          <Text style={styles.linkButtonText}>Terms of Service</Text>
+          <Text style={styles.linkButtonText}>Terms of Use</Text>
           <Ionicons name="chevron-forward" size={20} color="#CCCCCC" />
         </TouchableOpacity>
 
@@ -80,6 +80,15 @@ export default function AboutScreen() {
         >
           <Ionicons name="settings-outline" size={20} color="#5B2433" />
           <Text style={styles.linkButtonText}>Privacy Settings</Text>
+          <Ionicons name="chevron-forward" size={20} color="#CCCCCC" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.linkButton}
+          onPress={handleViewCookiePolicy}
+        >
+          <Ionicons name="document-text-outline" size={20} color="#5B2433" />
+          <Text style={styles.linkButtonText}>Cookie Policy</Text>
           <Ionicons name="chevron-forward" size={20} color="#CCCCCC" />
         </TouchableOpacity>
 

@@ -74,9 +74,10 @@ model UserConsent {
   deviceIdHash String? @map("device_id_hash") // SHA-256 hash for anonymous users (not reversible)
 
   // Consent data (minimal data for compliance)
-  consentType String @map("consent_type") // 'age_verification', 'terms', 'privacy_policy'
+  consentType String @map("consent_type") // 'age_verification', 'terms', 'privacy_policy', 'single_point_consent'
   accepted    Boolean
   version     String? // Version of terms/policy accepted (e.g., '1.0')
+  consentData Json?   @map("consent_data") // JSONB field for structured consent data (single point consent)
 
   // Compliance metadata
   acceptedAt   DateTime  @default(now()) @map("accepted_at")

@@ -242,6 +242,7 @@ export default function App() {
       return (
         <TermsScreen 
           onAccept={() => setShowTermsFromAge(false)} 
+          onBack={() => setShowTermsFromAge(false)}
           onPrivacyPolicyPress={handlePrivacyPolicyPress} 
         />
       );
@@ -250,6 +251,7 @@ export default function App() {
       return (
         <PrivacyPolicyScreen 
           onAccept={() => setShowPrivacyFromAge(false)} 
+          onBack={() => setShowPrivacyFromAge(false)}
         />
       );
     }
@@ -710,7 +712,37 @@ export default function App() {
               name="Terms" 
               component={TermsScreen} 
               options={{ 
-                title: 'Terms of Service',
+                title: 'Terms of Use',
+                headerShown: true,
+                headerStyle: {
+                  backgroundColor: '#5B2433', // Dark tone
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
+            <Stack.Screen 
+              name="CookiePolicy" 
+              component={CookiePolicyScreen} 
+              options={{ 
+                title: 'Cookie Policy',
+                headerShown: true,
+                headerStyle: {
+                  backgroundColor: '#5B2433', // Dark tone
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
+            <Stack.Screen 
+              name="ThirdPartyLicenses" 
+              component={ThirdPartyLicensesScreen} 
+              options={{ 
+                title: 'Third-Party Licenses',
                 headerShown: true,
                 headerStyle: {
                   backgroundColor: '#5B2433', // Dark tone

@@ -207,11 +207,23 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
     }
   };
 
+  const removeButtonPressed = useRef(false);
+  
   const handleRemovePress = (e: any) => {
     if (e) {
       e.stopPropagation();
       e.preventDefault?.();
     }
+    // Prevent multiple rapid clicks
+    if (removeButtonPressed.current) {
+      console.log('Remove button already processing, ignoring click');
+      return;
+    }
+    removeButtonPressed.current = true;
+    setTimeout(() => {
+      removeButtonPressed.current = false;
+    }, 1000);
+    
     if (onRemoveFromFavorites) {
       console.log('Remove button pressed for wine:', wine.wineName);
       onRemoveFromFavorites(wine);

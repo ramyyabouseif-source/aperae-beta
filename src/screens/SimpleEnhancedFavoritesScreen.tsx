@@ -108,9 +108,20 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
 
   const handleRemoveFavorite = async (wine: MyCellarWine) => {
     try {
+      console.log('Removing wine from My Cellar:', wine.wineName);
       await FavoritesService.removeFromFavorites(wine);
-      setFavorites(prev => prev.filter(fav => fav.id !== wine.id));
+      // Update state immediately for UI feedback
+      setFavorites(prev => prev.filter(fav => {
+        if (fav.id && wine.id) {
+          return fav.id !== wine.id;
+        }
+        // Fallback to matching by name/producer/vintage if no IDs
+        return !(fav.wineName === wine.wineName && 
+                fav.producer === wine.producer && 
+                fav.vintage === wine.vintage);
+      }));
       await loadStats();
+      console.log('Wine removed successfully from state');
     } catch (error) {
       console.error('Error removing wine:', error);
       Alert.alert('Error', 'Failed to remove wine from My Cellar');

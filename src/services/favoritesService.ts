@@ -677,7 +677,7 @@ export class FavoritesService {
         });
       }
       
-      await this.saveToStorage(updatedWines);
+      await this.saveToStorage(updatedWines); // This already invalidates and rebuilds cache
       console.log('Wine removed from My Cellar successfully');
     } catch (error) {
       console.error('Error removing wine from My Cellar:', error);

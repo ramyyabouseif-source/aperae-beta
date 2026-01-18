@@ -78,6 +78,8 @@ export default function AgeVerificationScreen({
       
       // Always call onVerified() after local storage succeeds
       onVerified();
+      // Reset verifying state after navigation is triggered
+      setIsVerifying(false);
     } catch (error) {
       console.error('Error storing verification/acceptance:', error);
       Alert.alert('Error', 'Failed to save verification. Please try again.');

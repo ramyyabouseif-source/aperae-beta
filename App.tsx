@@ -128,6 +128,12 @@ export default function App() {
     setHasAcceptedPrivacyPolicy(true);
     setForceUpdate(prev => prev + 1); // Force immediate re-render
     
+    // For web, use setTimeout to ensure state update propagates before next render
+    // This is needed because React state updates are batched on web
+    if (Platform.OS === 'web') {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
     // Verify storage succeeded (non-blocking, in background)
     Promise.resolve().then(async () => {
       try {

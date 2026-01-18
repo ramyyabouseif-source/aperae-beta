@@ -120,7 +120,7 @@ export default function App() {
     }
   };
 
-  const handleAgeVerified = useCallback(async () => {
+  const handleAgeVerified = useCallback(() => {
     // Set state immediately to trigger re-render - this is the key fix for mobile web
     // Age verification screen now also accepts Terms and Privacy Policy, so set all three
     setIsAgeVerified(true);
@@ -128,15 +128,12 @@ export default function App() {
     setHasAcceptedPrivacyPolicy(true);
     setForceUpdate(prev => prev + 1); // Force immediate re-render
     
-    // For web, use setTimeout to ensure state update propagates before next render
-    // This is needed because React state updates are batched on web
-    if (Platform.OS === 'web') {
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
-    // Verify storage succeeded (non-blocking, in background)
-    Promise.resolve().then(async () => {
+    // Verify storage succeeded asynchronously (non-blocking, in background)
+    // Don't await this - let it run in background while navigation happens
+    (async () => {
       try {
+        // Small delay to ensure storage is complete
+        await new Promise(resolve => setTimeout(resolve, 500));
         const verified = await AgeVerificationService.isAgeVerified();
         const termsAccepted = await TermsService.hasAcceptedTerms();
         const privacyAccepted = await PrivacyPolicyService.hasAcceptedPrivacyPolicy();
@@ -149,7 +146,7 @@ export default function App() {
       } catch (error) {
         console.error('Error verifying verification/acceptance state:', error);
       }
-    });
+    })();
   }, []);
 
   const handleAcceptTerms = useCallback(async () => {

@@ -8,6 +8,7 @@ import {
   Animated,
   ImageBackground,
   ScrollView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -129,14 +130,22 @@ const SimpleEnhancedFavoritesScreen: React.FC = () => {
   };
 
   const confirmRemoveFavorite = (wine: MyCellarWine) => {
-    Alert.alert(
-      'Remove from My Cellar',
-      `Are you sure you want to remove ${wine.wineName} from your cellar?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Remove', style: 'destructive', onPress: () => handleRemoveFavorite(wine) },
-      ]
-    );
+    // Use window.confirm for web, Alert.alert for native
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(`Are you sure you want to remove ${wine.wineName} from your cellar?`);
+      if (confirmed) {
+        handleRemoveFavorite(wine);
+      }
+    } else {
+      Alert.alert(
+        'Remove from My Cellar',
+        `Are you sure you want to remove ${wine.wineName} from your cellar?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Remove', style: 'destructive', onPress: () => handleRemoveFavorite(wine) },
+        ]
+      );
+    }
   };
 
   const handleWinePress = useCallback((wine: MyCellarWine) => {

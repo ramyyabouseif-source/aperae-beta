@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LEGAL_CONFIG } from '../config/legal';
@@ -13,7 +13,7 @@ interface TermsScreenProps {
 }
 
 // Inner component that doesn't use navigation hook
-function TermsScreenContent({ onAccept, onBack, onPrivacyPolicyPress, onCookiePolicyPress, navigation }: TermsScreenProps) {
+function TermsScreenContent({ onAccept, onBack, onPrivacyPolicyPress: _onPrivacyPolicyPress, onCookiePolicyPress, navigation }: TermsScreenProps) {
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -47,15 +47,6 @@ function TermsScreenContent({ onAccept, onBack, onPrivacyPolicyPress, onCookiePo
     // If neither onAccept nor navigation available, just do nothing
   };
 
-  const handlePrivacyPolicyPress = () => {
-    if (onPrivacyPolicyPress) {
-      onPrivacyPolicyPress();
-    } else if (navigation) {
-      // If no callback but navigation is available, navigate to Privacy Policy
-      // @ts-ignore - navigation type issue
-      navigation.navigate('PrivacyPolicy');
-    }
-  };
 
   const handleCookiePolicyPress = () => {
     if (onCookiePolicyPress) {
@@ -78,34 +69,30 @@ function TermsScreenContent({ onAccept, onBack, onPrivacyPolicyPress, onCookiePo
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        {/* Back button when shown from AgeVerificationScreen */}
-        {onBack && (
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={handleBack}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-        )}
-        <Image 
-          source={require('../../assets/images/Aperae Logo.jpg')} 
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <Text style={styles.title}>Terms of Use</Text>
-        <Text style={styles.subtitle}>Please read and accept to continue</Text>
-      </View>
+      {/* Back button when shown from AgeVerificationScreen - positioned absolutely */}
+      {onBack && (
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={handleBack}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={24} color="#5B2433" />
+        </TouchableOpacity>
+      )}
 
       <ScrollView 
         ref={scrollViewRef}
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         onScroll={handleScroll}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={true}
       >
         <View style={styles.content}>
+          <Text style={styles.title}>Terms of Use</Text>
+          <Text style={styles.subtitle}>
+            Please read and accept to continue
+          </Text>
           <Text style={styles.sectionTitle}>Aperae Terms of Use</Text>
           <Text style={styles.effectiveDate}>Effective Date: {LEGAL_CONFIG.termsEffectiveDate}</Text>
           <Text style={styles.effectiveDate}>Version: 1.0</Text>
@@ -954,37 +941,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F7F4F0', // Light tone background
   },
-  header: {
-    backgroundColor: '#5B2433', // Dark tone background
-    padding: 20,
-    paddingTop: 60, // Push header down to prevent cutoff
-    alignItems: 'center',
-    position: 'relative',
-  },
   backButton: {
     position: 'absolute',
-    top: 60,
+    top: 20,
     left: 20,
-    zIndex: 1,
+    zIndex: 10,
     padding: 8,
-  },
-  logo: {
-    width: 120,
-    height: 40,
-    marginBottom: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#5B2433',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#fff',
+    color: '#666666',
+    marginBottom: 24,
+    lineHeight: 22,
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   content: {
     padding: 20,

@@ -199,11 +199,22 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
   }, [wine, cellarWine.status, cellarWine.wineRating, cellarWine.pairingRating, cellarWine.wineNotes, cellarWine.pairingNotes, cellarWine.tags]);
 
   const handleFavoritePress = (e: any) => {
-    e.stopPropagation();
+    e?.stopPropagation();
     if (isFavorite && onRemoveFromFavorites) {
       onRemoveFromFavorites(wine);
     } else if (!isFavorite && onAddToFavorites) {
       onAddToFavorites(wine);
+    }
+  };
+
+  const handleRemovePress = (e: any) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault?.();
+    }
+    if (onRemoveFromFavorites) {
+      console.log('Remove button pressed for wine:', wine.wineName);
+      onRemoveFromFavorites(wine);
     }
   };
 
@@ -572,7 +583,8 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
         {showRemoveButton && onRemoveFromFavorites && (
           <TouchableOpacity
             style={styles.removeButton}
-            onPress={() => onRemoveFromFavorites(wine)}
+            onPress={handleRemovePress}
+            activeOpacity={0.7}
           >
             <Ionicons name="trash-outline" size={20} color="#f44336" />
             <Text style={styles.removeText}>Remove</Text>
@@ -786,6 +798,7 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="interactive"
               showsVerticalScrollIndicator={true}
+              nestedScrollEnabled={true}
             >
               {renderBackContent()}
             </ScrollView>

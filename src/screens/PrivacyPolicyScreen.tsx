@@ -72,36 +72,31 @@ function PrivacyPolicyContent({ onAccept, onBack, onCookiePolicyPress, navigatio
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        {/* Back button when shown from AgeVerificationScreen */}
-        {onBack && (
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={handleBack}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-        )}
-        <Image 
-          source={require('../../assets/images/Aperae Logo.jpg')} 
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <Text style={styles.title}>Privacy Notice</Text>
-        <Text style={styles.subtitle}>Please read and accept to continue</Text>
-      </View>
+      {/* Back button when shown from AgeVerificationScreen - positioned absolutely */}
+      {onBack && (
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={handleBack}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={24} color="#5B2433" />
+        </TouchableOpacity>
+      )}
 
       <ScrollView 
         ref={scrollViewRef}
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         onScroll={handleScroll}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={true}
       >
         <View style={styles.content}>
+          <Text style={styles.title}>Privacy Notice</Text>
+          <Text style={styles.subtitle}>
+            For Personal, Non-Commercial Use
+          </Text>
           <Text style={styles.sectionTitle}>Aperae Privacy Notice</Text>
-          <Text style={styles.subtitle2}>For Personal, Non-Commercial Use</Text>
           <Text style={styles.effectiveDate}>Last Updated: {LEGAL_CONFIG.privacyLastUpdated}</Text>
           <Text style={styles.effectiveDate}>Version: {LEGAL_CONFIG.privacyVersion}</Text>
           <Text style={styles.effectiveDate}>Effective Date: {LEGAL_CONFIG.privacyLastUpdated}</Text>
@@ -778,47 +773,35 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F7F4F0', // Light tone background
   },
-  header: {
-    backgroundColor: '#5B2433', // Dark tone background
-    padding: 20,
-    paddingTop: 60, // Push header down to prevent cutoff
-    alignItems: 'center',
-    position: 'relative',
-  },
   backButton: {
     position: 'absolute',
-    top: 60,
+    top: 20,
     left: 20,
-    zIndex: 1,
+    zIndex: 10,
     padding: 8,
-  },
-  logo: {
-    width: 120,
-    height: 40,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#fff',
-  },
-  subtitle2: {
-    fontSize: 16,
-    color: '#5B2433', // Dark tone text
-    fontStyle: 'italic',
-    marginBottom: 10,
-    textAlign: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
   },
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   content: {
     padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#5B2433',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 24,
+    lineHeight: 22,
   },
   sectionTitle: {
     fontSize: 20,

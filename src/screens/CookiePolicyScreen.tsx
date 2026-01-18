@@ -27,22 +27,18 @@ function CookiePolicyContent({ navigation }: CookiePolicyScreenProps) {
   
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Image 
-          source={require('../../assets/images/Aperae Logo.jpg')} 
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <Text style={styles.title}>Cookie Policy</Text>
-        <Text style={styles.subtitle}>Information about our use of cookies</Text>
-      </View>
 
       <ScrollView 
         ref={scrollViewRef}
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
       >
         <View style={styles.content}>
+          <Text style={styles.title}>Cookie Policy</Text>
+          <Text style={styles.subtitle}>
+            Information about our use of cookies
+          </Text>
           <Text style={styles.sectionTitle}>Aperae Cookie Policy</Text>
           <Text style={styles.effectiveDate}>Last Updated: {LEGAL_CONFIG.cookiePolicyLastUpdated || LEGAL_CONFIG.privacyLastUpdated}</Text>
           <Text style={styles.effectiveDate}>Effective Date: {LEGAL_CONFIG.cookiePolicyEffectiveDate || LEGAL_CONFIG.privacyLastUpdated}</Text>
@@ -363,29 +359,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F7F4F0', // Light tone background
   },
-  header: {
-    backgroundColor: '#5B2433', // Dark tone background
-    padding: 20,
-    paddingTop: 60, // Push header down to prevent cutoff
-    alignItems: 'center',
-  },
-  logo: {
-    width: 120,
-    height: 40,
-    marginBottom: 16,
-  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#5B2433',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#fff',
+    color: '#666666',
+    marginBottom: 24,
+    lineHeight: 22,
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   content: {
     padding: 20,

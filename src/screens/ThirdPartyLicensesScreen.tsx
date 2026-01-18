@@ -17,6 +17,7 @@ export default function ThirdPartyLicensesScreen() {
     <View style={styles.container}>
       <ScrollView 
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
       >
         <View style={styles.content}>
@@ -93,6 +94,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   content: {
     padding: 20,

@@ -22,6 +22,7 @@ import CookiePolicyScreen from './src/screens/CookiePolicyScreen';
 import PrivacySettingsScreen from './src/screens/PrivacySettingsScreen';
 import AboutScreen from './src/screens/AboutScreen';
 import GeoBlockedScreen from './src/screens/GeoBlockedScreen';
+import ThirdPartyLicensesScreen from './src/screens/ThirdPartyLicensesScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

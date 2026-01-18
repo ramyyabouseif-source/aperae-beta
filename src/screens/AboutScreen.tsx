@@ -28,9 +28,13 @@ export default function AboutScreen() {
   };
 
   const handleViewLicenses = () => {
-    // Note: Licenses screen would need to be created if not exists
-    // For now, we'll just show an alert
-    alert('Third-party licenses are available in the app documentation. See THIRD_PARTY_LICENSES.md');
+    // @ts-ignore - navigation type issue
+    navigation.navigate('ThirdPartyLicenses');
+  };
+
+  const handleViewCookiePolicy = () => {
+    // @ts-ignore - navigation type issue
+    navigation.navigate('CookiePolicy');
   };
 
   return (

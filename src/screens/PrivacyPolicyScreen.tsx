@@ -61,6 +61,15 @@ function PrivacyPolicyContent({ onAccept, onBack, onCookiePolicyPress, navigatio
     }
   };
 
+  const handleCookiePolicyPress = () => {
+    if (onCookiePolicyPress) {
+      onCookiePolicyPress();
+    } else if (navigation) {
+      // @ts-ignore - navigation type issue
+      navigation.navigate('CookiePolicy');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>

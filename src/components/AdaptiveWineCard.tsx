@@ -15,6 +15,7 @@ interface AdaptiveWineCardProps {
   onPress?: (wine: WineRecommendation) => void;
   index?: number;
   onWineUpdated?: () => void; // Callback when wine data is updated
+  showRemoveButton?: boolean; // Show remove button for My Cellar
 }
 
 const AdaptiveWineCard: React.FC<AdaptiveWineCardProps> = (props) => {
@@ -23,7 +24,7 @@ const AdaptiveWineCard: React.FC<AdaptiveWineCardProps> = (props) => {
 
   // V2 Enhanced Cards (with new fields and flip effect)
   if (isV2 && isEnhanced) {
-    return <FlipWineCard {...props} index={props.index} onWineUpdated={props.onWineUpdated} />;
+    return <FlipWineCard {...props} index={props.index} onWineUpdated={props.onWineUpdated} showRemoveButton={props.showRemoveButton} />;
   }
 
   // V2 Original Cards (with new fields)

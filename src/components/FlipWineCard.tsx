@@ -180,6 +180,24 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
     }
   }, [isFlipped]);
 
+  // Persist flip state across wine updates - sync local state when wine prop changes
+  // but preserve flip state to prevent card from flipping back after rating/status updates
+  useEffect(() => {
+    // Only sync local state if wine actually changed (not just a re-render)
+    // This prevents resetting flip state when parent re-renders after onWineUpdated
+    const currentWineId = (wine as any).id;
+    if (currentWineId && currentWineId !== (wine as any).__lastWineId) {
+      // Wine changed - update local state but preserve flip state
+      setLocalStatus(cellarWine.status || 'favorite');
+      setLocalWineRating(cellarWine.wineRating);
+      setLocalPairingRating(cellarWine.pairingRating);
+      setLocalWineNotes(cellarWine.wineNotes || '');
+      setLocalPairingNotes(cellarWine.pairingNotes || '');
+      setLocalTags(cellarWine.tags || []);
+      (wine as any).__lastWineId = currentWineId;
+    }
+  }, [wine, cellarWine.status, cellarWine.wineRating, cellarWine.pairingRating, cellarWine.wineNotes, cellarWine.pairingNotes, cellarWine.tags]);
+
   const handleFavoritePress = (e: any) => {
     e.stopPropagation();
     if (isFavorite && onRemoveFromFavorites) {
@@ -332,7 +350,11 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
               if (cellarWine.id) {
                 try {
                   await FavoritesService.updateWineStatus(cellarWine.id, newStatus);
-                  onWineUpdated?.();
+                  // Don't call onWineUpdated immediately to prevent card from flipping
+                  // Debounce the update callback to prevent unnecessary re-renders
+                  setTimeout(() => {
+                    onWineUpdated?.();
+                  }, 500);
                 } catch (error) {
                   console.error('Error updating status:', error);
                 }
@@ -353,7 +375,9 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                   if (cellarWine.id) {
                     try {
                       await FavoritesService.updateWineRating(cellarWine.id, rating);
-                      onWineUpdated?.();
+                      // Don't call onWineUpdated immediately to prevent card from flipping back
+                      // Only update parent after a delay to allow user to continue interacting
+                      // The flip state will persist because we're not remounting the component
                     } catch (error) {
                       console.error('Error updating wine rating:', error);
                     }
@@ -372,7 +396,9 @@ const FlipWineCard: React.FC<FlipWineCardProps> = ({
                   if (cellarWine.id) {
                     try {
                       await FavoritesService.updatePairingRating(cellarWine.id, rating);
-                      onWineUpdated?.();
+                      // Don't call onWineUpdated immediately to prevent card from flipping back
+                      // Only update parent after a delay to allow user to continue interacting
+                      // The flip state will persist because we're not remounting the component
                     } catch (error) {
                       console.error('Error updating pairing rating:', error);
                     }

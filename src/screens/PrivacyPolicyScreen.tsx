@@ -86,7 +86,6 @@ function PrivacyPolicyContent({ onAccept, onBack, onCookiePolicyPress, navigatio
       <ScrollView 
         ref={scrollViewRef}
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
         onScroll={handleScroll}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={true}
@@ -785,11 +784,9 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  scrollContent: {
-    paddingBottom: 40,
-  },
   content: {
     padding: 20,
+    paddingBottom: 40,
   },
   title: {
     fontSize: 24,

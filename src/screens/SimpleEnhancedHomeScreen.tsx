@@ -155,7 +155,14 @@ export default function SimpleEnhancedHomeScreen() {
       setProgress(0.3);
       setLoadingMessage('Finding perfect wine pairings...');
 
-      const preferences = await PreferencesService.getPreferences();
+      let preferences = null;
+      try {
+        preferences = await PreferencesService.getPreferences();
+      } catch (prefError) {
+        console.warn('Failed to load preferences, continuing without them:', prefError);
+        preferences = null;
+      }
+      
       const response = await WineService.getWineRecommendations(dish, preferences || undefined);
       
       // Initialize image service with total count and reset for new recommendations

@@ -5,6 +5,7 @@ import { getApiBaseUrl } from '../utils/api';
 // import { CacheService } from './cacheService';
 import { NETWORK_CONFIG } from '../utils/api';
 import SecureHttpClient from './secureHttpClient';
+import { rateLimiter } from '../utils/rateLimiter';
 
 /**
  * WineService - Core service for wine recommendation functionality

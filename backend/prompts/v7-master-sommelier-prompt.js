@@ -60,6 +60,11 @@ function getOptimizedJSONSchema() {
   return `{
   "dish": "exact dish name",
   "dishAnalysis": {
+    "cookingMethod": "method (brief description)",
+    "cookingMethodImpact": "how affects wine (150-250 characters)",
+    "sauce": "cream/butter/tomato/soy/vinegar/oil/reduction/mustard/none",
+    "sauceCharacteristic": "fat/acid/umami/sweet/spice (brief)",
+    "saucePriority": "why sauce determines wine (150-250 characters)",
     "dominantWeight": "light/medium/medium-heavy/heavy",
     "fatContent": "none/low/medium/medium-high/high",
     "primaryProtein": "type + texture",
@@ -67,14 +72,15 @@ function getOptimizedJSONSchema() {
     "spiceLevel": "none/mild/moderate/hot",
     "acidityLevel": "low/medium/medium-high/high",
     "applicablePrinciples": ["list from Section 2"],
-    "keyChallenge": "critical constraint (2-3 sentences)",
+    "keyChallenge": "critical constraint (150-250 characters)",
     "idealProfile": {
       "acidity": "low/medium/medium-high/high",
       "acidType": "malic/tartaric/balanced",
       "tannin": "none/low/low-medium/medium/medium-high/high",
       "body": "light/light-medium/medium/medium-full/full",
       "sweetness": "dry/off-dry/sweet",
-      "notes": "traits, compounds if applicable (2-3 sentences)"
+      "maxABV": "13.5% (only if capsaicin, else omit)",
+      "notes": "traits, compounds if applicable (150-250 characters)"
     }
   },
   "recommendations": [
@@ -85,8 +91,8 @@ function getOptimizedJSONSchema() {
       "region": "specific OR 'unknown'",
       "vintage": "YYYY / YYYY-YYYY (if approved) / NV / unknown",
       "grape": "Variety (Color) OR Variety (Color, Sweetness)",
-      "rationale": "2-3 sentences: strategy, prep/sauce, principles, bridge, acid type if needed",
-      "pairingPrinciplesApplied": ["list"],
+      "rationale": "300-500 characters (acceptable 275-550): sommelier voice per Section 7.C—describe wine-dish interaction using sensory language, explain pairing mechanism naturally without parenthetical principle names, include vintage context in natural phrasing.",
+      "pairingPrinciplesApplied": ["list - backend data, not in rationale text"],
       "tastingNotes": {
         "aromas": ["descriptor 1", "descriptor 2"],
         "palate": "flavors + structure",
@@ -104,16 +110,16 @@ function getOptimizedJSONSchema() {
           "wineKnowledge": 28,
           "complexityHandling": 15
         },
-        "rationale": "scoring summary (2-3 sentences)"
+        "rationale": "scoring summary (150-250 characters): components, deductions, verification per Section 6"
       },
-      "story": "brief context (2-3 sentences)",
+      "story": "brief context (150-250 characters)",
     }
   ],
   "avoid": {
-    "types": ["type 1", "type 2", "type 3"],
-    "reason": "why violates principles (2-3 plain english sentences)"
+    "types": ["Wine category 1", "Wine category 2", "Wine category 3"],
+    "reason": "Natural language explanation (200-350 characters, acceptable 175-375): why these wine types would create problems with this specific dish—describe the sensory clash or imbalance without referencing section numbers. Per Section 7.G examples."
   },
-  "closingNarrative": "brief summary (2-3 sentences)"
+  "closingNarrative": "brief summary (150-250 characters): wrap up the recommendation with an engaging sommelier tone, reinforcing the suitability of the selected wines for the dish."
 }`;
 }
 

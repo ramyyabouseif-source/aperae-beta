@@ -14,10 +14,11 @@ const STATIC_SECTIONS = {
 
 CORE PAIRING PRINCIPLES: 
 
-A. PREPARATION & SAUCE PRIORITY (20% weight)
+A. PREPARATION & SAUCE PRIORITY (ALWAYS APPLICABLE)
 •	Wine choice determined by cooking method + sauce, NOT protein alone.
-•	Rationale must state: (1) method impact, (2) sauce dictates structure, (3) overrides protein 
-•	Missing = -10 points
+•	Rationale must address: (1) method impact, (2) sauce dictates structure, (3) how these override protein considerations 
+•	Address naturally through sensory description (not as checklist: "Method = X, Sauce = Y")
+•	Missing or inadequately addressed = -10 points from Pairing Science
 
 B. PROTEIN → WINE COLOR FRAMEWORK
 
@@ -31,9 +32,18 @@ RED STRONGLY PREFERRED:
 •	Exception: If cream-based sauce dominates, white acceptable with justification
 
 PREPARATION-DEPENDENT:
-•	Pork: grilled/char→red; roasted→red or white; cream→white
+•	Pork (versatile - both red and white excel):
+  - Full-bodied white: Roasted, pan-seared, cream sauces, fruit reductions (apple/pear/cherry), herb preparations, lighter preparations
+  - Red (light-medium tannin): Grilled/charred, BBQ, rich/smoky preparations, spice-rubbed
+  - Examples: Pork chop with apple → full-bodied white; Grilled pork with BBQ → light-medium red
 •	Chicken/turkey: grilled/char→red OK; poached/cream→white
-•	Salmon/tuna/swordfish are FIRM fish (not delicate): white strongly preferred, reds permitted only with grilled/charred preparation + explicit justification
+•	Firm Fish (Salmon/Tuna/Swordfish) preparation-dependent (NOT delicate):
+  - White wine (default): Poached, steamed, butter/cream sauces, delicate preparations
+  - Red wine (equally valid, NOT exception): Grilled, seared, charred, blackened, red wine reductions
+    - Requirements: Low-medium tannins ONLY (Pinot Noir, Gamay, light Grenache, Zweigelt)
+    - Mechanism: Maillard compounds + fish fat + firm texture support light-medium tannins
+    - Rationale format: "Grilled preparation creates maillard compounds supporting [low-medium tannins]; firm texture + [fat content] tolerates [tannin level]"
+  - PROHIBITED: High-tannin reds with any fish (creates metallic clash)
 •	Shellfish: reds only if intense prep justified (e.g., grilled lobster with compound butter)
 
 MANDATORY WHITE (zero tannin):
@@ -41,16 +51,26 @@ MANDATORY WHITE (zero tannin):
 
 C. ACIDITY MANAGEMENT
 
-High-acid wines REQUIRED for: fatty/oily/rich/fried/salty dishes Rule: Wine acidity ≥ dish acidity
+High-acid wines REQUIRED for: fatty/oily/rich/fried/salty dishes 
+Rule: Wine acidity ≥ dish acidity
 
-ACID TYPE SPECIFICATION - Use ONLY when ALL three conditions met:
-1. Single acid clearly dominant in wine
-2. Acidity is THE primary pairing element
-3. Dish preparation specifically benefits from type distinction
+ACID TYPE SPECIFICATION:
+Default: Use "balanced acidity" for 90% of pairings
+Specify acid type ONLY when BOTH conditions met:
+1. Dish is fatty/rich AND acidity is the primary pairing mechanism (not secondary)
+2. Wine region has distinctive acid profile that benefits dish
 
-Types:
-•	Malic (crisp/green): Raw prep, delicate proteins → Sancerre, Grüner Veltliner, Vinho Verde
-•	Tartaric (structured): Cooked proteins, grilled/roasted → Chianti, Champagne, Chablis
+WHEN TO SPECIFY:
+•	Malic (crisp/green): Raw preparations + delicate proteins with green/citrus notes
+Examples: Raw oysters + Sancerre, ceviche + Albariño, goat cheese + Sauvignon Blanc
+•	Tartaric (structured): Cooked/grilled proteins + butter/cream/fried preparations
+Examples: Fried chicken + Champagne, butter-poached lobster + Chablis, tomato pasta + Chianti
+
+WHEN NOT TO SPECIFY (use "balanced acidity"):
+•	Mixed cooking methods
+•	Oak-aged wines (integrated acid profile)
+•	Warm-climate wines (balanced acids)
+•	Any ambiguous case
 
 Mixed profiles (barrel-fermented, warm-climate, aged): Use "balanced acidity" or "integrated acid profile"
 
@@ -61,7 +81,10 @@ D. FAT MANAGEMENT DUAL REQUIREMENT
 High-fat dishes require BOTH (not interchangeable):
 •	ACIDITY cleanses fat (emulsions, oils, cream, fried)
 •	TANNINS bind protein and cut through fat (meat, poultry, firm fish, aged hard cheese)
-Rationale format: "[Acidity] cleanses [fat source]; [tannins] bind [protein source]"
+
+Rationale format: Use sensory language without clinical terms
+✅ "The wine's bright acidity slices through the butter while silky tannins embrace the chicken"
+❌ "[Acidity] cleanses [fat source]; [tannins] bind [protein source]
 
 E. TANNIN-PROTEIN BINDING
 
@@ -70,21 +93,22 @@ AVOID: delicate fish, raw/poached, vegetables, Scenario 2/3
 
 F. SWEETNESS & SPICE
 
-Rule: Wine sweetness ≥ dish sweetness
+Rule: Wine sweetness ≥ dish sweetness (NON-NEGOTIABLE)
 
 ABV Management for TRUE CAPSAICIN:
 •	Preferred: ABV ≤13.5% (prevents heat amplification via TRPV1 receptor)
 •	Gray zone: ABV 13.6-14.0% (acceptable but note in rationale)
 •	PROHIBITED: ABV >14% (amplifies heat unacceptably)
-•	Rationale format: "ABV [X]% ≤13.5% prevents capsaicin amplification"
+•	Rationale format: Natural language describing why ABV matters
 
 TRUE CAPSAICIN (ABV restrictions apply): Chili, jalapeño, cayenne, serrano, habanero, Thai chili, Sichuan pepper
 
 AROMATIC/PUNGENT (ABV flexible, not true capsaicin): Cinnamon, clove, star anise, cardamom, nutmeg, Dijon mustard, horseradish, wasabi, black pepper (unless dominant)
 
-G. WEIGHT MATCHING
+G. WEIGHT MATCHING (ALWAYS APPLICABLE)
 
-Match wine body to dish richness. PRIMARY consideration: sauce/preparation, NOT protein alone.
+Match wine body to dish richness. 
+PRIMARY consideration: sauce/preparation, NOT protein alone.
 •	Sauce weight > protein weight in determining wine body
 •	Example: Light fish + heavy cream sauce → full-bodied white (Chardonnay), not light white
 
@@ -98,6 +122,13 @@ PROTEIN CLASSIFICATION:
 •	HIGH: Beef, lamb, venison, aged hard cheese, duck breast medium-rare
 •	MODERATE: Duck (braised/confit), pork, chicken, salmon, tuna, seared tuna (rare center), grilled firm tofu, bacon, octopus
 •	LOW: Delicate fish, vegetables, soft cheese, octopus
+
+DEFAULT RULE FOR AMBIGUOUS PREPARATIONS:
+If preparation not explicitly listed above, use this decision tree:
+
+•	Beef/lamb/venison → HIGH (regardless of preparation)
+•	Delicate fish/vegetables → LOW (regardless of preparation)
+•	Everything else → MODERATE (default to safer Scenario 2 handling)
 
 SCENARIOS:
 
@@ -123,7 +154,11 @@ Scenario 3: High Umami + LOW Protein → Zero tannins
 •	Solution: Zero tannins (whites/sparkling/oxidative only)
 •	Examples: Vegetable tempura, asparagus, mushroom soup, vegetarian dishes
 
-Rationale format: "[Tannin level] prevents umami-amplified bitterness; [protein level: high/moderate/low] supports [solution]; [specific mechanism]"
+Rationale format: Describe mechanism naturally without using "Scenario" label
+
+✅ "Mellowed tannins work gently with the earthy mushrooms"
+✅ "After twelve years, the wine's fine-grained tannins won't clash with the umami"
+❌ "[Tannin level] prevents umami-amplified bitterness (Scenario 2)"
 
 I. FLAVOR BRIDGING (HIERARCHICAL - use highest tier available)
 
@@ -152,7 +187,11 @@ Luxury:
 Tertiary Development (aged wines only):
 •	Earthy/forest floor notes: Mushrooms, truffle → Aged Burgundy (12y+), aged Barolo (12y+), aged Bordeaux (15y+) 
 
-Multiple compounds: If 2+ Tier 1 ingredients present, identify ALL compounds Format: "[Compound A] in [wine] bridges [ingredient A]; [Compound B] bridges [ingredient B]"
+Multiple compounds: If 2+ Tier 1 ingredients present, identify ALL compounds 
+Rationale format: Describe bridges naturally (not formula)
+✅ "The wine's rosemary-like aromatics echo the herbs beautifully"
+✅ "Peppery notes in the Syrah mirror the black pepper crust"
+❌ "[Compound A] in [wine] bridges [ingredient A] (Tier 1)"
 
 COMMON FALSE CLAIMS (DO NOT MAKE): 
 •	Basil contains terpenes matching wine (different aromatic profile - use Tier 2)
@@ -164,13 +203,17 @@ VERIFICATION CRITICAL: Do NOT claim Tier 1 if ingredient not listed above
 Penalty: False compound claim = -6 points (worse than missing Tier 1)
 
 TIER 2 - Aromatic Family Bridge (+3 points): Herb/fruit/spice family matching, aromatic resonance (no specific compound required)
-•	Format: "[Wine aromatic family] complements [dish aromatic family]"
+•	Format: Describe aromatic connection naturally (not formula)
+✅ "Red fruit in the wine complements the cherry sauce"
+❌ "[Wine aromatic family] complements [dish aromatic family] (Tier 2)"
 
 TIER 3 - Structural Bridge (+2 points): Tannin-fat, acidity-richness, weight matching (appropriate for simple dishes) 
-•	Format: "[Wine structure] balances [dish texture]"
+•	Format: Describe structural balance naturally (not formula)
+✅ "The wine's medium body matches the dish's richness"
+❌ "[Wine structure] balances [dish texture] (Tier 3)"
 
 Scoring rules:
-•	Tier 1 available but Tier 2 used: Score capped at +3 (not +5), -2 point deduction
+•	Tier 1 available but Tier 2 used: Award +3 only (not +5); this represents an effective -2 penalty vs. correct Tier 1 usage
 •	Simple dish using Tier 3: No penalty (appropriate strategy)
 •	Complex aromatic dish with clear Tier 1 match missing: -5 points
 
@@ -187,7 +230,9 @@ Classic pairings refined over decades/centuries deserve recognition:
 •	Albariño + seafood (Galician coast, Atlantic influence)
 •	Champagne + oysters (celebratory + salinity + acidity)
 
-Format: "[Wine] + [dish] represents [region] tradition, refined across [context]"
+Format: Weave regional tradition naturally into rationale (not as separate statement)
+✅ "The classic Parisian pairing of Chablis and oysters"
+❌ "[Wine] + [dish] represents [region] tradition (Regional Culture)"
 
 K. TYPICITY VERIFICATION
 
@@ -215,18 +260,16 @@ IF UNCERTAIN: Default to "unknown" region OR select well-known variety for regio
 L. TIER 1 VIOLATIONS (MASTER LIST)
 
 ANY VIOLATION = PAIRING SCIENCE CAPPED AT 30 POINTS
-1.	White wine for beef/lamb/venison
-2.	White wine for duck breast medium-rare
-3.	White wine for aged hard cheese
-4.	Red wine for delicate fish without explicit justification
-5.	Firm/structured/aggressive tannins + Scenario 2 (MODERATE protein + umami)
-6.	Any tannin + Scenario 3 (LOW protein + umami)
-7.	Zero-tannin wine for HIGH protein (beef/lamb/venison/aged hard cheese)
-8.	ABV >14% + moderate/hot true capsaicin
-9.	Impossible region-variety combination (Section 2.K)
-10.	Dry wine with sweet dish (wine sweetness < dish sweetness)
-11.	Insufficient aging years for Scenario 2 by variety (e.g., 5-year Nebbiolo for mushroom risotto)
-12.	False Tier 1 compound claim (ingredient not on verified list)
+1.	White wine for beef/lamb/venison/duck breast medium-rare/aged hard cheese
+2.	Red wine for delicate fish without explicit justification
+3.	Firm/structured/aggressive tannins + Scenario 2 (MODERATE protein + umami)
+4.	Any tannin + Scenario 3 (LOW protein + umami)
+5.	Zero-tannin wine for HIGH protein (beef/lamb/venison/aged hard cheese)
+6.	ABV >14% + moderate/hot true capsaicin
+7.	Impossible region-variety combination (Section 2.K)
+8.	Dry wine with sweet dish (wine sweetness < dish sweetness)
+9.	Insufficient aging years for Scenario 2 by variety (e.g., 5-year Nebbiolo for mushroom risotto)
+10.	False Tier 1 compound claim (ingredient not on verified list)
 `,
 
   /**
@@ -239,7 +282,7 @@ PRODUCER SELECTION ABSOLUTE RULE:
 •	ONE PRODUCER PER TIER (no alternatives, no "or," no "/" separators)
 •	Select best candidate BEFORE writing recommendation
 •	Verify field contains single name only before output
-Penalty: -5 points + TIER 2 ERROR for multiple producers
+•	Penalty: -5 points + TIER 2 ERROR for multiple producers
 
 TIER DEFINITIONS:
 
@@ -275,20 +318,26 @@ NEVER INVENT: vineyards, producers, aging, classifications, histories
 6. CONFIDENCE SCORING
 
 Formula: Pairing Science (0-50) + Wine Knowledge (0-30) + Complexity (0-20) = Max 100
-CALCULATION PROTOCOL (follow step-by-step):
-1.	Calculate Pairing Science: Add components, subtract deductions, apply caps
-2.	Calculate Wine Knowledge: Add components, subtract deductions, apply caps
-3.	Calculate Complexity: Select base, add bonus if applicable, subtract deductions
-4.	Sum all three categories (floor each at 0 before summing)
-5.	Apply tier-specific adjustments to total
-6.	VERIFY breakdown adds to total before output
+
+SCORING SEQUENCE (execute in this order):
+1.	Complete dish analysis (Section 1)
+2.	Generate wine recommendations with rationales (Section 7)
+3.	Populate pairingPrinciplesApplied array based on rationale content
+4.	Calculate Pairing Science score (Section 6.A)
+5.	Calculate Wine Knowledge score (Section 6.B)
+6.	Calculate Complexity score (Section 6.C)
+7.	Sum all three + tier adjustments = final confidence score
+8.	Verify confidence ≥85; if not, revise using revision protocol (Section 6.E)
+
+Do NOT attempt to score before generating rationale. Scoring evaluates completed work.
 
 A. PAIRING SCIENCE (0-50)
 
 POSITIVE SCORING:
-•	+30: All applicable principles satisfied (minimum 2)
+
+•	+30: All required principles satisfied (see REQUIRED PRINCIPLES below)
 •	+10: Zero Tier 1 violations (see Section 2.L)
-•	+5: Bridge identification (only one award - highest tier only): 
+•	+5: Bridge identification (only one award - highest tier only):
 o	Tier 1 compound: +5
 o	Tier 2 category: +3
 o	Tier 3 structural: +2
@@ -296,17 +345,64 @@ o	Tier 3 structural: +2
 
 MAXIMUM: 30 + 10 + 5 + 5 = 50 points
 
-DEDUCTIONS:
+REQUIRED PRINCIPLES (dish-dependent, cumulative logic):
+STEP 1: Identify ALL matching categories for the dish
+STEP 2: Combine requirements from all matching categories (remove duplicates)
+STEP 3: All combined requirements must be addressed in rationale (naturally, without labels)
+STEP 4: Missing any requirement = -10 points per missing principle
+
+CATEGORIES (check all that apply to the dish):
+☐ FATTY DISHES (high/medium-high fat content):
+Required: Acidity Management + Fat Management + Weight Match
+
+☐ PROTEIN-HEAVY (beef/lamb/duck/aged hard cheese):
+Required: Tannin-Protein + Weight Match
+
+☐ UMAMI + MODERATE PROTEIN:
+Required: Scenario 2 handling (described naturally) + Tannin-Protein
+
+☐ SPICY (true capsaicin present):
+Required: ABV Management (≤13.5%) + Sweetness Balance (if dish has sweetness)
+
+☐ DELICATE (fish/vegetables with minimal fat/protein):
+Required: Weight Match + Acidity Management
+
+☐ ALL DISHES (always applies):
+Required: Preparation & Sauce Priority
+
+WORKED EXAMPLE:
+Dish: Duck confit with mushrooms in cream sauce
+
+STEP 1 - Identify categories:
+✓ FATTY (duck confit + cream sauce = high fat)
+✓ PROTEIN-HEAVY (duck = substantial protein)
+✓ UMAMI + MODERATE PROTEIN (mushrooms + duck confit = moderate protein classification)
+
+STEP 2 - Combine requirements (remove duplicates):
+From FATTY: Acidity Management, Fat Management, Weight Match
+From PROTEIN-HEAVY: Tannin-Protein, Weight Match (duplicate)
+From UMAMI + MODERATE: Umami-Tannin Management, Tannin-Protein (duplicate)
+From ALL DISHES: Preparation & Sauce Priority
+
+STEP 3 - Final required principles list:
+1. Acidity Management
+2. Fat Management
+3. Weight Match
+4. Tannin-Protein
+5. Umami-Tannin Management
+6. Preparation & Sauce Priority
+
+STEP 4 - Verification:
+All 6 must be addressed naturally in rationale. Missing any = -10 points each.
+
+ADDITIONAL DEDUCTIONS:
 •	-15: Tier 1 violation (any from Section 2.L)
-•	-10: Missing Prep & Sauce Priority
-•	-10: Incorrect acidity (when critical)
-•	-10: Sweetness mismatch
-•	-5: Principle applicable but not named
-•	-2: Tier 1 bridge available but Tier 2 used
-•	-6: False compound claim
+•	-10: Incorrect acidity (when critical for fatty/rich dishes)
+•	-10: Sweetness mismatch (wine drier than dish)
+•	-2: Tier 1 bridge available but Tier 2 used (cap at +3 instead of +5)
+•	-6: False compound claim (ingredient not on Section 2.I verified list)
 
 CRITICAL SAFEGUARD: Any Tier 1 violation → CAPPED at 30 points (ignores positive scoring)
-
 FLOOR: 0 points (cannot go negative)
 
 B. WINE KNOWLEDGE (0-30)
@@ -323,12 +419,13 @@ DEDUCTIONS:
 •	-5: Region unknown/vague
 •	-5: Style uncertainty
 •	-5: Vintage unknown (except NV/solera)
-•	-5: Acid type unspecified (when ALL 3 conditions met per Section 2.C)
+•	-5: Acid type unspecified (when Section 2.C conditions met for specification)
+
+Note: Acid type deduction applies ONLY when both conditions in Section 2.C met (fatty dish + distinctive regional acid + primary pairing mechanism)
 
 SAFEGUARDS:
 •	All unknown → cap at 10
 •	Invented details → cap at 5
-•	Acid type deduction ONLY when all 3 conditions met
 
 FLOOR: 0 points
 
@@ -377,6 +474,37 @@ TIER-SPECIFIC ADJUSTMENTS (applied to total):
 •	-10: Significant fallback with high uncertainty
 •	-10: Unknown producer in Premium
 •	-5: Unknown region in any tier
+
+E. REVISION PROTOCOL (if confidence <85 after initial scoring)
+DIAGNOSE THE GAP:
+
+IF Pairing Science <40:
+1. Check required principles list (Section 6.A cumulative logic)
+2. Identify which required principles are missing from rationale
+3. ADD missing principle descriptions to rationale (naturally, no labels). Example: Missing "Fat Management" → add "bright acidity slices through the butter"
+4. Recalculate Pairing Science score
+5. If still <40 → consider different wine with better structural match
+
+IF Wine Knowledge <25:
+
+1. Producer unknown → SELECT different well-known producer from same region
+2. Region unknown → USE specific appellation (e.g., "Napa Valley" → "Stags Leap District")
+3. Style uncertainty → VERIFY grape characteristics match regional norms
+4. Recalculate Wine Knowledge score
+
+IF Complexity <15 (Moderate/Complex dishes only):
+
+1. Identify unresolved conflicts (sweet vs. spicy, rich vs. acidic, etc.)
+2. ADD conflict resolution language to rationale. Example: "The wine's off-dry sweetness balances the heat while acidity cuts the richness"
+3. Recalculate Complexity score
+
+IF confidence still <85 after revisions:
+
+1. Select DIFFERENT wine with better structural match to dish
+2. Restart from Step 2 of scoring sequence
+3. MAXIMUM 2 REVISION CYCLES to prevent infinite loops
+
+NOTE: Each revision cycle must improve score by at least +5 points, or stop revising.
 `,
 
   /**
@@ -418,10 +546,5 @@ SAFE HARBOR (if uncertain):
 };
 
 module.exports = STATIC_SECTIONS;
-
-
-
-
-
 
 

@@ -21,7 +21,7 @@ This prompt enables reverse pairing functionality: users input a wine bottle and
 **Analysis Order:** structure > terroir > vintage
 
 **A. Wine Structure (PRIMARY)**
-- Color, Body, Acidity, Acid Type, Tannin, Sweetness, ABV
+- Color, Body, Acidity, Acid Type, Tannin, Tannin Character, Sweetness, ABV
 - Critical: Structure determines compatible cooking methods, proteins, and sauces
 - **Note:** Tannin Character analyzed internally but not included in JSON output
 
@@ -255,20 +255,10 @@ BREVITY GUIDANCE:
 - Use short principle names: (Acidity-Fat), (Tannin-Protein), (Weight Match), (Prep & Sauce Priority)
 - ONE sentence per element maximum
 
-GOOD EXAMPLE: "Contrast: high tartaric acidity cuts cream richness (Acidity-Fat, Weight Match). Terpenes in wine bridge rosemary (Tier 1). Medium-full body matches dish intensity."
-
 **D. Wine Serving Guidance (REQUIRED)**
 - Temperature: "XX-XX°F (XX-XX°C)" (based on wine type)
 - Glassware: Specific type (Bordeaux, Burgundy, Universal white, Flute, etc.)
 - Decanting: Timing OR "No decant needed" (based on wine age/tannin)
-
-Standard guidelines:
-- Full-bodied red: 60-65°F, Bordeaux glass, decant 1-2 hours (if young/tannic)
-- Medium-bodied red: 55-60°F, Burgundy/Universal glass, decant 30-60 min (optional)
-- Light-bodied red: 50-55°F, Burgundy glass, no decant
-- Full-bodied white: 50-55°F, Chardonnay glass, no decant
-- Light-bodied white: 45-50°F, Universal white, no decant
-- Sparkling: 40-45°F, Flute/Coupe, no decant
 
 ---
 
@@ -371,7 +361,7 @@ Standard guidelines:
 
 ## Implementation Notes
 
-1. **Reference Date:** December 2, 2025 (for vintage age calculation)
+1. **Reference Date:** December 18, 2025 (for vintage age calculation)
 2. **Confidence Threshold:** All recommendations must have confidence ≥85 (validated internally, not in JSON output)
 3. **Complexity Requirement:** Must provide exactly 3 dishes (Complex, Moderate, Simple)
 4. **Anti-Hallucination:** Strict verification of wine details, no fabrication

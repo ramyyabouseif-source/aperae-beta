@@ -24,7 +24,6 @@ import FlipDishCard from '../components/FlipDishCard';
 import WineAnalysisCard from '../components/WineAnalysisCard';
 import PairingModeToggle, { PairingMode } from '../components/PairingModeToggle';
 import SimpleEnhancedButton from '../components/SimpleEnhancedButton';
-import MockModeToggle from '../components/MockModeToggle';
 import ResponsibleDrinkingDisclaimer from '../components/ResponsibleDrinkingDisclaimer';
 import AllergyFoodSafetyWarning from '../components/AllergyFoodSafetyWarning';
 import DishAnalysisCard from '../components/DishAnalysisCard';
@@ -514,9 +513,6 @@ export default function SimpleEnhancedHomeScreen() {
             <View style={styles.heroAccent} />
           </View>
         </View>
-
-        {/* Mock Mode Toggle */}
-        <MockModeToggle />
 
         {/* Input Section with Integrated Pairing Mode Toggle - Conditionally render based on mode */}
         {pairingMode === 'dish-to-wine' ? (

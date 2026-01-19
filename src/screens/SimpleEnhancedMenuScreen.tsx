@@ -20,7 +20,6 @@ import { WinePreferences } from '../types/wine';
 import { WineService } from '../services/wineService';
 import MenuCamera from '../components/MenuCamera';
 import MenuResults from '../components/MenuResults';
-import MockModeToggle from '../components/MockModeToggle';
 
 
 const SimpleEnhancedMenuScreen: React.FC = () => {
@@ -40,12 +39,10 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
     overallAvailable: false,
   });
   const [winePreferences, setWinePreferences] = useState<WinePreferences | null>(null);
-  const [isMockMode, setIsMockMode] = useState(WineService.isMockModeEnabled());
 
   React.useEffect(() => {
     checkServiceStatus();
     loadWinePreferences();
-    setIsMockMode(WineService.isMockModeEnabled());
   }, []);
 
   const checkServiceStatus = async () => {
@@ -181,23 +178,20 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
       return;
     }
     
-    // Photo is optional in mock mode (using state variable)
-    
-    if (!isMockMode && !capturedPhoto) {
+    // Photo is required for live mode
+    if (!capturedPhoto) {
       Alert.alert('Missing Photo', 'Please take or upload a photo of the wine list first.');
       return;
     }
     
     console.log('Starting wine list analysis...');
-    console.log('Mock mode:', isMockMode);
     setIsAnalyzing(true);
     setShowResults(true); // Show results area immediately for skeleton loading
     
     try {
       // Analyze wine list with dish context, serving style preference, and user wine preferences
-      // Pass null for photo in mock mode (will be skipped)
       const result = await MenuAnalysisService.analyzeWineListFromPhoto(
-        isMockMode ? null : capturedPhoto, 
+        capturedPhoto, 
         dishInput, 
         servingStyle,
         winePreferences
@@ -288,10 +282,10 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
         <TouchableOpacity 
           style={[
             styles.getRecommendationsButton, 
-            (isAnalyzing || !dishInput.trim() || (!isMockMode && !capturedPhoto)) && styles.getRecommendationsButtonDisabled
+            (isAnalyzing || !dishInput.trim() || !capturedPhoto) && styles.getRecommendationsButtonDisabled
           ]}
           onPress={handleGetRecommendations}
-          disabled={isAnalyzing || !dishInput.trim() || (!isMockMode && !capturedPhoto)}
+          disabled={isAnalyzing || !dishInput.trim() || !capturedPhoto}
         >
           {isAnalyzing ? (
             <ActivityIndicator color="#fff" />
@@ -332,9 +326,6 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled={true}
       >
-        {/* Mock Mode Toggle */}
-        <MockModeToggle onToggle={(enabled) => setIsMockMode(enabled)} />
-
         {/* Restaurant Wine Pairing Assistant */}
         {renderWinePairingAssistant()}
 

@@ -1186,8 +1186,8 @@ app.post('/api/recommendations',
 
       const message = await anthropic.messages.create({
         model: "claude-sonnet-4-5-20250929", // Claude Sonnet 4.5 model
-        max_tokens: 2500, // Set to 2500 to allow complete JSON while staying under 30s timeout (response time ~28.5s)
-        temperature: 0.7,
+        max_tokens: 2500, // Keep at 2500 to allow complete JSON while staying under timeout
+        temperature: 0.5, // Balanced temperature for faster responses with maintained creativity and confidence
         system: enhancedPrompt,
         messages: [
           {

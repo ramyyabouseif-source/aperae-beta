@@ -154,3 +154,4 @@ Before opening Web Inspector, make sure:
 
 That's it! The Web Inspector should now be open and ready to use.
 
+

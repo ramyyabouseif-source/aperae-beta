@@ -77,3 +77,4 @@ Or check in your Supabase dashboard - you should see the `user_consents` table.
 
 
 
+

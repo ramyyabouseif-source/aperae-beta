@@ -95,3 +95,4 @@ Imagine you're at a concert:
 
 CORS is like a security guard checking IDs at the door. Your app was trying to enter with a "User-Agent" badge, but it wasn't on the approved list. We simply added it to the list, and now everything works! 🎉
 
+

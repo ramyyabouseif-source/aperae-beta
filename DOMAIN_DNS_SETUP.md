@@ -164,3 +164,4 @@ If you encounter issues:
 2. Verify DNS records using: `dig aperae.com` or `nslookup aperae.com`
 3. Check Vercel project logs for domain configuration errors
 
+

@@ -87,3 +87,4 @@ Secure request successful: https://api.aperae.com/api/recommendations
 3. Share console errors and network request details
 4. Run the quick test above to isolate the issue
 
+

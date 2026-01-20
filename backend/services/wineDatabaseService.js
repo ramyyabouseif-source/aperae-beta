@@ -81,6 +81,12 @@ class WineDatabaseService {
       logger.debug(`Wine search: "${query}" returned ${wines.length} results`);
       return wines;
     } catch (error) {
+      // Handle missing table gracefully - this is expected if wines table doesn't exist
+      if (error.code === 'P2021' || (error.message && error.message.includes('does not exist'))) {
+        logger.debug('Wines table not found - wine search disabled (this is expected if table not migrated)');
+        return [];
+      }
+      
       if (error.message && error.message.includes('DATABASE_URL')) {
         logger.debug('DATABASE_URL not configured - wine database features disabled');
         return [];
@@ -123,6 +129,13 @@ class WineDatabaseService {
 
       return wine;
     } catch (error) {
+      // Handle missing table gracefully - this is expected if wines table doesn't exist
+      if (error.code === 'P2021' || (error.message && error.message.includes('does not exist'))) {
+        // Table doesn't exist - this is okay, wine enhancement is optional
+        logger.debug('Wines table not found - wine enhancement disabled (this is expected if table not migrated)');
+        return null;
+      }
+      
       // Log error but don't crash the app
       if (error.message && error.message.includes('DATABASE_URL')) {
         logger.debug('DATABASE_URL not configured - wine database features disabled');
@@ -157,6 +170,12 @@ class WineDatabaseService {
 
       return wine;
     } catch (error) {
+      // Handle missing table gracefully - this is expected if wines table doesn't exist
+      if (error.code === 'P2021' || (error.message && error.message.includes('does not exist'))) {
+        logger.debug('Wines table not found - wine details disabled (this is expected if table not migrated)');
+        return null;
+      }
+      
       if (error.message && error.message.includes('DATABASE_URL')) {
         logger.debug('DATABASE_URL not configured - wine database features disabled');
         return null;
@@ -310,6 +329,12 @@ class WineDatabaseService {
 
       return wines;
     } catch (error) {
+      // Handle missing table gracefully - this is expected if wines table doesn't exist
+      if (error.code === 'P2021' || (error.message && error.message.includes('does not exist'))) {
+        logger.debug('Wines table not found - wine filtering disabled (this is expected if table not migrated)');
+        return [];
+      }
+      
       if (error.message && error.message.includes('DATABASE_URL')) {
         logger.debug('DATABASE_URL not configured - wine database features disabled');
         return [];

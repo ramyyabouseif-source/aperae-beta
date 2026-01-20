@@ -95,3 +95,4 @@ After this fix, both should work!
 - No security implications from increasing limit (images are validated and compressed)
 - Rate limiting still applies to prevent abuse
 
+

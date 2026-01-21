@@ -83,6 +83,7 @@ function TermsScreenContent({ onAccept, onBack, onPrivacyPolicyPress: _onPrivacy
       <ScrollView 
         ref={scrollViewRef}
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         onScroll={handleScroll}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={true}
@@ -964,9 +965,11 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: 40,
+  },
   content: {
     padding: 20,
-    paddingBottom: 40,
   },
   sectionTitle: {
     fontSize: 20,

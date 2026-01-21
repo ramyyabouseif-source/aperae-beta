@@ -1057,17 +1057,16 @@ app.post('/api/recommendations',
     // CRITICAL-5: Set timeout (85 seconds - 5s buffer before Render's 90s limit)
     const timeout = setTimeout(() => {
       if (!res.headersSent) {
-        logger.warn('Request timeout - returning fallback', { 
+        logger.warn('Request timeout - returning error', { 
           requestId,
           timeout: '85s',
           dish: req.body.dish 
         });
-        const fallback = getFallbackResponse(
-          req.body.dish, 
-          requestId, 
-          !!(req.body.availableWines && Array.isArray(req.body.availableWines) && req.body.availableWines.length > 0)
-        );
-        res.status(200).json(fallback);
+        res.status(503).json({
+          error: 'Request timeout',
+          message: 'Something went wrong. Please try again.',
+          requestId
+        });
       }
     }, 85000);
     
@@ -1110,9 +1109,12 @@ app.post('/api/recommendations',
       // Check if Anthropic API key is configured
       if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'sk-ant-your-claude-api-key-here') {
         clearTimeout(timeout);
-        logger.warn('Anthropic API key not configured, falling back to mock data', { requestId, isMenuContext });
-        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
-        return res.json(mockResponse);
+        logger.error('Anthropic API key not configured', { requestId, isMenuContext });
+        return res.status(500).json({
+          error: 'Service unavailable',
+          message: 'Something went wrong. Please try again.',
+          requestId
+        });
       }
 
       // Build enhanced prompt - use appropriate prompt based on context
@@ -1179,26 +1181,101 @@ app.post('/api/recommendations',
       
       const claudeStartTime = Date.now();
       
-      // Call Anthropic Claude API
+      // Call Anthropic Claude API with retry logic for transient errors
       const anthropic = new Anthropic({
         apiKey: process.env.ANTHROPIC_API_KEY,
       });
 
-      const message = await anthropic.messages.create({
-        model: "claude-sonnet-4-5-20250929", // Claude Sonnet 4.5 model
-        max_tokens: 2500, // Keep at 2500 to allow complete JSON while staying under timeout
-        temperature: 0.5, // Balanced temperature for faster responses with maintained creativity and confidence
-        system: enhancedPrompt,
-        messages: [
-          {
-            role: "user",
-            content: `Provide wine recommendations for: ${dish}. Be EXTREMELY BRIEF - essential info only. Target <25s response.`
-          }
-        ]
-      });
+      // Retry logic for transient errors (529 Overloaded, 429 Rate Limit, 503 Service Unavailable)
+      const MAX_RETRIES = 3;
+      const INITIAL_RETRY_DELAY = 2000; // 2 seconds
+      let message;
+      let lastError;
+      let claudeResponseTime;
 
-      const claudeResponseTime = Date.now() - claudeStartTime;
-      RequestLogger.logExternalApiCall('anthropic', requestId, claudeResponseTime);
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          message = await anthropic.messages.create({
+            model: "claude-sonnet-4-5-20250929", // Claude Sonnet 4.5 model
+            max_tokens: 2500, // Keep at 2500 to allow complete JSON while staying under timeout
+            temperature: 0.5, // Balanced temperature for faster responses with maintained creativity and confidence
+            system: enhancedPrompt,
+            messages: [
+              {
+                role: "user",
+                content: `Provide wine recommendations for: ${dish}. Be EXTREMELY BRIEF - essential info only. Target <25s response.`
+              }
+            ]
+          });
+          
+          // Success - break out of retry loop
+          claudeResponseTime = Date.now() - claudeStartTime;
+          RequestLogger.logExternalApiCall('anthropic', requestId, claudeResponseTime, {
+            retryAttempt: attempt
+          });
+          break;
+          
+        } catch (error) {
+          lastError = error;
+          
+          // Check if error is transient (529, 429, 503) and we have retries left
+          const isTransientError = error.status === 529 || // Overloaded
+                                   error.status === 429 || // Rate Limit
+                                   error.status === 503 || // Service Unavailable
+                                   (error.status >= 500 && error.status < 600); // Any 5xx server error
+          
+          if (isTransientError && attempt < MAX_RETRIES) {
+            // Calculate exponential backoff: 2s, 4s, 8s
+            const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, attempt);
+            const totalElapsed = Date.now() - claudeStartTime;
+            
+            // Don't retry if we're getting close to timeout (leave 15s buffer)
+            const timeRemaining = 85000 - totalElapsed; // 85s timeout minus elapsed
+            if (timeRemaining < retryDelay + 15000) {
+              logger.warn('Skipping retry - insufficient time remaining', {
+                requestId,
+                attempt: attempt + 1,
+                timeRemaining,
+                retryDelay,
+                errorStatus: error.status
+              });
+              break; // Exit retry loop, will fall through to error handling
+            }
+            
+            logger.warn('Claude API transient error - retrying', {
+              requestId,
+              attempt: attempt + 1,
+              maxRetries: MAX_RETRIES,
+              errorStatus: error.status,
+              errorMessage: error.message,
+              retryDelay
+            });
+            
+            // Wait before retry (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            continue; // Retry
+          } else {
+            // Non-transient error or out of retries - exit retry loop
+            claudeResponseTime = Date.now() - claudeStartTime;
+            RequestLogger.logExternalApiCall('anthropic', requestId, claudeResponseTime, {
+              failed: true,
+              retryAttempt: attempt,
+              errorStatus: error.status
+            });
+            throw error; // Re-throw to be caught by outer catch block
+          }
+        }
+      }
+      
+      // If we exhausted retries and still no message, throw the last error
+      if (!message) {
+        claudeResponseTime = Date.now() - claudeStartTime;
+        RequestLogger.logExternalApiCall('anthropic', requestId, claudeResponseTime, {
+          failed: true,
+          exhaustedRetries: true
+        });
+        throw lastError;
+      }
 
       logger.debug('Claude API response received', { requestId });
       
@@ -1408,9 +1485,14 @@ app.post('/api/recommendations',
         console.error('Message Structure:', JSON.stringify(messageStructure, null, 2));
         console.error('===================================');
         
-        // Fallback to mock data if parsing fails
-        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
-        return res.json(mockResponse);
+        // Return error if parsing fails
+        logger.error('JSON parsing failed - returning error', { requestId, isMenuContext });
+        clearTimeout(timeout);
+        return res.status(500).json({
+          error: 'Invalid response',
+          message: 'Something went wrong. Please try again.',
+          requestId
+        });
       }
       
       // Store original response for database (before normalization/enhancement)
@@ -1495,8 +1577,12 @@ app.post('/api/recommendations',
       // Validate responseData before sending
       if (!responseData) {
         logger.error('responseData is null or undefined', { requestId, isMenuContext });
-        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
-        return res.json(mockResponse);
+        clearTimeout(timeout);
+        return res.status(500).json({
+          error: 'Invalid response',
+          message: 'Something went wrong. Please try again.',
+          requestId
+        });
       }
       
       if (!responseData.recommendations || !Array.isArray(responseData.recommendations)) {
@@ -1506,8 +1592,12 @@ app.post('/api/recommendations',
           responseDataType: typeof responseData,
           isMenuContext
         });
-        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
-        return res.json(mockResponse);
+        clearTimeout(timeout);
+        return res.status(500).json({
+          error: 'Invalid response',
+          message: 'Something went wrong. Please try again.',
+          requestId
+        });
       }
       
       // Check if responseData can be serialized
@@ -1541,8 +1631,12 @@ app.post('/api/recommendations',
           error: serializeError.message,
           isMenuContext
         });
-        const mockResponse = getFallbackResponse(dish, requestId, isMenuContext);
-        return res.json(mockResponse);
+        clearTimeout(timeout);
+        return res.status(500).json({
+          error: 'Serialization failed',
+          message: 'Something went wrong. Please try again.',
+          requestId
+        });
       }
       
       RequestLogger.logRequestSuccess('recommendations', requestId, totalResponseTime, {
@@ -1679,19 +1773,40 @@ app.post('/api/recommendations',
       // Determine if this was a menu context request (in case error occurred before isMenuContext was set)
       const errorIsMenuContext = req.body.availableWines && Array.isArray(req.body.availableWines) && req.body.availableWines.length > 0;
       
-      // Fallback to mock data on any error
-      clearTimeout(timeout); // Clear timeout before sending error fallback
-      logger.debug('Falling back to mock data due to error', { requestId, error: error.message, isMenuContext: errorIsMenuContext });
-      const mockResponse = getFallbackResponse(req.body.dish || 'unknown', requestId, errorIsMenuContext);
+      // Return error response instead of fallback mock data
+      clearTimeout(timeout); // Clear timeout before sending error response
+      logger.error('Request failed - returning error', { 
+        requestId, 
+        error: error.message, 
+        errorStatus: error.status,
+        isMenuContext: errorIsMenuContext 
+      });
+      
       try {
         if (!res.headersSent) {
-          res.json(mockResponse);
-          logger.info('Error fallback response sent', { requestId });
+          // Determine appropriate status code
+          let statusCode = 500;
+          if (error.status === 429) {
+            statusCode = 429; // Rate limit
+          } else if (error.status === 529 || error.status === 503) {
+            statusCode = 503; // Service unavailable (overloaded)
+          } else if (error.status >= 400 && error.status < 500) {
+            statusCode = error.status; // Client errors
+          } else if (error.status >= 500) {
+            statusCode = 503; // Server errors -> service unavailable
+          }
+          
+          res.status(statusCode).json({
+            error: 'Service error',
+            message: 'Something went wrong. Please try again.',
+            requestId
+          });
+          logger.info('Error response sent', { requestId, statusCode });
         } else {
-          logger.error('Cannot send error fallback - headers already sent', { requestId });
+          logger.error('Cannot send error response - headers already sent', { requestId });
         }
       } catch (sendError) {
-        logger.error('Failed to send error fallback response', { 
+        logger.error('Failed to send error response', { 
           requestId, 
           error: sendError.message 
         });

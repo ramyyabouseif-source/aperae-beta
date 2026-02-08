@@ -8,7 +8,10 @@ export class SecureErrorHandler {
         'Request timeout',
         'Invalid input',
         'Server error',
-        'Authentication failed'
+        'Authentication failed',
+        'Something went wrong',
+        'Rate limit exceeded',
+        'Please try again'
       ];
       
       if (safeErrors.some(safeError => error.message.includes(safeError))) {

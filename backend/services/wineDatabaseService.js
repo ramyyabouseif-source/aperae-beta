@@ -17,6 +17,11 @@ const logger = require('../logger');
 let prisma = null;
 let prismaInitialized = false;
 
+// Cache: once we detect wines table doesn't exist, skip all wine-related queries
+// (avoids repeated prisma:error logs - 3 per request → 0 after first detection)
+let winesTableUnavailable = false;
+let winesTableProbeAttempted = false;
+
 // Check if DATABASE_URL is configured
 const isDatabaseAvailable = () => {
   if (!process.env.DATABASE_URL) {
@@ -109,6 +114,10 @@ class WineDatabaseService {
       logger.debug('Wine database not available - skipping validation');
       return null;
     }
+    // Skip if we've already detected wines table doesn't exist (avoids repeated Prisma error logs)
+    if (winesTableUnavailable) {
+      return null;
+    }
 
     try {
       const where = {
@@ -131,8 +140,8 @@ class WineDatabaseService {
     } catch (error) {
       // Handle missing table gracefully - this is expected if wines table doesn't exist
       if (error.code === 'P2021' || (error.message && error.message.includes('does not exist'))) {
-        // Table doesn't exist - this is okay, wine enhancement is optional
-        logger.debug('Wines table not found - wine enhancement disabled (this is expected if table not migrated)');
+        winesTableUnavailable = true;
+        logger.info('Wines table not found - wine enhancement disabled for this process (expected if table not migrated)');
         return null;
       }
       
@@ -535,12 +544,49 @@ class WineDatabaseService {
   }
 
   /**
+   * Probe if wines table exists (one-time check per process)
+   * @returns {Promise<boolean>} true if table exists, false if not
+   */
+  async _probeWinesTableExists() {
+    if (winesTableProbeAttempted) {
+      return !winesTableUnavailable;
+    }
+    winesTableProbeAttempted = true;
+    if (!isDatabaseAvailable()) {
+      winesTableUnavailable = true;
+      return false;
+    }
+    try {
+      await prisma.wine.findFirst({ where: { wineName: '__table_probe__' } });
+      return true;
+    } catch (error) {
+      if (error.code === 'P2021' || (error.message && error.message.includes('does not exist'))) {
+        winesTableUnavailable = true;
+        logger.info('Wines table not found - skipping enhancement (expected if table not migrated)');
+        return false;
+      }
+      logger.warn('Wines table probe failed, skipping enhancement:', error.message);
+      winesTableUnavailable = true;
+      return false;
+    }
+  }
+
+  /**
    * Batch enhance recommendations
    * @param {Array} recommendations - Array of AI recommendations
    * @returns {Promise<Array>} Array of enhanced recommendations
    */
   async enhanceRecommendations(recommendations) {
     try {
+      const tableExists = await this._probeWinesTableExists();
+      if (!tableExists) {
+        return recommendations.map(rec => ({
+          ...rec,
+          expertRating: this.normalizeExpertRating(rec.expertRating),
+          category: rec.category || this.inferCategory(rec),
+          verified: false
+        }));
+      }
       const enhanced = await Promise.all(
         recommendations.map(rec => this.enhanceRecommendation(rec))
       );

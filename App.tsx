@@ -47,9 +47,9 @@ export default function App() {
   // Check for geo-blocking on app startup
   const checkGeoBlocking = async () => {
     try {
-      // Make a lightweight health check request to detect geo-blocking
+      // Use geo-check endpoint (NOT exempt from geo-blocking; /health is exempt)
       const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://api.aperae.com/api';
-      const response = await fetch(`${apiUrl}/health`, {
+      const response = await fetch(`${apiUrl}/geo-check`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -263,6 +263,10 @@ export default function App() {
     return (
       <AgeVerificationScreen 
         onVerified={handleAgeVerified}
+        onGeoBlocked={(data) => {
+          setIsGeoBlocked(true);
+          setGeoBlockData({ country: data.country, countryName: data.countryName });
+        }}
         onTermsPress={handleTermsPressFromAge}
         onPrivacyPress={handlePrivacyPressFromAge}
       />

@@ -120,8 +120,8 @@ export class DishService {
       }
     }
 
-    // If all retries failed, throw the error
-    throw lastError || new Error('Dish recommendations API call failed after all retries');
+    // If all retries failed, throw user-friendly error
+    throw new Error('Something went wrong. Please try again.');
   }
 
   /**

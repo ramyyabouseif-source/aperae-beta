@@ -74,6 +74,7 @@ export default function SimpleEnhancedHomeScreen() {
   const wineInputRef = useRef<TextInput>(null);
 
   const handleGetRecommendations = async () => {
+    if (loading) return;
     const timingId = performanceMonitor.startTiming('wine_recommendations', {
       dish,
       timestamp: new Date().toISOString(),
@@ -420,6 +421,7 @@ export default function SimpleEnhancedHomeScreen() {
 
   // Handle dish recommendations (Wine-to-Dish)
   const handleGetDishRecommendations = async () => {
+    if (loading) return;
     const timingId = performanceMonitor.startTiming('dish_recommendations', {
       wine,
       timestamp: new Date().toISOString(),
@@ -560,6 +562,7 @@ export default function SimpleEnhancedHomeScreen() {
               variant="primary"
               size="large"
               loading={loading}
+              disabled={loading}
               fullWidth
               style={styles.recommendButton}
             />
@@ -609,6 +612,7 @@ export default function SimpleEnhancedHomeScreen() {
               variant="primary"
               size="large"
               loading={loading}
+              disabled={loading}
               fullWidth
               style={styles.recommendButton}
             />

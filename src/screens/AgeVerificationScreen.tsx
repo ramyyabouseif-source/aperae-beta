@@ -9,6 +9,7 @@ import { getDeviceId } from '../utils/deviceId';
 
 interface AgeVerificationScreenProps {
   onVerified: () => void;
+  onGeoBlocked?: (data: { country?: string; countryName?: string }) => void;
   onTermsPress?: () => void;
   onPrivacyPress?: () => void;
 }
@@ -17,6 +18,7 @@ const LEGAL_DRINKING_AGE = 21;
 
 export default function AgeVerificationScreen({ 
   onVerified, 
+  onGeoBlocked, 
   onTermsPress, 
   onPrivacyPress 
 }: AgeVerificationScreenProps) {
@@ -69,6 +71,22 @@ export default function AgeVerificationScreen({
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Failed to store consent' }));
+          if (response.status === 403 && errorData.code === 'GEO_BLOCKED') {
+            // Geo-blocked (GDPR country): do NOT proceed; show geo-blocked screen
+            if (onGeoBlocked) {
+              onGeoBlocked({
+                country: errorData.country,
+                countryName: errorData.countryName,
+              });
+            } else {
+              Alert.alert(
+                'Service Not Available',
+                'Aperae is currently available in the United States only. Access from your region is not permitted.'
+              );
+            }
+            setIsVerifying(false);
+            return;
+          }
           console.warn('Failed to store consent to backend (non-blocking):', errorData.error || 'Failed to store consent');
         }
       } catch (apiError) {
@@ -76,7 +94,7 @@ export default function AgeVerificationScreen({
         console.warn('Failed to store consent to backend (non-blocking):', apiError);
       }
       
-      // Always call onVerified() after local storage succeeds
+      // Call onVerified() after local storage succeeds and consent stored (or non-geo-block error)
       onVerified();
       // Reset verifying state after navigation is triggered
       setIsVerifying(false);

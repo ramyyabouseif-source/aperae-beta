@@ -178,8 +178,16 @@ const corsOptions = {
         return callback(null, true);
       }
       
+      // Check exact match for production origins
       if (productionOrigins.includes(origin)) {
         logger.debug('CORS: Allowing production origin', { origin });
+        return callback(null, true);
+      }
+      
+      // Allow Vercel preview deployments (pattern: https://aperae-*-aperaes-projects.vercel.app)
+      const vercelPreviewPattern = /^https:\/\/aperae-[a-z0-9]+-aperaes-projects\.vercel\.app$/;
+      if (vercelPreviewPattern.test(origin)) {
+        logger.debug('CORS: Allowing Vercel preview deployment', { origin });
         return callback(null, true);
       }
       
@@ -482,6 +490,12 @@ app.get('/api/health', async (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
+});
+
+// Geo-check: used by frontend to detect geo-blocking on landing/age verification
+// NOT exempt from geo-block middleware - EU/EEA requests get 403 before reaching here
+app.get('/api/geo-check', (req, res) => {
+  res.status(200).json({ allowed: true });
 });
 
 // Readiness: return 503 only if dependencies are not ready
@@ -1195,7 +1209,8 @@ app.post('/api/recommendations',
 
       for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
         try {
-          message = await anthropic.messages.create({
+          // Use streaming to keep connection alive during long generation (avoids HTTP timeouts)
+          const stream = anthropic.messages.stream({
             model: "claude-sonnet-4-5-20250929", // Claude Sonnet 4.5 model
             max_tokens: 2500, // Keep at 2500 to allow complete JSON while staying under timeout
             temperature: 0.5, // Balanced temperature for faster responses with maintained creativity and confidence
@@ -1207,6 +1222,7 @@ app.post('/api/recommendations',
               }
             ]
           });
+          message = await stream.finalMessage();
           
           // Success - break out of retry loop
           claudeResponseTime = Date.now() - claudeStartTime;
@@ -2845,8 +2861,8 @@ app.post('/api/dish-recommendations',
       
       const claudeStartTime = Date.now();
       
-      // Call Master Chef (JSON will be parsed and validated below)
-      const message = await anthropic.messages.create({
+      // Use streaming to keep connection alive during long generation (avoids HTTP timeouts)
+      const stream = anthropic.messages.stream({
         model: "claude-sonnet-4-5-20250929",
         system: buildMasterChefSystemPrompt(),
         messages: [
@@ -2860,6 +2876,7 @@ app.post('/api/dish-recommendations',
         max_tokens: 6000,
         temperature: 0.5
       });
+      const message = await stream.finalMessage();
       
       const claudeResponseTime = Date.now() - claudeStartTime;
       RequestLogger.logExternalApiCall('anthropic', requestId, claudeResponseTime);

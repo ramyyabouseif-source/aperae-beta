@@ -377,11 +377,12 @@ export class WineService {
       }
     }
     
-    // If all attempts failed, fallback to mock data instead of throwing
-    console.log('=== FALLBACK TO MOCK DATA ===');
-    console.log('All API attempts failed, using mock data');
-    console.log('=============================');
-    return this.getMockRecommendations(dish);
+    // If all attempts failed, throw user-friendly error (no fallback to mock in production)
+    const userMessage = 'Something went wrong. Please try again.';
+    console.error('=== API FAILED - NO FALLBACK ===');
+    console.error('All API attempts failed. Returning error to user.');
+    console.error('=============================');
+    throw new Error(userMessage);
   }
 
   /**

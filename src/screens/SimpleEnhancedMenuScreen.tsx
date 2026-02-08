@@ -168,6 +168,7 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
   };
 
   const handleGetRecommendations = async () => {
+    if (isAnalyzing) return;
     console.log('Get Wine Recommendations button pressed');
     console.log('Dish:', dishInput);
     console.log('Serving style:', servingStyle);
@@ -198,9 +199,12 @@ const SimpleEnhancedMenuScreen: React.FC = () => {
       );
       console.log('Analysis result:', result);
       setAnalysisResult(result);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Wine list analysis error:', error);
-      Alert.alert('Analysis Error', 'Failed to analyze wine list. Please try again.');
+      const message = error?.message && (error.message.includes('Something went wrong') || error.message.includes('Please try again'))
+        ? error.message
+        : 'Something went wrong. Please try again.';
+      Alert.alert('Something Went Wrong', message);
     } finally {
       setIsAnalyzing(false);
     }

@@ -191,6 +191,25 @@ export class EnhancedErrorHandler {
       };
     }
 
+    // API/recommendation failures - preserve user-friendly message
+    if (error.message?.includes('Something went wrong') || error.message?.includes('Please try again')) {
+      return {
+        title: 'Something Went Wrong',
+        message: error.message || 'Something went wrong. Please try again.',
+        recoveryActions: [
+          {
+            label: 'Try Again',
+            action: () => this.retryOperation(context?.operation),
+            variant: 'primary',
+          },
+        ],
+        severity: 'medium',
+        category: 'server',
+        timestamp,
+        context: baseContext,
+      };
+    }
+
     // Default error
     return {
       title: 'Something Went Wrong',

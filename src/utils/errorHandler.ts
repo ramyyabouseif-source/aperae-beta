@@ -6,6 +6,7 @@ export class SecureErrorHandler {
       const safeErrors = [
         'Network request failed',
         'Request timeout',
+        'The request took too long',
         'Invalid input',
         'Server error',
         'Authentication failed',

@@ -179,6 +179,74 @@ class SecureHttpClient {
   }
 
   /**
+   * POST that consumes NDJSON stream (heartbeat + result). Used for /recommendations
+   * to prevent proxy timeout - server sends heartbeats every 10s during long Claude call.
+   * Falls back to regular JSON parse if Content-Type is not application/x-ndjson (e.g. mock mode).
+   */
+  async postStreamingNDJSON<T = any>(endpoint: string, body?: any, headers?: Record<string, string>): Promise<T> {
+    const url = `${this.baseURL}${endpoint}`;
+    const isUrlSecure = certificatePinningService.validateUrlSecurity(url);
+    if (!isUrlSecure) {
+      throw new Error(`Insecure URL detected - request blocked: ${url}`);
+    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    const requestConfig: RequestInit = {
+      method: 'POST',
+      headers: { ...this.defaultHeaders, ...headers },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    };
+    try {
+      const response = await fetch(url, requestConfig);
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || errData.message || `HTTP ${response.status}`);
+      }
+      const ct = response.headers.get('Content-Type') || '';
+      if (ct.includes('ndjson')) {
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No response body');
+        const decoder = new TextDecoder();
+        let buffer = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const obj = JSON.parse(line);
+              if (obj.type === 'result' && obj.data !== undefined) return obj.data as T;
+              if (obj.type === 'error') throw new Error(obj.error || 'Server error');
+            } catch (e) {
+              if (e instanceof SyntaxError) continue;
+              throw e;
+            }
+          }
+        }
+        if (buffer.trim()) {
+          const obj = JSON.parse(buffer);
+          if (obj.type === 'result' && obj.data !== undefined) return obj.data as T;
+          if (obj.type === 'error') throw new Error(obj.error || 'Server error');
+        }
+        throw new Error('Incomplete NDJSON response');
+      }
+      return (await response.json()) as T;
+    } catch (e) {
+      clearTimeout(timeoutId);
+      if (e instanceof Error) {
+        if (e.name === 'AbortError') throw new Error(`Request timed out after ${this.timeout / 1000} seconds`);
+        if (e.message.includes('timeout')) throw new Error('Request timeout - please try again');
+      }
+      throw e;
+    }
+  }
+
+  /**
    * Make a PUT request
    * @param endpoint - The API endpoint
    * @param body - Request body

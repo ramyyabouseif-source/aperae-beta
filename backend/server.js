@@ -1069,7 +1069,16 @@ app.post('/api/recommendations',
     });
     
     // CRITICAL-5: Set timeout (85 seconds - 5s buffer before Render's 90s limit)
+    let heartbeatInterval = null; // Set when chunked response starts
+    const sendStreamError = (errMsg) => {
+      if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
+      try {
+        if (!res.writableEnded) res.write(JSON.stringify({ type: 'error', error: errMsg }) + '\n');
+        if (!res.writableEnded) res.end();
+      } catch (e) { /* ignore */ }
+    };
     const timeout = setTimeout(() => {
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
       if (!res.headersSent) {
         logger.warn('Request timeout - returning error', { 
           requestId,
@@ -1081,6 +1090,11 @@ app.post('/api/recommendations',
           message: 'Something went wrong. Please try again.',
           requestId
         });
+      } else if (!res.writableEnded) {
+        try {
+          res.write(JSON.stringify({ type: 'error', error: 'Request timeout' }) + '\n');
+          res.end();
+        } catch (e) { /* ignore */ }
       }
     }, 85000);
     
@@ -1130,6 +1144,21 @@ app.post('/api/recommendations',
           requestId
         });
       }
+
+      // Start chunked NDJSON response with keepalive heartbeats to prevent proxy timeout (~30s)
+      // Proxies (Render, CDNs) may close idle connections; heartbeats keep the connection alive
+      res.writeHead(200, {
+        'Transfer-Encoding': 'chunked',
+        'Content-Type': 'application/x-ndjson',
+        'X-Request-ID': requestId,
+        'Cache-Control': 'no-cache'
+      });
+      const HEARTBEAT_INTERVAL_MS = 10000; // 10 seconds
+      heartbeatInterval = setInterval(() => {
+        try {
+          if (!res.writableEnded) res.write(JSON.stringify({ type: 'heartbeat', ts: Date.now() }) + '\n');
+        } catch (e) { /* ignore if connection closed */ }
+      }, HEARTBEAT_INTERVAL_MS);
 
       // Build enhanced prompt - use appropriate prompt based on context
       let enhancedPrompt;
@@ -1594,11 +1623,8 @@ app.post('/api/recommendations',
       if (!responseData) {
         logger.error('responseData is null or undefined', { requestId, isMenuContext });
         clearTimeout(timeout);
-        return res.status(500).json({
-          error: 'Invalid response',
-          message: 'Something went wrong. Please try again.',
-          requestId
-        });
+        sendStreamError('Invalid response');
+        return;
       }
       
       if (!responseData.recommendations || !Array.isArray(responseData.recommendations)) {
@@ -1609,11 +1635,8 @@ app.post('/api/recommendations',
           isMenuContext
         });
         clearTimeout(timeout);
-        return res.status(500).json({
-          error: 'Invalid response',
-          message: 'Something went wrong. Please try again.',
-          requestId
-        });
+        sendStreamError('Invalid response');
+        return;
       }
       
       // Check if responseData can be serialized
@@ -1648,11 +1671,8 @@ app.post('/api/recommendations',
           isMenuContext
         });
         clearTimeout(timeout);
-        return res.status(500).json({
-          error: 'Serialization failed',
-          message: 'Something went wrong. Please try again.',
-          requestId
-        });
+        sendStreamError('Serialization failed');
+        return;
       }
       
       RequestLogger.logRequestSuccess('recommendations', requestId, totalResponseTime, {
@@ -1665,107 +1685,26 @@ app.post('/api/recommendations',
       // Track successful recommendation
       monitoring.trackRecommendation(dish, true, totalResponseTime);
       
-      // Add response event listeners to track what's happening
-      res.on('finish', () => {
-        logger.info('Response finished event fired', { 
-          requestId,
-          statusCode: res.statusCode,
-          headersSent: res.headersSent
-        });
-      });
-      
-      res.on('close', () => {
-        logger.info('Response close event fired', { 
-          requestId,
-          finished: res.finished
-        });
-      });
-      
-      res.on('error', (err) => {
-        logger.error('Response error event fired', { 
-          requestId,
-          error: err.message,
-          stack: err.stack
-        });
-      });
-      
+      // Send final result via NDJSON stream and end
+      clearInterval(heartbeatInterval);
+      heartbeatInterval = null;
+      clearTimeout(timeout);
       try {
-        // Set explicit content type and ensure headers are set
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Content-Length', serializedResponse.length);
-        
-        // Add keep-alive headers to prevent ngrok timeout
-        res.setHeader('Connection', 'keep-alive');
-        res.setHeader('Keep-Alive', 'timeout=120, max=1000');
-        
-        // Send periodic keep-alive packets during long operations
-        // This helps prevent ngrok from timing out the connection
-        if (req.socket && !req.socket.destroyed) {
-          req.socket.setKeepAlive(true, 60000); // Enable keep-alive with 60s initial delay
-          req.socket.setTimeout(120000); // Set socket timeout to 120 seconds
-        }
-        
-        logger.info('Sending response with headers', { 
-          requestId,
-          contentLength: serializedResponse.length,
-          responseSizeKB: Math.round(serializedResponse.length / 1024),
-          headersSent: res.headersSent,
-          contentEncoding: res.getHeader('Content-Encoding'),
-          statusCode: res.statusCode || 200,
-          socketDestroyed: req.socket.destroyed,
-          socketReadable: req.socket.readable
-        });
-        
-        // Check if socket is still valid
-        if (req.socket.destroyed) {
-          logger.error('Socket already destroyed before sending response', { requestId });
-          return;
-        }
-        
-        // Use res.send() with the serialized string instead of res.json()
-        // This gives us more control and better error handling
-        try {
-          clearTimeout(timeout); // Clear timeout on successful response
-          res.status(200).send(serializedResponse);
-          logger.info('Response send() called successfully', { 
+        if (!res.writableEnded) {
+          res.write(JSON.stringify({ type: 'result', data: responseData }) + '\n');
+          res.end();
+          logger.info('NDJSON response sent successfully', { 
             requestId,
-            finished: res.finished,
-            headersSent: res.headersSent,
-            socketDestroyed: req.socket.destroyed
+            responseSizeKB: Math.round(serializedResponse.length / 1024)
           });
-        } catch (sendErr) {
-          logger.error('Error in res.send()', {
-            requestId,
-            error: sendErr.message,
-            stack: sendErr.stack
-          });
-          throw sendErr;
         }
-      } catch (sendError) {
-        logger.error('Error sending response', { 
-          requestId, 
-          error: sendError.message,
-          stack: sendError.stack,
-          headersSent: res.headersSent
-        });
-        // Try to send error response
-        if (!res.headersSent) {
-          try {
-            res.status(500).json({ 
-              error: 'Failed to send response', 
-              requestId 
-            });
-          } catch (fallbackError) {
-            logger.error('Failed to send error response', {
-              requestId,
-              error: fallbackError.message
-            });
-          }
-        }
+      } catch (sendErr) {
+        logger.error('Error sending NDJSON result', { requestId, error: sendErr.message });
       }
       
     } catch (error) {
-      clearTimeout(timeout); // Clear timeout on error
+      if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
+      clearTimeout(timeout);
       const responseTime = Date.now() - requestStartTime;
       
       // Enhanced error logging
@@ -1819,7 +1758,8 @@ app.post('/api/recommendations',
           });
           logger.info('Error response sent', { requestId, statusCode });
         } else {
-          logger.error('Cannot send error response - headers already sent', { requestId });
+          // Chunked response already started - send error via NDJSON stream
+          sendStreamError('Something went wrong. Please try again.');
         }
       } catch (sendError) {
         logger.error('Failed to send error response', { 

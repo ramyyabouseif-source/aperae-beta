@@ -89,18 +89,19 @@ export class MenuAnalysisService {
   };
 
   /**
-   * Generate a unique request ID for tracking
+   * Generate a unique request ID for tracking (UUID v4 format).
+   * Backend /api/recommendations validates requestId as UUID - must match.
    */
   private static async generateRequestId(): Promise<string> {
-    // Generate a base64url-encoded random ID (similar to backend)
-    // Use expo-crypto for React Native compatibility
-    const randomBytes = new Uint8Array(12);
-    const randomValues = await Crypto.getRandomBytesAsync(12);
-    randomBytes.set(randomValues);
-    return btoa(String.fromCharCode(...randomBytes))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
+    const randomValues = await Crypto.getRandomBytesAsync(16);
+    const bytes = new Uint8Array(16);
+    bytes.set(randomValues);
+    bytes[6] = (bytes[6]! & 0x0f) | 0x40; // Version 4
+    bytes[8] = (bytes[8]! & 0x3f) | 0x80; // Variant 10
+    const hex = Array.from(bytes)
+      .map((b) => b!.toString(16).padStart(2, '0'))
+      .join('');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
   }
 
   /**

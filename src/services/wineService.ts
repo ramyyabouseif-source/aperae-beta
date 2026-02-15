@@ -301,7 +301,7 @@ export class WineService {
           headers['ngrok-skip-browser-warning'] = 'true';
         }
         
-        const response = await secureClient.post('/recommendations', requestBody, headers);
+        const response = await secureClient.postStreamingNDJSON<WineRecommendationResponse>('/recommendations', requestBody, headers);
 
         const attemptEndTime = performance.now();
         const attemptResponseTime = attemptEndTime - attemptStartTime;
@@ -345,10 +345,10 @@ export class WineService {
           });
         }
         
-        // Check if it's a timeout error
+        // Check if it's a timeout error - use actionable message
         if (error.name === 'AbortError' || error.message.includes('timeout')) {
           console.error('Request timed out after', NETWORK_CONFIG.timeout, 'ms');
-          lastError = new Error(`Request timed out after ${NETWORK_CONFIG.timeout / 1000} seconds. Please check your connection and try again.`);
+          lastError = new Error('The request took too long. This can happen during busy times. Please try again.');
         }
         
         // Network errors
@@ -368,9 +368,11 @@ export class WineService {
         console.error('=============================');
         
         if (attempt < this.MAX_RETRIES) {
+          const isTimeout = lastError?.message?.includes('too long') || lastError?.message?.includes('timed out');
+          const baseDelay = isTimeout ? 3000 : this.BASE_RETRY_DELAY; // Longer delay for timeouts - fresh connection helps
           const exp = Math.pow(2, attempt - 1);
-          const jitter = Math.floor(Math.random() * 300); // 0-300ms jitter
-          const delay = this.BASE_RETRY_DELAY * exp + jitter;
+          const jitter = Math.floor(Math.random() * 300);
+          const delay = baseDelay * exp + jitter;
           console.log(`Retrying in ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
         }

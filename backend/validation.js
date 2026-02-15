@@ -41,8 +41,15 @@ const validateRecommendationRequest = [
     .withMessage('Available wines must be an array'),
   body('requestId')
     .optional()
-    .isUUID()
-    .withMessage('Request ID must be a valid UUID')
+    .custom((value) => {
+      if (value == null || value === '') return true;
+      if (typeof value !== 'string') return false;
+      // Accept UUID (backend and fixed frontend) or menu-style IDs (legacy base64url from menu flow)
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+      const isMenuId = /^[A-Za-z0-9_-]{10,64}$/.test(value);
+      return isUuid || isMenuId;
+    })
+    .withMessage('Request ID must be a valid UUID or menu request ID')
 ];
 
 // Validation rules for dish recommendations (wine -> dish pairing)

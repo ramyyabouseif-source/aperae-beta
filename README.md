@@ -228,8 +228,3 @@ For support, email aperaeai@gmail.com.
 ---
 
 **Aperae** - Your personal AI sommelier, always in your pocket! 🍷✨
-
-
-
-
-

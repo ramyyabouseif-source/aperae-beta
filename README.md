@@ -1,20 +1,18 @@
-# Aperae - AI Wine Sommelier App
+# Aperae - AI Wine Sommelier
 
-Aperae is a React Native mobile application that provides AI-powered wine recommendations based on food pairings and user preferences. The app features a sophisticated backend API that leverages Anthropic Claude and OpenAI's GPT models to deliver expert-level wine recommendations.
+Aperae (www.aperae.com) is a **React Native (Expo)** app with a **Node.js / Express** backend that provides AI-powered wine recommendations from a dish or food description or AI-powered dish recommendations based on a bottle of wine in your existing collection. Live recommendations use **Anthropic Claude** (Sonnet 4.5) and includes a local **Favorites / My Cellar** storage to tracking your collection.
 
 ## 🍷 Features
 
 ### Core Functionality
-- **AI Wine Recommendations**: Get personalized wine suggestions for any dish
-- **User Preferences**: Customize recommendations based on budget, region, grape variety, and more
+- **Dish -> Wine Recommendations**: Get personalized wine suggestions for any dish
+- **Wine -> Dish Recommendations**: Get personalized dish suggestions for any wine in your collection
 - **Favorites System**: Save and manage your favorite wines
-- **Menu Analysis**: Analyze restaurant menus for wine pairings (coming soon)
-- **Camera Integration**: Take photos of menus for OCR analysis (coming soon)
+- **Menu Analysis**: Take photos of menus for OCR analysis and analyze restaurant menus for wine pairings
 
 ### User Experience
 - **Intuitive Interface**: Clean, modern design with wine-themed aesthetics
 - **Responsive Design**: Optimized for both iOS and Android
-- **Offline Support**: Core functionality works without internet connection
 - **Secure Authentication**: JWT-based authentication with secure token storage
 
 ## 🏗️ Architecture
@@ -32,6 +30,14 @@ Aperae is a React Native mobile application that provides AI-powered wine recomm
 - **Security**: Helmet, CORS, rate limiting, input validation
 - **AI Integration**: Anthropic Claude Sonnet 4.5 for wine recommendations
 - **Validation**: Express-validator for request validation
+- **Data**: **PostgreSQL** via **Prisma** (users, sessions, preferences, consents, wine catalog and recommendation persistence — see `backend/prisma/schema.prisma`).
+- **Docs**: Swagger setup (`swagger.js` / `swagger-ui-express`).
+
+### Compliance & eligibility
+
+- **Age verification** and acceptance of **Terms**, **Privacy Policy**, and **Cookie Policy** before main use.
+- **Privacy settings** and **consent** endpoints for compliance-oriented tracking 
+- **Geo-blocking** check on startup; restricted regions see a dedicated screen.
 
 ## 🚀 Getting Started
 
@@ -103,23 +109,9 @@ Aperae is a React Native mobile application that provides AI-powered wine recomm
 ### Getting Wine Recommendations
 1. Open the app and navigate to the home screen
 2. Enter a dish or food item in the text input
-3. Optionally set your wine preferences in the Preferences screen
-4. Tap "Get Wine Recommendations" to receive AI-powered suggestions
-5. View detailed information about each recommended wine
-6. Add wines to your favorites for future reference
-
-### Setting Preferences
-1. Navigate to the Preferences screen
-2. Configure your wine preferences:
-   - Budget sensitivity
-   - Preferred regions
-   - Grape varieties
-   - Wine styles
-   - Occasion context
-   - Retail accessibility
-   - Aging potential
-   - Food pairing style
-3. Save your preferences to personalize future recommendations
+3. Tap "Get Wine Recommendations" to receive AI-powered suggestions
+4. View detailed information about each recommended wine
+5. Add wines to your favorites for future reference
 
 ### Managing Favorites
 1. View your saved wines in the Favorites screen
@@ -128,14 +120,8 @@ Aperae is a React Native mobile application that provides AI-powered wine recomm
 
 ## 🔧 Configuration
 
-### Mock Mode
-The app supports a mock mode for development and testing:
-- Set `MOCK_MODE=true` in the backend `.env` file
-- Mock data will be returned instead of calling the OpenAI API
-- Useful for development and testing without API costs
-
 ### API Configuration
-- **OpenAI Model**: Currently using `gpt-4o-mini` for cost efficiency
+- **Claude Sonnet 4.5**: Currently using `sonnet 4.5` despite high token cost for more accurate results
 - **Rate Limiting**: 10 recommendations per 15 minutes per user
 - **Request Timeout**: 60 seconds for API calls
 - **Retry Logic**: 3 attempts with exponential backoff
@@ -221,37 +207,25 @@ For licensing inquiries, please contact: legal@aperae.com
 
 See the [LICENSE](LICENSE) file for full terms and conditions.
 
-## 🙏 Acknowledgments
-
-- OpenAI for providing the AI capabilities
-- Expo team for the excellent React Native framework
-- Wine experts and sommeliers for domain knowledge
-- Open source community for various dependencies
-
 ## 📞 Support
 
-For support, email support@aperae.com or join our Discord community.
+For support, email aperaeai@gmail.com.
 
 ## 🔮 Roadmap
 
 ### Upcoming Features
-- [ ] Menu photo analysis with OCR
 - [ ] Social features (share recommendations)
-- [ ] Wine cellar management
 - [ ] Price tracking and alerts
 - [ ] Integration with wine retailers
 - [ ] Advanced filtering and search
 - [ ] Wine education content
-- [ ] Offline mode improvements
 
 ### Technical Improvements
-- [ ] Database integration (PostgreSQL/MongoDB)
 - [ ] Redis caching layer
 - [ ] Microservices architecture
 - [ ] GraphQL API
 - [ ] Real-time notifications
 - [ ] Advanced analytics
-- [ ] A/B testing framework
 
 ---
 

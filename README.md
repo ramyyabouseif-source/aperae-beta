@@ -203,9 +203,7 @@ information of Aperae. Unauthorized copying, distribution, modification, or use
 of this software, via any medium, is strictly prohibited without the express 
 written permission of Aperae.
 
-For licensing inquiries, please contact: legal@aperae.com
-
-See the [LICENSE](LICENSE) file for full terms and conditions.
+For licensing inquiries, please contact: aperaeai@gmail.com.
 
 ## 📞 Support
 
